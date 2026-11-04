@@ -10,7 +10,7 @@ from .stage1_ingestion_crawler import (
 )
 from .stage2_indexer import TextPreprocessor, DocumentIndexer
 from .stage3_retrieval import RetrievalEngine
-from .stage4_reliability import ReliabilityAndMiningEngine
+from .stage4_reliability import ReliabilityAnalyzer
 from .stage5_ranking_qa import HybridRankingQAEngine
 from .stage6_game_theory import GameTheoryIndustryEngine
 
@@ -21,7 +21,7 @@ __all__ = [
     "TextPreprocessor",
     "DocumentIndexer",
     "RetrievalEngine",
-    "ReliabilityAndMiningEngine",
+    "ReliabilityAnalyzer",
     "HybridRankingQAEngine",
     "GameTheoryIndustryEngine",
 ]
