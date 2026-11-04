@@ -361,16 +361,34 @@
         formData.append('file', fileInput.files[0]);
       }
 
+      let responseReceived = false;
       try {
         const res = await fetch('/api/search', { method: 'POST', body: formData });
-        const data = await res.json();
+        responseReceived = true;
+        const responseText = await res.text();
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          throw new Error(res.ok
+            ? 'Backend returned an invalid response.'
+            : `Backend returned HTTP ${res.status}.`);
+        }
+        if (!res.ok) {
+          const detail = typeof data.detail === 'string' ? data.detail : null;
+          throw new Error(detail || `Backend returned HTTP ${res.status}.`);
+        }
         clearInterval(stepTimer);
         loader.classList.add('hidden');
         renderResults(data);
         resultsBox.classList.remove('hidden');
       } catch (err) {
         clearInterval(stepTimer);
-        document.getElementById('loader-step-text').textContent = 'Error connecting to backend.';
+        const message = err instanceof Error ? err.message : String(err);
+        document.getElementById('loader-step-text').textContent =
+          responseReceived
+            ? `Search failed: ${message}`
+            : `Cannot reach backend. Check that the API server is running and accessible. (${message})`;
       }
     });
 
