@@ -23,22 +23,205 @@
     }
     .auto-fit-grid-compact > * { min-width: 0; }
 
+    /* Let the results dashboard use the full browser width instead of a centered max-width column. */
+    #results-container {
+      width: 100% !important;
+      max-width: none !important;
+      min-width: 0;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-left: clamp(14px, 2vw, 36px);
+      padding-right: clamp(14px, 2vw, 36px);
+      box-sizing: border-box;
+      align-self: stretch;
+    }
+
     /* Prevent long content and tables from forcing the page wider. */
-    #results-container { min-width: 0; }
     #results-container pre,
     #results-container table { max-width: 100%; }
     #results-container a,
     #results-container p,
     #results-container code { overflow-wrap: anywhere; }
 
+    :root { --sidebar-width: 256px; }
+
+    /* Fixed workspace navigation */
+    #workspace-sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      width: var(--sidebar-width);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #f1f5f9;
+      border-top: 3px solid #334155;
+      border-right: 1px solid #e2e8f0;
+      transition: width 0.25s ease, transform 0.25s ease;
+    }
+    #workspace-sidebar.hidden { display: none; }
+    #workspace-sidebar:not(.hidden) { display: flex; }
+    .sidebar-top {
+      height: 72px;
+      flex: 0 0 72px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 22px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .sidebar-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 32px;
+      flex: 0 0 20px;
+      color: #64748b;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+    }
+    .sidebar-toggle:hover { color: #2563eb; }
+    .sidebar-brand {
+      color: #2563eb;
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+    .sidebar-section-label {
+      padding: 18px 24px 8px;
+      color: #94a3b8;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: 42px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    .sidebar-nav .tab-btn:hover { background: #e8eef6; color: #1e40af; }
+    .sidebar-nav .tab-btn.nav-active { background: #dbeafe; color: #1d4ed8; }
+    .sidebar-nav .nav-icon { width: 19px; height: 19px; flex: 0 0 19px; }
+
+    /* The workspace and all dashboard content occupy the space beside the sidebar. */
+    body.dashboard-active #app-wrapper {
+      flex: 0 0 auto;
+      width: calc(100% - var(--sidebar-width));
+      margin-left: var(--sidebar-width);
+      align-self: flex-start;
+      box-sizing: border-box;
+    }
+    body.dashboard-active #search-loader {
+      width: calc(100% - var(--sidebar-width));
+      max-width: none;
+      margin-left: var(--sidebar-width);
+      margin-right: 0;
+      box-sizing: border-box;
+    }
+    body.dashboard-active #results-container {
+      width: calc(100% - var(--sidebar-width)) !important;
+      max-width: none !important;
+      margin-left: var(--sidebar-width) !important;
+      margin-right: 0 !important;
+      padding-left: clamp(16px, 2vw, 32px);
+      padding-right: clamp(16px, 2vw, 32px);
+      align-self: flex-start;
+      box-sizing: border-box;
+    }
+
+    body.sidebar-collapsed { --sidebar-width: 76px; }
+    body.sidebar-collapsed #workspace-sidebar { width: 76px; }
+    body.sidebar-collapsed .sidebar-top { padding: 0; justify-content: center; gap: 0; }
+    body.sidebar-collapsed .sidebar-brand,
+    body.sidebar-collapsed .sidebar-section-label,
+    body.sidebar-collapsed .sidebar-nav .nav-label { display: none; }
+    body.sidebar-collapsed .sidebar-nav { padding: 0 10px; }
+    body.sidebar-collapsed .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    @media (max-width: 640px) {
+    @media (max-width: 700px) {
+      :root { --sidebar-width: 68px; }
+      #workspace-sidebar { width: 68px; }
+      .sidebar-top { padding: 0; justify-content: center; gap: 0; }
+      .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label { display: none; }
+      .sidebar-nav { padding: 0 8px; }
+      .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
+      body.sidebar-expanded #workspace-sidebar {
+        width: 248px;
+        box-shadow: 12px 0 30px rgba(15, 23, 42, 0.12);
+      }
+      body.sidebar-expanded .sidebar-top { padding: 0 22px; justify-content: flex-start; gap: 18px; }
+      body.sidebar-expanded .sidebar-brand { display: block; }
+      body.sidebar-expanded .sidebar-section-label,
+      body.sidebar-expanded .sidebar-nav .nav-label { display: block; }
+      body.sidebar-expanded .sidebar-nav { padding: 0 12px; }
+      body.sidebar-expanded .sidebar-nav .tab-btn { justify-content: flex-start; padding: 0 13px; }
       #results-container { padding-left: 0.75rem; padding-right: 0.75rem; }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Workspace sidebar: shown once the dashboard has results -->
+  <aside id="workspace-sidebar" class="hidden" aria-label="Workspace navigation">
+    <div class="sidebar-top">
+      <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation" aria-expanded="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div class="sidebar-brand">MarketAura</div>
+    </div>
+    <div class="sidebar-section-label">WORKSPACE VIEWS</div>
+    <nav class="sidebar-nav">
+      <button onclick="switchTab('tab-results')" id="btn-tab-results" class="tab-btn nav-active" type="button" title="Search Results">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        <span class="nav-label">Search Results</span>
+      </button>
+      <button onclick="switchTab('tab-trust')" id="btn-tab-trust" class="tab-btn" type="button" title="Trust Breakdown">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span class="nav-label">Trust Breakdown</span>
+      </button>
+      <button onclick="switchTab('tab-compare')" id="btn-tab-compare" class="tab-btn" type="button" title="Keyword Compare">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/><path d="M20 7 15 12M4 17l5-5"/></svg>
+        <span class="nav-label">Keyword Compare</span>
+      </button>
+      <button onclick="switchTab('tab-index')" id="btn-tab-index" class="tab-btn" type="button" title="Index View">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></svg>
+        <span class="nav-label">Index View</span>
+      </button>
+      <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn" type="button" title="Accuracy Metrics">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12h4v8H4ZM10 20V7h4v13h-4ZM16 20V3h4v17h-4Z"/></svg>
+        <span class="nav-label">Accuracy Metrics</span>
+      </button>
+      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn" type="button" title="Game Theory Strategy">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 7 1.6 3.3L17 12l-3.4 1.7L12 17l-1.6-3.3L7 12l3.4-1.7L12 7Z"/></svg>
+        <span class="nav-label">Game Theory Strategy</span>
+      </button>
+    </nav>
+  </aside>
 
   <!-- 1. INITIAL BOOT SPLASH LOADER -->
   <div id="boot-loader" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
@@ -118,7 +301,7 @@
   </div>
 
   <!-- 4. RESULTS SECTION -->
-  <main id="results-container" class="hidden w-full max-w-none mx-0 px-3 sm:px-5 lg:px-8 2xl:px-10 pb-12 fade-in">
+  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-12 fade-in">
     
     <!-- Quick Summary & Direct Answer Box -->
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-6 mt-4">
@@ -139,27 +322,7 @@
       </div>
     </div>
 
-    <!-- NAVIGATION TABS (GAME THEORY + ALL 5 IR TABS INTACT) -->
-    <div class="flex border-b border-slate-200 mb-6 gap-6 text-sm font-medium text-slate-500 overflow-x-auto">
-      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn pb-3 border-b-2 border-blue-600 text-blue-600 whitespace-nowrap font-semibold">
-        🎯 Industry Brands & Game Theory Strategy
-      </button>
-      <button onclick="switchTab('tab-results')" id="btn-tab-results" class="tab-btn pb-3 border-b-2 border-transparent hover:text-slate-800 whitespace-nowrap">
-        Search Results (IR)
-      </button>
-      <button onclick="switchTab('tab-trust')" id="btn-tab-trust" class="tab-btn pb-3 border-b-2 border-transparent hover:text-slate-800 whitespace-nowrap">
-        Trust Breakdown
-      </button>
-      <button onclick="switchTab('tab-compare')" id="btn-tab-compare" class="tab-btn pb-3 border-b-2 border-transparent hover:text-slate-800 whitespace-nowrap">
-        Keyword Compare
-      </button>
-      <button onclick="switchTab('tab-index')" id="btn-tab-index" class="tab-btn pb-3 border-b-2 border-transparent hover:text-slate-800 whitespace-nowrap">
-        Index View
-      </button>
-      <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn pb-3 border-b-2 border-transparent hover:text-slate-800 whitespace-nowrap">
-        Accuracy Metrics
-      </button>
-    </div>
+    <!-- Navigation is provided by the fixed workspace sidebar. -->
 
     <!-- =============================================================== -->
     <!-- TAB 0: INDUSTRY BRANDS, STRATEGIES & GAME THEORY ENGINE         -->
@@ -342,12 +505,21 @@
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.getElementById(tabId).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-blue-600', 'text-blue-600');
-        btn.classList.add('border-transparent');
+      document.querySelectorAll('#workspace-sidebar .tab-btn').forEach(btn => {
+        btn.classList.remove('nav-active');
       });
-      document.getElementById('btn-' + tabId).classList.add('border-blue-600', 'text-blue-600');
+      const activeButton = document.getElementById('btn-' + tabId);
+      if (activeButton) activeButton.classList.add('nav-active');
     }
+
+    // Collapse the sidebar on desktop; on small screens it opens as an overlay.
+    document.getElementById('sidebar-toggle').addEventListener('click', () => {
+      const isMobile = window.matchMedia('(max-width: 700px)').matches;
+      const className = isMobile ? 'sidebar-expanded' : 'sidebar-collapsed';
+      document.body.classList.toggle(className);
+      const expanded = document.body.classList.contains(className) === (isMobile ? true : false);
+      document.getElementById('sidebar-toggle').setAttribute('aria-expanded', String(isMobile ? expanded : !document.body.classList.contains('sidebar-collapsed')));
+    });
 
     document.getElementById('search-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -408,7 +580,10 @@
         clearInterval(stepTimer);
         loader.classList.add('hidden');
         renderResults(data);
+        document.getElementById('workspace-sidebar').classList.remove('hidden');
+        document.body.classList.add('dashboard-active');
         resultsBox.classList.remove('hidden');
+        switchTab('tab-results');
       } catch (err) {
         clearInterval(stepTimer);
         const message = err instanceof Error ? err.message : String(err);
