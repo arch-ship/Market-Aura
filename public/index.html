@@ -132,12 +132,144 @@
       align-self: flex-start;
       box-sizing: border-box;
     }
-    body.dashboard-active #search-loader {
-      width: calc(100% - var(--sidebar-width));
+    /* Responsive search state: fills the usable viewport and respects the sidebar. */
+    #search-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
       max-width: none;
-      margin-left: var(--sidebar-width);
-      margin-right: 0;
+      min-height: 100dvh;
+      margin: 0;
+      padding: clamp(16px, 4vw, 48px);
       box-sizing: border-box;
+      background: rgba(248, 250, 252, 0.91);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    #search-loader.hidden { display: none; }
+    body.dashboard-active #search-loader {
+      left: var(--sidebar-width);
+      right: 0;
+      width: auto;
+    }
+    .loader-panel {
+      width: min(100%, 720px);
+      padding: clamp(22px, 4vw, 38px);
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.09);
+      text-align: center;
+    }
+    .loader-orbit {
+      position: relative;
+      display: grid;
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 20px;
+      place-items: center;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+    }
+    .loader-orbit::before,
+    .loader-orbit::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 2px solid transparent;
+      border-top-color: #2563eb;
+      border-right-color: #6366f1;
+      border-radius: 50%;
+      animation: loaderSpin 1.15s linear infinite;
+    }
+    .loader-orbit::after {
+      inset: 13px;
+      border-top-color: #818cf8;
+      border-right-color: transparent;
+      animation-direction: reverse;
+      animation-duration: 1.7s;
+    }
+    .loader-orbit span {
+      color: #1d4ed8;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+    .loader-track {
+      position: relative;
+      height: 7px;
+      margin-top: 25px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eaf0f8;
+    }
+    #loader-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 36%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #6366f1, #818cf8);
+      animation: loaderTravel 1.65s ease-in-out infinite;
+      will-change: transform;
+    }
+    .loader-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 13px;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .loader-live { display: inline-flex; align-items: center; gap: 7px; color: #2563eb; }
+    .loader-live::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3b82f6;
+      box-shadow: 0 0 0 4px #dbeafe;
+      animation: loaderPulse 1.4s ease-in-out infinite;
+    }
+    #search-loader[data-state="error"] .loader-orbit { background: #fff1f2; }
+    #search-loader[data-state="error"] .loader-orbit::before,
+    #search-loader[data-state="error"] .loader-orbit::after,
+    #search-loader[data-state="error"] #loader-bar,
+    #search-loader[data-state="error"] .loader-live::before { animation: none; }
+    #search-loader[data-state="error"] .loader-orbit::before { border: 2px solid #fecdd3; }
+    #search-loader[data-state="error"] .loader-orbit span,
+    #search-loader[data-state="error"] #loader-title { color: #be123c; }
+    #search-loader[data-state="error"] #loader-bar { width: 100%; background: #fda4af; transform: none; }
+    .loader-dismiss {
+      margin-top: 22px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 999px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .loader-dismiss:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    @keyframes loaderSpin { to { transform: rotate(360deg); } }
+    @keyframes loaderTravel {
+      0% { transform: translateX(-110%); }
+      50% { transform: translateX(180%); }
+      100% { transform: translateX(330%); }
+    }
+    @keyframes loaderPulse { 50% { opacity: 0.45; transform: scale(0.82); } }
+    @media (prefers-reduced-motion: reduce) {
+      .loader-orbit::before, .loader-orbit::after, #loader-bar, .loader-live::before { animation: none !important; }
     }
     body.dashboard-active #results-container {
       width: calc(100% - var(--sidebar-width)) !important;
@@ -291,14 +423,21 @@
     </form>
   </div>
 
-  <!-- 3. ANIMATED SEARCHING PROGRESS OVERLAY -->
-  <div id="search-loader" class="hidden max-w-xl mx-auto my-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center">
-    <div class="w-9 h-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-    <p id="loader-step-text" class="text-sm font-medium text-slate-700">Crawling industry intelligence & web sources...</p>
-    <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-      <div id="loader-bar" class="bg-blue-600 h-full transition-all duration-300" style="width: 20%"></div>
+  <!-- 3. RESPONSIVE SEARCH LOADING OVERLAY -->
+  <section id="search-loader" class="hidden" role="status" aria-live="polite" aria-busy="true" data-state="loading">
+    <div class="loader-panel">
+      <div class="loader-orbit" aria-hidden="true"><span>MA</span></div>
+      <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">MarketAura Intelligence Engine</p>
+      <h2 id="loader-title" class="text-xl sm:text-2xl font-bold text-slate-900">Analyzing your industry</h2>
+      <p id="loader-step-text" class="text-sm sm:text-base text-slate-500 mt-2 leading-relaxed">Connecting to live industry and web sources...</p>
+      <div class="loader-track" role="presentation"><div id="loader-bar"></div></div>
+      <div class="loader-meta">
+        <span id="loader-phase">Preparing analysis</span>
+        <span class="loader-live" id="loader-live-label">Processing live</span>
+      </div>
+      <button id="loader-dismiss" class="loader-dismiss hidden" type="button">Return to search</button>
     </div>
-  </div>
+  </section>
 
   <!-- 4. RESULTS SECTION -->
   <main id="results-container" class="hidden w-full max-w-none mx-0 pb-12 fade-in">
@@ -513,6 +652,10 @@
     }
 
     // Collapse the sidebar on desktop; on small screens it opens as an overlay.
+    document.getElementById('loader-dismiss').addEventListener('click', () => {
+      document.getElementById('search-loader').classList.add('hidden');
+    });
+
     document.getElementById('sidebar-toggle').addEventListener('click', () => {
       const isMobile = window.matchMedia('(max-width: 700px)').matches;
       const className = isMobile ? 'sidebar-expanded' : 'sidebar-collapsed';
@@ -533,23 +676,38 @@
 
       const loader = document.getElementById('search-loader');
       const resultsBox = document.getElementById('results-container');
+      const loaderTitle = document.getElementById('loader-title');
+      const loaderStepText = document.getElementById('loader-step-text');
+      const loaderPhase = document.getElementById('loader-phase');
+      const loaderLiveLabel = document.getElementById('loader-live-label');
       resultsBox.classList.add('hidden');
+      loader.dataset.state = 'loading';
+      loader.setAttribute('aria-busy', 'true');
+      loaderTitle.textContent = 'Analyzing your industry';
+      loaderLiveLabel.textContent = 'Processing live';
+      loaderStepText.textContent = 'Connecting to live industry and web sources...';
+      document.getElementById('loader-dismiss').classList.add('hidden');
+      loaderPhase.textContent = 'Preparing analysis';
       loader.classList.remove('hidden');
 
+      // The API currently returns one completed response (not streamed progress).
+      // Cycle through transparent stage descriptions and use an indeterminate bar
+      // rather than displaying a misleading percentage.
       const steps = [
-        { text: 'Crawling live industry & web sources...', pct: '25%' },
-        { text: 'Building inverted indexes & scoring reliability...', pct: '55%' },
-        { text: 'Mapping Top Brands vs. Mid/Low-Tier strategies...', pct: '80%' },
-        { text: 'Solving Nash Equilibrium, Zero-Sum & Backward Induction models...', pct: '95%' }
+        { phase: 'Source discovery', text: 'Collecting relevant industry information and live web sources...' },
+        { phase: 'Information retrieval', text: 'Building the document index and calculating relevance scores...' },
+        { phase: 'Trust evaluation', text: 'Evaluating source reliability, authority, recency and consensus...' },
+        { phase: 'Game theory analysis', text: 'Comparing market players and evaluating strategic responses...' },
+        { phase: 'Strategy modelling', text: 'Computing payoff outcomes, Nash equilibrium and entry strategies...' },
+        { phase: 'Finalising results', text: 'Organising insights, comparisons and evaluation metrics...' }
       ];
       let sIdx = 0;
       const stepTimer = setInterval(() => {
-        if (sIdx < steps.length) {
-          document.getElementById('loader-step-text').textContent = steps[sIdx].text;
-          document.getElementById('loader-bar').style.width = steps[sIdx].pct;
-          sIdx++;
-        }
-      }, 300);
+        const step = steps[sIdx % steps.length];
+        loaderPhase.textContent = step.phase;
+        loaderStepText.textContent = step.text;
+        sIdx++;
+      }, 1800);
 
       const formData = new FormData();
       formData.append('query', query);
@@ -578,6 +736,7 @@
           throw new Error(detail || `Backend returned HTTP ${res.status}.`);
         }
         clearInterval(stepTimer);
+        loader.setAttribute('aria-busy', 'false');
         loader.classList.add('hidden');
         renderResults(data);
         document.getElementById('workspace-sidebar').classList.remove('hidden');
@@ -587,10 +746,15 @@
       } catch (err) {
         clearInterval(stepTimer);
         const message = err instanceof Error ? err.message : String(err);
-        document.getElementById('loader-step-text').textContent =
-          responseReceived
-            ? `Search failed: ${message}`
-            : `Cannot reach backend. Check that the API server is running and accessible. (${message})`;
+        loader.dataset.state = 'error';
+        loader.setAttribute('aria-busy', 'false');
+        loaderTitle.textContent = 'Analysis could not be completed';
+        loaderPhase.textContent = 'Action required';
+        loaderLiveLabel.textContent = 'Error';
+        document.getElementById('loader-dismiss').classList.remove('hidden');
+        loaderStepText.textContent = responseReceived
+          ? `Search failed: ${message}`
+          : `Cannot reach backend. Check that the API server is running and accessible. (${message})`;
       }
     });
 
