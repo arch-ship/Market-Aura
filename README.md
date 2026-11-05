@@ -4,13 +4,13 @@ Market exploration and Strategic discovery.
 An interactive **Game Theory & Strategic Market Intelligence System** powered by a live **5-Stage Information Retrieval (IR) Pipeline**. 
 
 When a user enters any interest industry (e.g., *Cloud Computing*, *Artificial Intelligence*, *Smartphones*, *E-Commerce*, or any custom domain), the system crawls and verifies live web intelligence to generate:
-1. **🏆 Top-Tier Incumbent Brands & ⚡ Middle/Low-End Challengers:** Live market share, current status, and active strategic posture.
-2. **🚀 Immediate Actionable Entry Strategy (Zero Extensive Research Required):** A 4-step *Judo Strategy & Ecosystem Co-opetition Playbook* that a new entrant can execute immediately to carve out a profitable position without getting crushed in a price war.
-3. **📊 Interactive Game Theory Mathematical Models (Modules 1–5):** Full computational breakdown of Normal-Form Payoff Matrices, Dominant Strategies, IESDS, Pure Strategy Nash Equilibrium, Pareto Optimality, Two-Person Zero-Sum Maximin/Minimax & Mixed-Strategy Linear Programming, Extensive-Form Backward Induction (Subgame Perfect Equilibrium), Bayesian Signaling, Repeated Games ($\delta$), Evolutionarily Stable Strategies (ESS), and Vickrey Auctions.
+1. **Top-Tier Incumbent Brands & Middle/Low-End Challengers:** Live market share, current status, and active strategic posture.
+2. **Immediate Actionable Entry Strategy (Zero Extensive Research Required):** A 4-step *Judo Strategy & Ecosystem Co-opetition Playbook* that a new entrant can execute immediately to carve out a profitable position without getting crushed in a price war.
+3. **Interactive Game Theory Mathematical Models (Modules 1–5):** Full computational breakdown of Normal-Form Payoff Matrices, Dominant Strategies, IESDS, Pure Strategy Nash Equilibrium, Pareto Optimality, Two-Person Zero-Sum Maximin/Minimax & Mixed-Strategy Linear Programming, Extensive-Form Backward Induction (Subgame Perfect Equilibrium), Bayesian Signaling, Repeated Games ($\delta$), Evolutionarily Stable Strategies (ESS), and Vickrey Auctions.
 
 ---
 
-## 📚 Course Syllabus Mapping (`23B61CA412 / C402 — Game Theory`)
+## Course Syllabus Mapping (`23B61CA412 / C402 — Game Theory`)
 
 | Syllabus Module | Implemented Mathematical Models & Features (`modules/stage6_game_theory.py`) |
 | :--- | :--- |
@@ -22,7 +22,7 @@ When a user enters any interest industry (e.g., *Cloud Computing*, *Artificial I
 
 ---
 
-## 🏗️ Repository File Structure
+## Repository File Structure
 
 ```text
 ├── api/
@@ -48,7 +48,7 @@ When a user enters any interest industry (e.g., *Cloud Computing*, *Artificial I
 
 ---
 
-## 🚀 Getting Started (Local Setup)
+## Getting Started (Local Setup)
 
 ### 1. Clone the Repository
 ```bash
