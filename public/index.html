@@ -142,15 +142,21 @@
       justify-content: center;
       width: auto;
       max-width: none;
+      min-height: 100vh;
       min-height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
       margin: 0;
       padding: clamp(16px, 4vw, 48px);
       box-sizing: border-box;
-      background: rgba(248, 250, 252, 0.91);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background: rgba(248, 250, 252, 0.94);
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
     }
     #search-loader.hidden { display: none; }
+    body.is-loading { overflow: hidden; }
     body.dashboard-active #search-loader {
       left: var(--sidebar-width);
       right: 0;
@@ -158,6 +164,8 @@
     }
     .loader-panel {
       width: min(100%, 720px);
+      min-width: 0;
+      box-sizing: border-box;
       padding: clamp(22px, 4vw, 38px);
       border: 1px solid #e2e8f0;
       border-radius: 24px;
@@ -311,6 +319,63 @@
       body.sidebar-expanded .sidebar-nav { padding: 0 12px; }
       body.sidebar-expanded .sidebar-nav .tab-btn { justify-content: flex-start; padding: 0 13px; }
       #results-container { padding-left: 0.75rem; padding-right: 0.75rem; }
+
+      /* On phones the loader must cover the ENTIRE device viewport. The desktop
+         sidebar offset is intentionally cancelled so it cannot squeeze the card
+         or leave a strip of the page uncovered. */
+      #search-loader,
+      body.dashboard-active #search-loader {
+        inset: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding-top: max(14px, env(safe-area-inset-top));
+        padding-right: max(14px, env(safe-area-inset-right));
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+        padding-left: max(14px, env(safe-area-inset-left));
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .loader-panel {
+        width: 100%;
+        max-width: 480px;
+        padding: clamp(18px, 5vw, 26px);
+        border-radius: 20px;
+      }
+      .loader-orbit {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 16px;
+        border-radius: 19px;
+      }
+      #loader-title {
+        font-size: clamp(1.2rem, 5vw, 1.5rem);
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+      }
+      #loader-step-text { overflow-wrap: anywhere; }
+      .loader-meta { justify-content: center; text-align: center; }
+      .loader-dismiss { min-height: 44px; padding: 11px 20px; }
+    }
+
+    /* Compact landscape phones have very little vertical room. Let the overlay
+       scroll naturally rather than clipping the loader panel. */
+    @media (max-width: 700px) and (max-height: 520px) {
+      #search-loader,
+      body.dashboard-active #search-loader {
+        align-items: flex-start;
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+      }
+      .loader-panel { margin: auto 0; padding: 15px; }
+      .loader-orbit { width: 46px; height: 46px; margin-bottom: 10px; }
+      .loader-track { margin-top: 16px; }
+      .loader-dismiss { margin-top: 14px; }
     }
   </style>
 </head>
@@ -654,6 +719,7 @@
     // Collapse the sidebar on desktop; on small screens it opens as an overlay.
     document.getElementById('loader-dismiss').addEventListener('click', () => {
       document.getElementById('search-loader').classList.add('hidden');
+      document.body.classList.remove('is-loading');
     });
 
     document.getElementById('sidebar-toggle').addEventListener('click', () => {
@@ -689,6 +755,7 @@
       document.getElementById('loader-dismiss').classList.add('hidden');
       loaderPhase.textContent = 'Preparing analysis';
       loader.classList.remove('hidden');
+      document.body.classList.add('is-loading');
 
       // The API currently returns one completed response (not streamed progress).
       // Cycle through transparent stage descriptions and use an indeterminate bar
@@ -738,6 +805,7 @@
         clearInterval(stepTimer);
         loader.setAttribute('aria-busy', 'false');
         loader.classList.add('hidden');
+        document.body.classList.remove('is-loading');
         renderResults(data);
         document.getElementById('workspace-sidebar').classList.remove('hidden');
         document.body.classList.add('dashboard-active');
@@ -748,6 +816,7 @@
         const message = err instanceof Error ? err.message : String(err);
         loader.dataset.state = 'error';
         loader.setAttribute('aria-busy', 'false');
+        document.body.classList.remove('is-loading');
         loaderTitle.textContent = 'Analysis could not be completed';
         loaderPhase.textContent = 'Action required';
         loaderLiveLabel.textContent = 'Error';
