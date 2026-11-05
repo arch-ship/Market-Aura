@@ -8,7 +8,34 @@
   <style>
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .fade-in { animation: fadeIn 0.35s ease-in-out; }
+
+    /* Fluid dashboard layouts: cards expand and wrap to use available space. */
+    .auto-fit-grid:not(.hidden) {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+      align-items: stretch;
+    }
+    .auto-fit-grid > * { min-width: 0; }
+    .auto-fit-grid-compact {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      align-items: stretch;
+    }
+    .auto-fit-grid-compact > * { min-width: 0; }
+
+    /* Prevent long content and tables from forcing the page wider. */
+    #results-container { min-width: 0; }
+    #results-container pre,
+    #results-container table { max-width: 100%; }
+    #results-container a,
+    #results-container p,
+    #results-container code { overflow-wrap: anywhere; }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 640px) {
+      #results-container { padding-left: 0.75rem; padding-right: 0.75rem; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -91,7 +118,7 @@
   </div>
 
   <!-- 4. RESULTS SECTION -->
-  <main id="results-container" class="hidden max-w-6xl w-full mx-auto px-4 pb-16 fade-in">
+  <main id="results-container" class="hidden w-full max-w-none mx-0 px-3 sm:px-5 lg:px-8 2xl:px-10 pb-12 fade-in">
     
     <!-- Quick Summary & Direct Answer Box -->
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-6 mt-4">
@@ -149,7 +176,7 @@
       </div>
 
       <!-- 1. TOP BRANDS vs MIDDLE/LOW-END BRANDS GRID -->
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Top Brands Column -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
           <div class="flex items-center justify-between mb-4">
@@ -179,11 +206,11 @@
         </div>
         <h3 id="gt-strat-title" class="text-xl font-bold text-slate-900 mt-2"></h3>
         <p id="gt-strat-summary" class="text-sm text-slate-700 mt-2 leading-relaxed"></p>
-        <div id="gt-strat-steps" class="grid md:grid-cols-2 gap-4 mt-4"></div>
+        <div id="gt-strat-steps" class="auto-fit-grid-compact gap-4 mt-4"></div>
       </div>
 
       <!-- 3. SYLLABUS MODULES 1-5 GAME THEORY MODELS BREAKDOWN -->
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="auto-fit-grid gap-6">
         
         <!-- Module 1 & 2: Payoff Matrix, Dominance, Nash & Pareto -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
@@ -220,7 +247,7 @@
         <h3 class="text-base font-bold text-slate-900 mb-3">
           🌳 Advanced Game Theory Models (Extensive-Form Tree, Bayesian, Repeated & ESS)
         </h3>
-        <div id="gt-advanced-details" class="grid md:grid-cols-2 gap-4 text-xs text-slate-700"></div>
+        <div id="gt-advanced-details" class="auto-fit-grid-compact gap-4 text-xs text-slate-700"></div>
       </div>
 
     </div>
@@ -250,7 +277,7 @@
     </div>
 
     <!-- TAB 3: SIDE-BY-SIDE KEYWORD COMPARE -->
-    <div id="tab-compare" class="tab-pane hidden grid md:grid-cols-2 gap-6">
+    <div id="tab-compare" class="tab-pane hidden auto-fit-grid gap-6">
       <div>
         <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-3">MarketAura Ranking (Relevance + Trust)</h3>
         <div id="compare-hybrid" class="space-y-3"></div>
@@ -276,7 +303,7 @@
     <!-- TAB 5: ACCURACY METRICS -->
     <div id="tab-metrics" class="tab-pane hidden bg-white rounded-2xl p-5 border border-slate-200">
       <h3 class="text-base font-semibold mb-3">Retrieval Quality Comparison (Top 3 Results)</h3>
-      <div id="metrics-cards" class="grid md:grid-cols-2 gap-4"></div>
+      <div id="metrics-cards" class="auto-fit-grid-compact gap-4"></div>
     </div>
 
   </main>
