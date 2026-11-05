@@ -2,11 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MarketAura — Game Theory Intelligence System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    /* Initial page bootloader: viewport-aware on phones, tablets and desktops. */
+    body.is-booting { overflow: hidden; }
+    #boot-loader.boot-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+      height: 100vh;
+      height: 100svh;
+      height: 100dvh;
+      box-sizing: border-box;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-right: max(18px, env(safe-area-inset-right));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(18px, env(safe-area-inset-left));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background:
+        radial-gradient(ellipse at 18% 18%, rgba(59, 130, 246, 0.09), transparent 42%),
+        radial-gradient(ellipse at 82% 82%, rgba(99, 102, 241, 0.09), transparent 42%),
+        #f8fafc;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 360ms ease, visibility 360ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #boot-loader.boot-screen.is-hiding {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .boot-card {
+      width: min(100%, 440px);
+      min-width: 0;
+      box-sizing: border-box;
+      padding: clamp(24px, 5vw, 40px) clamp(18px, 5vw, 34px);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 65px rgba(15, 23, 42, 0.08);
+      text-align: center;
+    }
+    .boot-mark {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: clamp(58px, 14vw, 72px);
+      aspect-ratio: 1;
+      margin: 0 auto 19px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+    }
+    .boot-mark::before,
+    .boot-mark::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border: 2px solid transparent;
+      border-top-color: #2563eb;
+      border-right-color: #6366f1;
+      border-radius: 50%;
+      animation: bootSpin 1.15s linear infinite;
+    }
+    .boot-mark::after {
+      inset: 6px;
+      border-top-color: #818cf8;
+      border-right-color: transparent;
+      animation-duration: 1.7s;
+      animation-direction: reverse;
+    }
+    .boot-mark span {
+      color: #1d4ed8;
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.07em;
+    }
+    .boot-brand {
+      margin: 0;
+      color: #0f172a;
+      font-size: clamp(27px, 7vw, 35px);
+      line-height: 1.12;
+      font-weight: 850;
+      letter-spacing: -0.055em;
+      overflow-wrap: anywhere;
+    }
+    .boot-brand .market { color: #2563eb; }
+    .boot-brand .aura { color: #4f46e5; }
+    .boot-description {
+      margin: 9px auto 0;
+      max-width: 34ch;
+      color: #64748b;
+      font-size: clamp(12px, 3.4vw, 14px);
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+    .boot-progress {
+      position: relative;
+      width: min(100%, 260px);
+      height: 6px;
+      margin: 24px auto 0;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eaf0f8;
+    }
+    .boot-progress span {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 38%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #6366f1);
+      animation: bootProgress 1.5s ease-in-out infinite;
+    }
+    .boot-caption {
+      margin-top: 13px;
+      color: #94a3b8;
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    @keyframes bootSpin { to { transform: rotate(360deg); } }
+    @keyframes bootProgress {
+      0% { transform: translateX(-115%); }
+      55% { transform: translateX(165%); }
+      100% { transform: translateX(330%); }
+    }
+    @media (max-width: 520px) {
+      #boot-loader.boot-screen {
+        padding-top: max(14px, env(safe-area-inset-top));
+        padding-right: max(14px, env(safe-area-inset-right));
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+        padding-left: max(14px, env(safe-area-inset-left));
+      }
+      .boot-card { border-radius: 21px; padding: 26px 19px; }
+      .boot-mark { margin-bottom: 17px; }
+      .boot-progress { margin-top: 20px; }
+    }
+    @media (max-width: 700px) and (max-height: 480px) {
+      #boot-loader.boot-screen { place-items: start center; }
+      .boot-card { margin: auto 0; padding-top: 18px; padding-bottom: 18px; }
+      .boot-mark { width: 46px; margin-bottom: 12px; border-radius: 15px; }
+      .boot-brand { font-size: clamp(23px, 5vw, 29px); }
+      .boot-description { margin-top: 6px; }
+      .boot-progress { margin-top: 14px; }
+      .boot-caption { margin-top: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .boot-mark::before, .boot-mark::after, .boot-progress span { animation: none !important; }
+    }
+
     .fade-in { animation: fadeIn 0.35s ease-in-out; }
 
     /* Fluid dashboard layouts: cards expand and wrap to use available space. */
@@ -379,7 +537,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col is-booting">
 
   <!-- Workspace sidebar: shown once the dashboard has results -->
   <aside id="workspace-sidebar" class="hidden" aria-label="Workspace navigation">
@@ -421,9 +579,14 @@
   </aside>
 
   <!-- 1. INITIAL BOOT SPLASH LOADER -->
-  <div id="boot-loader" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-    <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-    <h2 class="text-xl font-semibold text-slate-800">Loading...</h2>
+  <div id="boot-loader" class="boot-screen" role="status" aria-live="polite" aria-busy="true">
+    <div class="boot-card">
+      <div class="boot-mark" aria-hidden="true"><span>MA</span></div>
+      <h1 class="boot-brand"><span class="market">Market</span><span class="aura">Aura</span></h1>
+      <p class="boot-description">Initializing your search workspace and Game Theory intelligence engine...</p>
+      <div class="boot-progress" aria-hidden="true"><span></span></div>
+      <p class="boot-caption">Information Retrieval · Game Theory</p>
+    </div>
   </div>
 
   <!-- 2. MAIN CONTAINER (GOOGLE-STYLE SEARCH BAR) -->
@@ -676,11 +839,15 @@
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const boot = document.getElementById('boot-loader');
-        boot.style.opacity = '0';
-        setTimeout(() => boot.style.display = 'none', 400);
-      }, 500);
+      const boot = document.getElementById('boot-loader');
+      const finishBoot = () => {
+        boot.setAttribute('aria-busy', 'false');
+        boot.classList.add('is-hiding');
+        document.body.classList.remove('is-booting');
+        window.setTimeout(() => { boot.hidden = true; }, 380);
+      };
+      // Keep the splash visible briefly so its animation is perceptible, then fade out.
+      window.setTimeout(finishBoot, 650);
     });
 
     const alphaSlider = document.getElementById('alpha-slider');
