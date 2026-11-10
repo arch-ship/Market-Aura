@@ -1,14 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>MarketAura — Game Theory Intelligence System</title>
+  <title>MarketAura</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    :root {
+      --sidebar-width: 268px;
+      --bg-void: #05070f;
+      --bg-surface: rgba(12, 17, 32, 0.78);
+      --bg-card: rgba(15, 23, 42, 0.72);
+      --neon-cyan: #00f5d4;
+      --neon-violet: #8b5cf6;
+      --neon-pink: #f43f5e;
+      --neon-amber: #f59e0b;
+    }
 
-    /* Initial page bootloader: viewport-aware on phones, tablets and desktops. */
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139, 92, 246, 0.45) rgba(5, 7, 15, 0.9);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-void);
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* =====================================================================
+       ANIMATED CYBER-QUANT BACKGROUND CANVAS (GRID + FLOATING AURA ORBS)
+       ===================================================================== */
+    .aura-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(0, 245, 212, 0.11), transparent 38%),
+        radial-gradient(circle at 85% 20%, rgba(139, 92, 246, 0.14), transparent 42%),
+        radial-gradient(circle at 50% 88%, rgba(244, 63, 94, 0.08), transparent 45%),
+        linear-gradient(180deg, #04060d 0%, #070b18 55%, #05070f 100%);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .aura-grid {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(to right, rgba(0, 245, 212, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(139, 92, 246, 0.045) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 25%, transparent 85%);
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 25%, transparent 85%);
+      animation: gridDrift 28s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gridDrift {
+      0% { background-position: 0 0; }
+      100% { background-position: 48px 48px; }
+    }
+
+    .aura-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(90px);
+      opacity: 0.35;
+      z-index: -1;
+      pointer-events: none;
+      animation: orbFloat 18s ease-in-out infinite alternate;
+    }
+    .aura-orb-1 {
+      width: 420px;
+      height: 420px;
+      top: -110px;
+      left: -90px;
+      background: radial-gradient(circle, #00f5d4, transparent 70%);
+    }
+    .aura-orb-2 {
+      width: 480px;
+      height: 480px;
+      bottom: -140px;
+      right: -100px;
+      background: radial-gradient(circle, #8b5cf6, transparent 70%);
+      animation-duration: 24s;
+      animation-direction: alternate-reverse;
+    }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(45px, 35px) scale(1.12); }
+    }
+
+    /* =====================================================================
+       SLOWER, HYPNOTIC INITIAL BOOTLOADER
+       ===================================================================== */
     body.is-booting { overflow: hidden; }
     #boot-loader.boot-screen {
       position: fixed;
@@ -17,27 +118,16 @@
       display: grid;
       place-items: center;
       width: 100%;
-      min-height: 100vh;
-      min-height: 100svh;
       min-height: 100dvh;
-      height: 100vh;
-      height: 100svh;
-      height: 100dvh;
-      box-sizing: border-box;
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-right: max(18px, env(safe-area-inset-right));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
-      padding-left: max(18px, env(safe-area-inset-left));
-      overflow-y: auto;
-      overscroll-behavior: contain;
+      padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
       background:
-        radial-gradient(ellipse at 18% 18%, rgba(59, 130, 246, 0.09), transparent 42%),
-        radial-gradient(ellipse at 82% 82%, rgba(99, 102, 241, 0.09), transparent 42%),
-        #f8fafc;
+        radial-gradient(ellipse at 20% 20%, rgba(0, 245, 212, 0.14), transparent 45%),
+        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.16), transparent 45%),
+        #04060d;
       opacity: 1;
       visibility: visible;
-      transition: opacity 360ms ease, visibility 360ms ease;
-      -webkit-tap-highlight-color: transparent;
+      /* Slowed fade-out transition to 950ms */
+      transition: opacity 950ms cubic-bezier(0.22, 1, 0.36, 1), visibility 950ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     #boot-loader.boot-screen.is-hiding {
       opacity: 0;
@@ -45,129 +135,304 @@
       pointer-events: none;
     }
     .boot-card {
-      width: min(100%, 440px);
-      min-width: 0;
-      box-sizing: border-box;
-      padding: clamp(24px, 5vw, 40px) clamp(18px, 5vw, 34px);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      border-radius: 26px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 22px 65px rgba(15, 23, 42, 0.08);
+      width: min(100%, 480px);
+      padding: clamp(28px, 5vw, 44px) clamp(22px, 5vw, 38px);
+      border: 1px solid rgba(0, 245, 212, 0.28);
+      border-radius: 28px;
+      background: rgba(10, 15, 29, 0.88);
+      backdrop-filter: blur(20px);
+      box-shadow:
+        0 0 60px rgba(0, 245, 212, 0.12),
+        0 0 110px rgba(139, 92, 246, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
     .boot-mark {
       position: relative;
       display: grid;
       place-items: center;
-      width: clamp(58px, 14vw, 72px);
-      aspect-ratio: 1;
-      margin: 0 auto 19px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 22px;
+      border-radius: 24px;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 245, 212, 0.2), rgba(139, 92, 246, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 30px rgba(0, 245, 212, 0.2);
     }
     .boot-mark::before,
     .boot-mark::after {
       content: "";
       position: absolute;
-      inset: -5px;
+      inset: -7px;
       border: 2px solid transparent;
-      border-top-color: #2563eb;
-      border-right-color: #6366f1;
+      border-top-color: #00f5d4;
+      border-right-color: #8b5cf6;
       border-radius: 50%;
-      animation: bootSpin 1.15s linear infinite;
+      /* Slower, hypnotic rotation: 4.2s instead of 1.15s */
+      animation: bootSpin 4.2s linear infinite;
     }
     .boot-mark::after {
-      inset: 6px;
-      border-top-color: #818cf8;
+      inset: 7px;
+      border-top-color: #f43f5e;
       border-right-color: transparent;
-      animation-duration: 1.7s;
+      /* Slower counter-rotation: 6.5s instead of 1.7s */
+      animation-duration: 6.5s;
       animation-direction: reverse;
     }
     .boot-mark span {
-      color: #1d4ed8;
-      font-size: 17px;
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: -0.07em;
+      font-family: 'Syne', sans-serif;
+      background: linear-gradient(135deg, #00f5d4, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
     }
     .boot-brand {
+      font-family: 'Syne', sans-serif;
       margin: 0;
-      color: #0f172a;
-      font-size: clamp(27px, 7vw, 35px);
-      line-height: 1.12;
-      font-weight: 850;
-      letter-spacing: -0.055em;
-      overflow-wrap: anywhere;
+      font-size: clamp(30px, 7vw, 40px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.04em;
     }
-    .boot-brand .market { color: #2563eb; }
-    .boot-brand .aura { color: #4f46e5; }
+    .boot-brand .market {
+      background: linear-gradient(90deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .boot-brand .aura {
+      background: linear-gradient(90deg, #00f5d4, #8b5cf6, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .boot-description {
-      margin: 9px auto 0;
-      max-width: 34ch;
-      color: #64748b;
-      font-size: clamp(12px, 3.4vw, 14px);
-      line-height: 1.55;
-      overflow-wrap: anywhere;
+      margin: 12px auto 0;
+      max-width: 36ch;
+      color: #94a3b8;
+      font-size: 13.5px;
+      line-height: 1.6;
     }
     .boot-progress {
       position: relative;
-      width: min(100%, 260px);
-      height: 6px;
-      margin: 24px auto 0;
+      width: min(100%, 280px);
+      height: 7px;
+      margin: 26px auto 0;
       overflow: hidden;
       border-radius: 999px;
-      background: #eaf0f8;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
     .boot-progress span {
       position: absolute;
       inset: 0 auto 0 0;
-      width: 38%;
+      width: 42%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #2563eb, #6366f1);
-      animation: bootProgress 1.5s ease-in-out infinite;
+      background: linear-gradient(90deg, #00f5d4, #8b5cf6, #f43f5e);
+      box-shadow: 0 0 18px #00f5d4;
+      /* Slowed progress sweep from 1.5s to 3.8s */
+      animation: bootProgress 3.8s ease-in-out infinite;
     }
     .boot-caption {
-      margin-top: 13px;
-      color: #94a3b8;
-      font-size: 10px;
-      line-height: 1.4;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 15px;
+      color: #00f5d4;
+      font-size: 10.5px;
       font-weight: 700;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
     @keyframes bootSpin { to { transform: rotate(360deg); } }
     @keyframes bootProgress {
       0% { transform: translateX(-115%); }
-      55% { transform: translateX(165%); }
-      100% { transform: translateX(330%); }
-    }
-    @media (max-width: 520px) {
-      #boot-loader.boot-screen {
-        padding-top: max(14px, env(safe-area-inset-top));
-        padding-right: max(14px, env(safe-area-inset-right));
-        padding-bottom: max(14px, env(safe-area-inset-bottom));
-        padding-left: max(14px, env(safe-area-inset-left));
-      }
-      .boot-card { border-radius: 21px; padding: 26px 19px; }
-      .boot-mark { margin-bottom: 17px; }
-      .boot-progress { margin-top: 20px; }
-    }
-    @media (max-width: 700px) and (max-height: 480px) {
-      #boot-loader.boot-screen { place-items: start center; }
-      .boot-card { margin: auto 0; padding-top: 18px; padding-bottom: 18px; }
-      .boot-mark { width: 46px; margin-bottom: 12px; border-radius: 15px; }
-      .boot-brand { font-size: clamp(23px, 5vw, 29px); }
-      .boot-description { margin-top: 6px; }
-      .boot-progress { margin-top: 14px; }
-      .boot-caption { margin-top: 9px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .boot-mark::before, .boot-mark::after, .boot-progress span { animation: none !important; }
+      50% { transform: translateX(155%); }
+      100% { transform: translateX(320%); }
     }
 
-    .fade-in { animation: fadeIn 0.35s ease-in-out; }
+    /* =====================================================================
+       SLOWER, CINEMATIC SEARCH ANALYSIS OVERLAY
+       ===================================================================== */
+    #search-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: clamp(16px, 4vw, 48px);
+      background: rgba(4, 6, 14, 0.88);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+    #search-loader.hidden { display: none; }
+    body.is-loading { overflow: hidden; }
+    body.dashboard-active #search-loader {
+      left: var(--sidebar-width);
+      right: 0;
+    }
+    .loader-panel {
+      width: min(100%, 680px);
+      padding: clamp(26px, 4.5vw, 44px);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(0, 245, 212, 0.12), transparent 55%),
+        rgba(10, 15, 29, 0.94);
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.75),
+        0 0 50px rgba(0, 245, 212, 0.12);
+      text-align: center;
+    }
+    .loader-orbit {
+      position: relative;
+      display: grid;
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 22px;
+      place-items: center;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      box-shadow: 0 0 30px rgba(0, 245, 212, 0.18);
+    }
+    .loader-orbit::before,
+    .loader-orbit::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 2.5px solid transparent;
+      border-top-color: #00f5d4;
+      border-right-color: #8b5cf6;
+      border-radius: 50%;
+      /* Slower orbit spin: 4.5s instead of 1.15s */
+      animation: loaderSpin 4.5s linear infinite;
+    }
+    .loader-orbit::after {
+      inset: 14px;
+      border-top-color: #f43f5e;
+      border-right-color: transparent;
+      animation-direction: reverse;
+      /* Slower inner ring spin: 7.2s instead of 1.7s */
+      animation-duration: 7.2s;
+    }
+    .loader-orbit span {
+      font-family: 'Syne', sans-serif;
+      background: linear-gradient(135deg, #00f5d4, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .loader-track {
+      position: relative;
+      height: 8px;
+      margin-top: 28px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    #loader-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 38%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #00f5d4, #8b5cf6, #f43f5e);
+      box-shadow: 0 0 18px rgba(0, 245, 212, 0.7);
+      /* Slowed bar travel from 1.65s to 4.4s */
+      animation: loaderTravel 4.4s ease-in-out infinite;
+      will-change: transform;
+    }
+    .loader-meta {
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 16px;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .loader-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #00f5d4;
+    }
+    .loader-live::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00f5d4;
+      box-shadow: 0 0 12px #00f5d4;
+      /* Slowed pulse from 1.4s to 3.0s */
+      animation: loaderPulse 3s ease-in-out infinite;
+    }
+    #search-loader[data-state="error"] .loader-orbit { background: rgba(136, 19, 55, 0.3); border-color: #f43f5e; }
+    #search-loader[data-state="error"] .loader-orbit::before,
+    #search-loader[data-state="error"] .loader-orbit::after,
+    #search-loader[data-state="error"] #loader-bar,
+    #search-loader[data-state="error"] .loader-live::before { animation: none; }
+    #search-loader[data-state="error"] #loader-title { color: #fda4af; }
+    #search-loader[data-state="error"] #loader-bar { width: 100%; background: #f43f5e; transform: none; }
+    .loader-dismiss {
+      margin-top: 24px;
+      padding: 11px 22px;
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.2), rgba(139, 92, 246, 0.3));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .loader-dismiss:hover {
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.35);
+      transform: translateY(-1px);
+    }
 
-    /* Fluid dashboard layouts: cards expand and wrap to use available space. */
+    @keyframes loaderSpin { to { transform: rotate(360deg); } }
+    @keyframes loaderTravel {
+      0% { transform: translateX(-110%); }
+      50% { transform: translateX(175%); }
+      100% { transform: translateX(320%); }
+    }
+    @keyframes loaderPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    /* =====================================================================
+       CYBER-GLASS CARDS, GRIDS & SIDEBAR NAVIGATION
+       ===================================================================== */
+    .cyber-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(9, 13, 26, 0.92));
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .cyber-card:hover {
+      border-color: rgba(0, 245, 212, 0.32);
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.6), 0 0 28px rgba(0, 245, 212, 0.08);
+    }
+
+    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .auto-fit-grid:not(.hidden) {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
@@ -176,34 +441,30 @@
     .auto-fit-grid > * { min-width: 0; }
     .auto-fit-grid-compact {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
       align-items: stretch;
     }
     .auto-fit-grid-compact > * { min-width: 0; }
 
-    /* Let the results dashboard use the full browser width instead of a centered max-width column. */
     #results-container {
       width: 100% !important;
       max-width: none !important;
       min-width: 0;
       margin-left: 0 !important;
       margin-right: 0 !important;
-      padding-left: clamp(14px, 2vw, 36px);
-      padding-right: clamp(14px, 2vw, 36px);
+      padding-left: clamp(16px, 2.4vw, 40px);
+      padding-right: clamp(16px, 2.4vw, 40px);
       box-sizing: border-box;
       align-self: stretch;
     }
 
-    /* Prevent long content and tables from forcing the page wider. */
     #results-container pre,
     #results-container table { max-width: 100%; }
     #results-container a,
     #results-container p,
     #results-container code { overflow-wrap: anywhere; }
 
-    :root { --sidebar-width: 256px; }
-
-    /* Fixed workspace navigation */
+    /* Fixed Cyber Sidebar */
     #workspace-sidebar {
       position: fixed;
       inset: 0 auto 0 0;
@@ -212,77 +473,95 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: #f1f5f9;
-      border-top: 3px solid #334155;
-      border-right: 1px solid #e2e8f0;
-      transition: width 0.25s ease, transform 0.25s ease;
+      background: rgba(7, 11, 22, 0.94);
+      backdrop-filter: blur(20px);
+      border-top: 3px solid #00f5d4;
+      border-right: 1px solid rgba(148, 163, 184, 0.14);
+      box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+      transition: width 0.28s ease, transform 0.28s ease;
     }
     #workspace-sidebar.hidden { display: none; }
     #workspace-sidebar:not(.hidden) { display: flex; }
+
     .sidebar-top {
-      height: 72px;
-      flex: 0 0 72px;
+      height: 76px;
+      flex: 0 0 76px;
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
       padding: 0 22px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     }
     .sidebar-toggle {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 32px;
-      flex: 0 0 20px;
-      color: #64748b;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      color: #94a3b8;
       cursor: pointer;
-      background: transparent;
-      border: 0;
-      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 10px;
+      transition: all 0.2s ease;
     }
-    .sidebar-toggle:hover { color: #2563eb; }
+    .sidebar-toggle:hover {
+      color: #00f5d4;
+      border-color: rgba(0, 245, 212, 0.45);
+      box-shadow: 0 0 15px rgba(0, 245, 212, 0.2);
+    }
     .sidebar-brand {
-      color: #2563eb;
-      font-size: 20px;
-      line-height: 1;
+      font-family: 'Syne', sans-serif;
+      background: linear-gradient(90deg, #ffffff, #00f5d4, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 21px;
       font-weight: 800;
       letter-spacing: -0.04em;
       white-space: nowrap;
     }
     .sidebar-section-label {
-      padding: 18px 24px 8px;
-      color: #94a3b8;
-      font-size: 11px;
-      line-height: 1.2;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 20px 22px 10px;
+      color: #64748b;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
       white-space: nowrap;
     }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 6px; padding: 0 12px; }
     .sidebar-nav .tab-btn {
       display: flex;
       align-items: center;
       gap: 14px;
       width: 100%;
-      min-height: 42px;
-      padding: 0 13px;
-      border: 0;
-      border-radius: 12px;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid transparent;
+      border-radius: 14px;
       background: transparent;
-      color: #475569;
-      font-size: 14px;
-      font-weight: 500;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-weight: 600;
       text-align: left;
       white-space: nowrap;
       cursor: pointer;
-      transition: background 0.18s ease, color 0.18s ease;
+      transition: all 0.2s ease;
     }
-    .sidebar-nav .tab-btn:hover { background: #e8eef6; color: #1e40af; }
-    .sidebar-nav .tab-btn.nav-active { background: #dbeafe; color: #1d4ed8; }
+    .sidebar-nav .tab-btn:hover {
+      background: rgba(30, 41, 59, 0.65);
+      color: #f8fafc;
+      border-color: rgba(148, 163, 184, 0.16);
+    }
+    .sidebar-nav .tab-btn.nav-active {
+      background: linear-gradient(90deg, rgba(0, 245, 212, 0.16), rgba(139, 92, 246, 0.16));
+      color: #00f5d4;
+      border-color: rgba(0, 245, 212, 0.4);
+      box-shadow: 0 0 22px rgba(0, 245, 212, 0.12);
+    }
     .sidebar-nav .nav-icon { width: 19px; height: 19px; flex: 0 0 19px; }
 
-    /* The workspace and all dashboard content occupy the space beside the sidebar. */
     body.dashboard-active #app-wrapper {
       flex: 0 0 auto;
       width: calc(100% - var(--sidebar-width));
@@ -290,564 +569,491 @@
       align-self: flex-start;
       box-sizing: border-box;
     }
-    /* Responsive search state: fills the usable viewport and respects the sidebar. */
-    #search-loader {
-      position: fixed;
-      inset: 0;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: auto;
-      max-width: none;
-      min-height: 100vh;
-      min-height: 100dvh;
-      height: 100vh;
-      height: 100dvh;
-      margin: 0;
-      padding: clamp(16px, 4vw, 48px);
-      box-sizing: border-box;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      background: rgba(248, 250, 252, 0.94);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-    #search-loader.hidden { display: none; }
-    body.is-loading { overflow: hidden; }
-    body.dashboard-active #search-loader {
-      left: var(--sidebar-width);
-      right: 0;
-      width: auto;
-    }
-    .loader-panel {
-      width: min(100%, 720px);
-      min-width: 0;
-      box-sizing: border-box;
-      padding: clamp(22px, 4vw, 38px);
-      border: 1px solid #e2e8f0;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.97);
-      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.09);
-      text-align: center;
-    }
-    .loader-orbit {
-      position: relative;
-      display: grid;
-      width: 68px;
-      height: 68px;
-      margin: 0 auto 20px;
-      place-items: center;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #eff6ff, #eef2ff);
-    }
-    .loader-orbit::before,
-    .loader-orbit::after {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border: 2px solid transparent;
-      border-top-color: #2563eb;
-      border-right-color: #6366f1;
-      border-radius: 50%;
-      animation: loaderSpin 1.15s linear infinite;
-    }
-    .loader-orbit::after {
-      inset: 13px;
-      border-top-color: #818cf8;
-      border-right-color: transparent;
-      animation-direction: reverse;
-      animation-duration: 1.7s;
-    }
-    .loader-orbit span {
-      color: #1d4ed8;
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: -0.06em;
-    }
-    .loader-track {
-      position: relative;
-      height: 7px;
-      margin-top: 25px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #eaf0f8;
-    }
-    #loader-bar {
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 36%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #2563eb, #6366f1, #818cf8);
-      animation: loaderTravel 1.65s ease-in-out infinite;
-      will-change: transform;
-    }
-    .loader-meta {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 13px;
-      color: #94a3b8;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-    }
-    .loader-live { display: inline-flex; align-items: center; gap: 7px; color: #2563eb; }
-    .loader-live::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #3b82f6;
-      box-shadow: 0 0 0 4px #dbeafe;
-      animation: loaderPulse 1.4s ease-in-out infinite;
-    }
-    #search-loader[data-state="error"] .loader-orbit { background: #fff1f2; }
-    #search-loader[data-state="error"] .loader-orbit::before,
-    #search-loader[data-state="error"] .loader-orbit::after,
-    #search-loader[data-state="error"] #loader-bar,
-    #search-loader[data-state="error"] .loader-live::before { animation: none; }
-    #search-loader[data-state="error"] .loader-orbit::before { border: 2px solid #fecdd3; }
-    #search-loader[data-state="error"] .loader-orbit span,
-    #search-loader[data-state="error"] #loader-title { color: #be123c; }
-    #search-loader[data-state="error"] #loader-bar { width: 100%; background: #fda4af; transform: none; }
-    .loader-dismiss {
-      margin-top: 22px;
-      padding: 10px 18px;
-      border: 0;
-      border-radius: 999px;
-      background: #2563eb;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      transition: background 0.18s ease, transform 0.18s ease;
-    }
-    .loader-dismiss:hover { background: #1d4ed8; transform: translateY(-1px); }
-
-    @keyframes loaderSpin { to { transform: rotate(360deg); } }
-    @keyframes loaderTravel {
-      0% { transform: translateX(-110%); }
-      50% { transform: translateX(180%); }
-      100% { transform: translateX(330%); }
-    }
-    @keyframes loaderPulse { 50% { opacity: 0.45; transform: scale(0.82); } }
-    @media (prefers-reduced-motion: reduce) {
-      .loader-orbit::before, .loader-orbit::after, #loader-bar, .loader-live::before { animation: none !important; }
-    }
     body.dashboard-active #results-container {
       width: calc(100% - var(--sidebar-width)) !important;
       max-width: none !important;
       margin-left: var(--sidebar-width) !important;
       margin-right: 0 !important;
-      padding-left: clamp(16px, 2vw, 32px);
-      padding-right: clamp(16px, 2vw, 32px);
+      padding-left: clamp(16px, 2.2vw, 36px);
+      padding-right: clamp(16px, 2.2vw, 36px);
       align-self: flex-start;
       box-sizing: border-box;
     }
 
-    body.sidebar-collapsed { --sidebar-width: 76px; }
-    body.sidebar-collapsed #workspace-sidebar { width: 76px; }
+    body.sidebar-collapsed { --sidebar-width: 78px; }
+    body.sidebar-collapsed #workspace-sidebar { width: 78px; }
     body.sidebar-collapsed .sidebar-top { padding: 0; justify-content: center; gap: 0; }
     body.sidebar-collapsed .sidebar-brand,
     body.sidebar-collapsed .sidebar-section-label,
-    body.sidebar-collapsed .sidebar-nav .nav-label { display: none; }
+    body.sidebar-collapsed .sidebar-nav .nav-label,
+    body.sidebar-collapsed .sidebar-footer { display: none; }
     body.sidebar-collapsed .sidebar-nav { padding: 0 10px; }
     body.sidebar-collapsed .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    /* Neon Search Input Bar & Button */
+    .aura-search-shell {
+      background: rgba(12, 18, 34, 0.85);
+      border: 1px solid rgba(0, 245, 212, 0.28);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 35px rgba(0, 245, 212, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      transition: all 0.28s ease;
+    }
+    .aura-search-shell:focus-within {
+      border-color: #00f5d4;
+      box-shadow:
+        0 20px 65px rgba(0, 0, 0, 0.75),
+        0 0 40px rgba(0, 245, 212, 0.24),
+        0 0 70px rgba(139, 92, 246, 0.16);
+    }
+
+    .aura-btn-primary {
+      background: linear-gradient(135deg, #00f5d4 0%, #06b6d4 45%, #8b5cf6 100%);
+      color: #030712;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.35);
+      transition: all 0.25s ease;
+    }
+    .aura-btn-primary:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 0 35px rgba(0, 245, 212, 0.6), 0 0 55px rgba(139, 92, 246, 0.4);
+    }
 
     @media (max-width: 700px) {
       :root { --sidebar-width: 68px; }
       #workspace-sidebar { width: 68px; }
       .sidebar-top { padding: 0; justify-content: center; gap: 0; }
-      .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label { display: none; }
+      .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label, .sidebar-footer { display: none; }
       .sidebar-nav { padding: 0 8px; }
       .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
       body.sidebar-expanded #workspace-sidebar {
-        width: 248px;
-        box-shadow: 12px 0 30px rgba(15, 23, 42, 0.12);
+        width: 256px;
+        box-shadow: 16px 0 45px rgba(0, 0, 0, 0.75);
       }
-      body.sidebar-expanded .sidebar-top { padding: 0 22px; justify-content: flex-start; gap: 18px; }
-      body.sidebar-expanded .sidebar-brand { display: block; }
+      body.sidebar-expanded .sidebar-top { padding: 0 22px; justify-content: flex-start; gap: 16px; }
+      body.sidebar-expanded .sidebar-brand,
       body.sidebar-expanded .sidebar-section-label,
-      body.sidebar-expanded .sidebar-nav .nav-label { display: block; }
+      body.sidebar-expanded .sidebar-nav .nav-label,
+      body.sidebar-expanded .sidebar-footer { display: block; }
       body.sidebar-expanded .sidebar-nav { padding: 0 12px; }
-      body.sidebar-expanded .sidebar-nav .tab-btn { justify-content: flex-start; padding: 0 13px; }
-      #results-container { padding-left: 0.75rem; padding-right: 0.75rem; }
-
-      /* On phones the loader must cover the ENTIRE device viewport. The desktop
-         sidebar offset is intentionally cancelled so it cannot squeeze the card
-         or leave a strip of the page uncovered. */
+      body.sidebar-expanded .sidebar-nav .tab-btn { justify-content: flex-start; padding: 0 14px; }
       #search-loader,
       body.dashboard-active #search-loader {
         inset: 0 !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
-        height: 100vh;
-        height: 100dvh;
-        min-height: 100vh;
-        min-height: 100dvh;
-        padding-top: max(14px, env(safe-area-inset-top));
-        padding-right: max(14px, env(safe-area-inset-right));
-        padding-bottom: max(14px, env(safe-area-inset-bottom));
-        padding-left: max(14px, env(safe-area-inset-left));
         z-index: 100;
-        align-items: center;
-        justify-content: center;
       }
-      .loader-panel {
-        width: 100%;
-        max-width: 480px;
-        padding: clamp(18px, 5vw, 26px);
-        border-radius: 20px;
-      }
-      .loader-orbit {
-        width: 58px;
-        height: 58px;
-        margin-bottom: 16px;
-        border-radius: 19px;
-      }
-      #loader-title {
-        font-size: clamp(1.2rem, 5vw, 1.5rem);
-        line-height: 1.25;
-        overflow-wrap: anywhere;
-      }
-      #loader-step-text { overflow-wrap: anywhere; }
-      .loader-meta { justify-content: center; text-align: center; }
-      .loader-dismiss { min-height: 44px; padding: 11px 20px; }
-    }
-
-    /* Compact landscape phones have very little vertical room. Let the overlay
-       scroll naturally rather than clipping the loader panel. */
-    @media (max-width: 700px) and (max-height: 520px) {
-      #search-loader,
-      body.dashboard-active #search-loader {
-        align-items: flex-start;
-        padding-top: max(10px, env(safe-area-inset-top));
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
-      }
-      .loader-panel { margin: auto 0; padding: 15px; }
-      .loader-orbit { width: 46px; height: 46px; margin-bottom: 10px; }
-      .loader-track { margin-top: 16px; }
-      .loader-dismiss { margin-top: 14px; }
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col is-booting">
+<body class="min-h-screen flex flex-col is-booting selection:bg-teal-400 selection:text-slate-950">
 
-  <!-- Workspace sidebar: shown once the dashboard has results -->
-  <aside id="workspace-sidebar" class="hidden" aria-label="Workspace navigation">
+  <!-- AMBIENT CYBER-QUANT VISUAL LAYERS -->
+  <div class="aura-backdrop" aria-hidden="true"></div>
+  <div class="aura-grid" aria-hidden="true"></div>
+  <div class="aura-orb aura-orb-1" aria-hidden="true"></div>
+  <div class="aura-orb aura-orb-2" aria-hidden="true"></div>
+
+  <!-- WORKSPACE SIDEBAR -->
+  <aside id="workspace-sidebar" class="hidden" aria-label="MarketAura workspace navigation">
     <div class="sidebar-top">
       <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation" aria-expanded="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
       <div class="sidebar-brand">MarketAura</div>
     </div>
-    <div class="sidebar-section-label">WORKSPACE VIEWS</div>
+
+    <div class="sidebar-section-label">COMMAND DECK</div>
     <nav class="sidebar-nav">
-      <button onclick="switchTab('tab-results')" id="btn-tab-results" class="tab-btn nav-active" type="button" title="Search Results">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
-        <span class="nav-label">Search Results</span>
-      </button>
-      <button onclick="switchTab('tab-trust')" id="btn-tab-trust" class="tab-btn" type="button" title="Trust Breakdown">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-        <span class="nav-label">Trust Breakdown</span>
-      </button>
-      <button onclick="switchTab('tab-compare')" id="btn-tab-compare" class="tab-btn" type="button" title="Keyword Compare">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/><path d="M20 7 15 12M4 17l5-5"/></svg>
-        <span class="nav-label">Keyword Compare</span>
-      </button>
-      <button onclick="switchTab('tab-index')" id="btn-tab-index" class="tab-btn" type="button" title="Index View">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></svg>
-        <span class="nav-label">Index View</span>
-      </button>
-      <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn" type="button" title="Accuracy Metrics">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12h4v8H4ZM10 20V7h4v13h-4ZM16 20V3h4v17h-4Z"/></svg>
-        <span class="nav-label">Accuracy Metrics</span>
-      </button>
-      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn" type="button" title="Game Theory Strategy">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 7 1.6 3.3L17 12l-3.4 1.7L12 17l-1.6-3.3L7 12l3.4-1.7L12 7Z"/></svg>
+      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn nav-active" type="button" title="Game Theory Strategy">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 7 1.6 3.3L17 12l-3.4 1.7L12 17l-1.6-3.3L7 12l3.4-1.7L12 7Z"/></svg>
         <span class="nav-label">Game Theory Strategy</span>
       </button>
+      <button onclick="switchTab('tab-results')" id="btn-tab-results" class="tab-btn" type="button" title="Market Intelligence Feed">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        <span class="nav-label">Intelligence Signals</span>
+      </button>
+      <button onclick="switchTab('tab-trust')" id="btn-tab-trust" class="tab-btn" type="button" title="Credibility Matrix">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span class="nav-label">Authority & Trust</span>
+      </button>
+      <button onclick="switchTab('tab-compare')" id="btn-tab-compare" class="tab-btn" type="button" title="Signal vs Keyword">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/><path d="M20 7 15 12M4 17l5-5"/></svg>
+        <span class="nav-label">Ranking Compare</span>
+      </button>
+      <button onclick="switchTab('tab-index')" id="btn-tab-index" class="tab-btn" type="button" title="Corpus Index">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></svg>
+        <span class="nav-label">Token & Index Core</span>
+      </button>
+      <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn" type="button" title="Precision Benchmarks">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12h4v8H4ZM10 20V7h4v13h-4ZM16 20V3h4v17h-4Z"/></svg>
+        <span class="nav-label">Benchmark Metrics</span>
+      </button>
     </nav>
+
+    <div class="sidebar-footer mt-auto p-4 m-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400">
+      <div class="flex items-center gap-2 text-teal-300 font-mono-tech font-bold mb-1">
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+        <span>NASH SOLVER ONLINE</span>
+      </div>
+      <div>MarketAura Strategic Core • Modules 1–5 Active</div>
+    </div>
   </aside>
 
-  <!-- 1. INITIAL BOOT SPLASH LOADER -->
+  <!-- 1. INITIAL BOOT SPLASH LOADER (SLOWER, HYPNOTIC) -->
   <div id="boot-loader" class="boot-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="boot-card">
       <div class="boot-mark" aria-hidden="true"><span>MA</span></div>
       <h1 class="boot-brand"><span class="market">Market</span><span class="aura">Aura</span></h1>
-      <p class="boot-description">Initializing your search workspace and Game Theory intelligence engine...</p>
+      <p class="boot-description">Calibrating Autonomous Game Theory Solvers, Payoff Matrices & Competitive Market Telemetry...</p>
       <div class="boot-progress" aria-hidden="true"><span></span></div>
-      <p class="boot-caption">Loading</p>
+      <p class="boot-caption">Initializing Strategic Equilibrium Engine</p>
     </div>
   </div>
 
-  <!-- 2. MAIN CONTAINER (GOOGLE-STYLE SEARCH BAR) -->
-  <div id="app-wrapper" class="flex-1 flex flex-col justify-center items-center px-4 transition-all duration-300">
-    
-    <!-- BRAND HEADER -->
-    <div id="brand-header" class="text-center mb-6">
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-        <span class="text-blue-600">Market</span><span class="text-indigo-600">Aura</span>
+  <!-- 2. MAIN COMMAND HEADER & SEARCH BAR -->
+  <div id="app-wrapper" class="flex-1 flex flex-col justify-center items-center px-4 py-8 transition-all duration-500">
+
+    <!-- BRAND HERO -->
+    <div id="brand-header" class="text-center mb-8 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-500/10 border border-teal-400/30 text-teal-300 text-xs font-mono-tech uppercase tracking-widest mb-4">
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+        <span>Autonomous Game-Theoretic Market Intelligence</span>
+      </div>
+
+      <h1 class="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-none">
+        <span class="bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">Market</span><span class="bg-gradient-to-r from-teal-300 via-cyan-400 to-violet-400 bg-clip-text text-transparent">Aura</span>
       </h1>
-      <p class="text-sm text-slate-500 mt-2">
-        Enter an Interest Industry or Search Query — Live IR Verification + Brand Strategy & Game Theory Engine
+      <p class="text-sm sm:text-base text-slate-400 mt-3 max-w-2xl mx-auto leading-relaxed">
+        Decode incumbent dominance, challenger disruptions, Pure &amp; Mixed Strategy Nash Equilibria, and ready-to-execute market entry playbooks in real time.
       </p>
     </div>
 
-    <!-- GOOGLE-STYLE SEARCH BAR -->
-    <form id="search-form" class="w-full max-w-2xl">
-      <div class="flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 rounded-full px-5 py-3 shadow-sm transition">
-        <svg class="w-5 h-5 text-slate-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    <!-- CYBER-QUANT SEARCH BAR -->
+    <form id="search-form" class="w-full max-w-3xl">
+      <div class="aura-search-shell flex items-center rounded-full px-5 py-3.5">
+        <svg class="w-5 h-5 text-teal-400 mr-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input
           id="query-input"
           type="text"
-          placeholder="Enter interest industry (e.g., Cloud Computing, AI, Smartphones, E-Commerce)..."
-          class="w-full bg-transparent focus:outline-none text-slate-800 text-base"
+          placeholder="Enter target industry or sector (e.g., Cloud Computing, AI, Smartphones, E-Commerce)..."
+          class="w-full bg-transparent focus:outline-none text-slate-100 placeholder-slate-500 text-sm sm:text-base"
         />
         <!-- File Upload Trigger -->
-        <label for="file-input" class="cursor-pointer text-slate-400 hover:text-blue-600 mx-2" title="Upload File (TXT, PDF, DOCX, XML)">
+        <label for="file-input" class="cursor-pointer text-slate-400 hover:text-teal-300 mx-3 p-1.5 rounded-full hover:bg-slate-800/70 transition" title="Upload Market Brief (TXT, PDF, DOCX, XML)">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
           </svg>
         </label>
         <input id="file-input" type="file" accept=".txt,.pdf,.docx,.xml" class="hidden" />
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-full transition shrink-0">
-          Analyze
+        <button type="submit" class="aura-btn-primary text-xs sm:text-sm px-6 py-2.5 rounded-full shrink-0 cursor-pointer">
+          Simulate Aura ✦
         </button>
       </div>
 
-      <!-- Quick Industry Chips + IR Controls -->
-      <div class="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs">
-        <span class="text-slate-400 font-medium">Quick Industries:</span>
-        <button type="button" onclick="quickSearch('Cloud Computing Industry')" class="bg-white border border-slate-200 hover:border-blue-400 text-slate-600 px-3 py-1 rounded-full transition">☁️ Cloud Computing</button>
-        <button type="button" onclick="quickSearch('Artificial Intelligence Industry')" class="bg-white border border-slate-200 hover:border-blue-400 text-slate-600 px-3 py-1 rounded-full transition">🤖 AI & LLMs</button>
-        <button type="button" onclick="quickSearch('Smartphone Hardware Industry')" class="bg-white border border-slate-200 hover:border-blue-400 text-slate-600 px-3 py-1 rounded-full transition">📱 Smartphones</button>
-        <button type="button" onclick="quickSearch('E-Commerce & Quick Retail')" class="bg-white border border-slate-200 hover:border-blue-400 text-slate-600 px-3 py-1 rounded-full transition">🛒 E-Commerce</button>
+      <!-- Quick Sector Presets -->
+      <div class="flex flex-wrap items-center justify-center gap-2.5 mt-4 text-xs">
+        <span class="text-slate-500 font-mono-tech uppercase tracking-wider text-[11px]">Sector Presets:</span>
+        <button type="button" onclick="quickSearch('Cloud Computing Industry')" class="bg-slate-900/90 border border-slate-700/80 hover:border-teal-400/60 hover:text-teal-300 text-slate-300 px-3.5 py-1.5 rounded-full transition">☁️ Cloud Computing</button>
+        <button type="button" onclick="quickSearch('Artificial Intelligence Industry')" class="bg-slate-900/90 border border-slate-700/80 hover:border-violet-400/60 hover:text-violet-300 text-slate-300 px-3.5 py-1.5 rounded-full transition">🤖 AI &amp; Foundation Models</button>
+        <button type="button" onclick="quickSearch('Smartphone Hardware Industry')" class="bg-slate-900/90 border border-slate-700/80 hover:border-cyan-400/60 hover:text-cyan-300 text-slate-300 px-3.5 py-1.5 rounded-full transition">📱 Smartphones</button>
+        <button type="button" onclick="quickSearch('E-Commerce & Quick Retail')" class="bg-slate-900/90 border border-slate-700/80 hover:border-rose-400/60 hover:text-rose-300 text-slate-300 px-3.5 py-1.5 rounded-full transition">🛒 E-Commerce &amp; Quick Commerce</button>
       </div>
 
-      <div class="flex flex-wrap items-center justify-center gap-4 mt-2.5 text-xs text-slate-500">
-        <span id="file-badge" class="hidden bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium"></span>
-        <label class="flex items-center gap-1.5 cursor-pointer">
-          <span>Trust Weight:</span>
-          <input id="alpha-slider" type="range" min="0" max="1" step="0.05" value="0.50" class="w-20 accent-blue-600" />
-          <span id="alpha-label" class="font-semibold text-slate-700">50%</span>
+      <!-- Parameter Controls -->
+      <div class="flex flex-wrap items-center justify-center gap-5 mt-3.5 text-xs text-slate-400">
+        <span id="file-badge" class="hidden bg-teal-500/15 border border-teal-400/40 text-teal-300 px-3 py-1 rounded-full font-mono-tech"></span>
+        <label class="flex items-center gap-2 cursor-pointer bg-slate-900/70 border border-slate-800 px-3.5 py-1.5 rounded-full">
+          <span class="text-slate-400">Signal Authority Weight:</span>
+          <input id="alpha-slider" type="range" min="0" max="1" step="0.05" value="0.50" class="w-24 accent-teal-400" />
+          <span id="alpha-label" class="font-mono-tech font-bold text-teal-300">50%</span>
         </label>
-        <label class="flex items-center gap-1 cursor-pointer">
-          <input id="prf-check" type="checkbox" checked class="accent-blue-600 rounded" />
-          <span>Smart Query Expansion</span>
+        <label class="flex items-center gap-2 cursor-pointer bg-slate-900/70 border border-slate-800 px-3.5 py-1.5 rounded-full">
+          <input id="prf-check" type="checkbox" checked class="accent-teal-400 rounded" />
+          <span>Autonomous Query Expansion</span>
         </label>
       </div>
     </form>
+
+    <!-- LANDING FEATURE PILLARS (HIDDEN ONCE RESULTS OPEN) -->
+    <div id="landing-pillars" class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full mt-10">
+      <div class="cyber-card rounded-2xl p-4">
+        <div class="text-xs font-mono-tech text-teal-400 uppercase tracking-wider">01 // Brand Hierarchy</div>
+        <div class="text-sm font-bold text-white mt-1">Incumbents vs. Challengers</div>
+        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Maps real-time market shares and active defensive or niche pricing postures.</p>
+      </div>
+      <div class="cyber-card rounded-2xl p-4">
+        <div class="text-xs font-mono-tech text-violet-400 uppercase tracking-wider">02 // Nash &amp; Zero-Sum</div>
+        <div class="text-sm font-bold text-white mt-1">Payoff &amp; LP Solvers</div>
+        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Computes 3×3 Normal-Form matrices, IESDS, Maximin/Minimax, and Mixed Strategies.</p>
+      </div>
+      <div class="cyber-card rounded-2xl p-4">
+        <div class="text-xs font-mono-tech text-rose-400 uppercase tracking-wider">03 // Subgame Perfect</div>
+        <div class="text-sm font-bold text-white mt-1">Zero-Research Entry Playbook</div>
+        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Generates a 4-step Judo &amp; Co-opetition strategy to enter profitably without price wars.</p>
+      </div>
+    </div>
   </div>
 
-  <!-- 3. RESPONSIVE SEARCH LOADING OVERLAY -->
+  <!-- 3. SLOWER, DELIBERATE SEARCH LOADING OVERLAY -->
   <section id="search-loader" class="hidden" role="status" aria-live="polite" aria-busy="true" data-state="loading">
     <div class="loader-panel">
       <div class="loader-orbit" aria-hidden="true"><span>MA</span></div>
-      <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">MarketAura Intelligence Engine</p>
-      <h2 id="loader-title" class="text-xl sm:text-2xl font-bold text-slate-900">Analyzing your industry</h2>
-      <p id="loader-step-text" class="text-sm sm:text-base text-slate-500 mt-2 leading-relaxed">Connecting to live industry and web sources...</p>
+      <p class="font-mono-tech text-xs font-bold uppercase tracking-widest text-teal-400 mb-2">MarketAura Strategic Core</p>
+      <h2 id="loader-title" class="font-display text-2xl sm:text-3xl font-extrabold text-white">Simulating Industry Dynamics</h2>
+      <p id="loader-step-text" class="text-sm sm:text-base text-slate-400 mt-2.5 leading-relaxed">Ingesting live competitive intelligence and market signals...</p>
       <div class="loader-track" role="presentation"><div id="loader-bar"></div></div>
       <div class="loader-meta">
-        <span id="loader-phase">Preparing analysis</span>
-        <span class="loader-live" id="loader-live-label">Processing live</span>
+        <span id="loader-phase">STAGE 01 // SIGNAL INGESTION</span>
+        <span class="loader-live" id="loader-live-label">SOLVING EQUILIBRIA</span>
       </div>
-      <button id="loader-dismiss" class="loader-dismiss hidden" type="button">Return to search</button>
+      <button id="loader-dismiss" class="loader-dismiss hidden" type="button">Return to Command Deck</button>
     </div>
   </section>
 
-  <!-- 4. RESULTS SECTION -->
-  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-12 fade-in">
-    
-    <!-- Quick Summary & Direct Answer Box -->
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-6 mt-4">
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 mb-2">
-        <div>
-          <span class="font-semibold text-slate-700">Processed Query:</span>
-          <span id="out-active-query" class="bg-slate-100 px-2 py-0.5 rounded text-slate-700"></span>
-        </div>
-        <div>
-          <span class="font-semibold text-slate-700">Expanded Terms:</span>
-          <span id="out-expanded-terms" class="text-blue-600 font-medium"></span>
-        </div>
+  <!-- 4. RESULTS COMMAND DASHBOARD -->
+  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-16 fade-in">
+
+    <!-- LIVE TELEMETRY HUD RIBBON -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mt-5 mb-5">
+      <div class="cyber-card rounded-2xl p-4 border-l-4 border-l-teal-400">
+        <div class="text-[10px] font-mono-tech uppercase tracking-widest text-slate-400">Active Sector</div>
+        <div id="hud-sector" class="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">—</div>
+        <div class="text-[11px] text-teal-300 font-mono-tech mt-1">Oligopoly + Niche Fringe</div>
       </div>
-      <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-4 mt-2">
-        <div class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-1">Instant IR Verified Summary</div>
-        <p id="out-answer" class="text-slate-800 text-sm md:text-base font-medium leading-relaxed"></p>
-        <div id="out-answer-meta" class="text-xs text-slate-500 mt-1.5"></div>
+      <div class="cyber-card rounded-2xl p-4 border-l-4 border-l-violet-400">
+        <div class="text-[10px] font-mono-tech uppercase tracking-widest text-slate-400">Equilibrium Regime</div>
+        <div id="hud-equilibrium" class="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">Pure + Mixed Nash</div>
+        <div class="text-[11px] text-violet-300 font-mono-tech mt-1">Pareto-Optimal Co-opetition</div>
+      </div>
+      <div class="cyber-card rounded-2xl p-4 border-l-4 border-l-cyan-400">
+        <div class="text-[10px] font-mono-tech uppercase tracking-widest text-slate-400">Dominant Posture</div>
+        <div id="hud-posture" class="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">Judo Differentiation</div>
+        <div class="text-[11px] text-cyan-300 font-mono-tech mt-1">Price War Strictly Dominated</div>
+      </div>
+      <div class="cyber-card rounded-2xl p-4 border-l-4 border-l-rose-400">
+        <div class="text-[10px] font-mono-tech uppercase tracking-widest text-slate-400">Game Theory Modules</div>
+        <div class="font-display text-base sm:text-lg font-extrabold text-white mt-0.5">5 / 5 Active</div>
+        <div id="hud-confidence" class="text-[11px] text-rose-300 font-mono-tech mt-1">Signal Confidence: Verified</div>
       </div>
     </div>
 
-    <!-- Navigation is provided by the fixed workspace sidebar. -->
+    <!-- EXECUTIVE INTELLIGENCE SYNTHESIS BANNER -->
+    <div class="cyber-card rounded-2xl p-5 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="font-mono-tech uppercase text-[11px] text-slate-400">Processed Vector:</span>
+          <span id="out-active-query" class="bg-slate-800/90 border border-slate-700 px-2.5 py-0.5 rounded-md text-teal-300 font-mono-tech"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono-tech uppercase text-[11px] text-slate-400">Expanded Signals:</span>
+          <span id="out-expanded-terms" class="text-violet-300 font-mono-tech"></span>
+        </div>
+      </div>
+      <div class="bg-gradient-to-r from-teal-500/10 via-violet-500/10 to-rose-500/10 border border-teal-400/25 rounded-xl p-4">
+        <div class="flex items-center gap-2 text-xs font-mono-tech font-bold uppercase tracking-wider text-teal-300 mb-1">
+          <span>✦ Executive Market Intelligence Synthesis</span>
+        </div>
+        <p id="out-answer" class="text-slate-100 text-sm md:text-base font-medium leading-relaxed"></p>
+        <div id="out-answer-meta" class="text-xs font-mono-tech text-slate-400 mt-2"></div>
+      </div>
+    </div>
 
     <!-- =============================================================== -->
     <!-- TAB 0: INDUSTRY BRANDS, STRATEGIES & GAME THEORY ENGINE         -->
     <!-- =============================================================== -->
     <div id="tab-strategy" class="tab-pane space-y-6">
-      
-      <!-- Banner: Industry Name -->
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl p-6 shadow-sm">
-        <div class="text-xs uppercase tracking-wider font-semibold text-blue-100">Game-Theoretic Market Intelligence</div>
-        <h2 id="gt-industry-title" class="text-2xl font-bold mt-1"></h2>
-        <p class="text-sm text-blue-100 mt-1">
-          Live competitive breakdown of Top Incumbents, Middle/Low-End Challengers, and your Optimal Nash Entry Strategy.
-        </p>
+
+      <!-- Sector Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-teal-400/30 bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-900 shadow-2xl">
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-teal-300 bg-teal-500/10 border border-teal-400/30 px-3 py-1 rounded-full">
+              <span>MarketAura Strategic Topology</span>
+            </div>
+            <h2 id="gt-industry-title" class="font-display text-2xl sm:text-4xl font-extrabold text-white mt-2"></h2>
+            <p class="text-sm text-slate-300 mt-1.5 max-w-3xl">
+              Live competitive mapping of Top-Tier Incumbents, Middle/Low-End Challengers, and your Subgame-Perfect Nash Entry Strategy.
+            </p>
+          </div>
+          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl px-4 py-3 text-right font-mono-tech">
+            <div class="text-[10px] uppercase tracking-widest text-slate-400">Solution Concept</div>
+            <div class="text-sm font-bold text-teal-300 mt-0.5">SPE + Pareto Frontier</div>
+            <div class="text-[11px] text-violet-300">IESDS Verified</div>
+          </div>
+        </div>
       </div>
 
       <!-- 1. TOP BRANDS vs MIDDLE/LOW-END BRANDS GRID -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Top Brands Column -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-slate-900">🏆 Current Top-Tier Brands</h3>
-            <span class="text-xs bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">Market Incumbents</span>
+        <div class="cyber-card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="font-display text-lg font-extrabold text-white">🏆 Top-Tier Incumbent Brands</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Dominant scale leaders controlling core infrastructure &amp; ecosystem lock-in</p>
+            </div>
+            <span class="text-xs font-mono-tech bg-teal-500/15 text-teal-300 font-bold px-3 py-1 rounded-full border border-teal-400/30">Incumbents</span>
           </div>
           <div id="gt-top-brands" class="space-y-4"></div>
         </div>
 
         <!-- Middle / Low-End Brands Column -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-slate-900">⚡ Middle & Low-End Brands</h3>
-            <span class="text-xs bg-amber-50 text-amber-700 font-semibold px-2.5 py-1 rounded-full border border-amber-200">Niche & Price Challengers</span>
+        <div class="cyber-card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="font-display text-lg font-extrabold text-white">⚡ Middle &amp; Low-End Challengers</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Agile disruptors competing via aggressive pricing, speed &amp; vertical focus</p>
+            </div>
+            <span class="text-xs font-mono-tech bg-amber-500/15 text-amber-300 font-bold px-3 py-1 rounded-full border border-amber-400/30">Challengers</span>
           </div>
           <div id="gt-mid-brands" class="space-y-4"></div>
         </div>
       </div>
 
-      <!-- 2. OVERALL STRATEGY USER CAN USE RIGHT NOW (WITHOUT EXTENSIVE RESEARCH) -->
-      <div class="bg-emerald-50/70 border-2 border-emerald-500/30 rounded-2xl p-6 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider bg-emerald-600 text-white px-3 py-1 rounded-full">
-            🚀 Ready-to-Use Entry Strategy (Zero Extensive Research Needed)
+      <!-- 2. OVERALL STRATEGY USER CAN USE RIGHT NOW (ZERO EXTENSIVE RESEARCH) -->
+      <div class="rounded-3xl p-6 sm:p-7 border-2 border-teal-400/40 bg-gradient-to-br from-teal-950/45 via-slate-900/95 to-violet-950/40 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="text-xs font-mono-tech font-bold uppercase tracking-wider bg-teal-400 text-slate-950 px-3.5 py-1 rounded-full shadow-lg shadow-teal-500/25">
+            🚀 Immediate Actionable Entry Strategy (Zero Extensive Research Required)
           </span>
-          <span class="text-xs font-medium text-emerald-800">Subgame Perfect & Pareto-Optimal Playbook</span>
+          <span class="text-xs font-mono-tech font-semibold text-teal-300 bg-teal-500/10 border border-teal-400/30 px-3 py-1 rounded-full">
+            Subgame Perfect &amp; Pareto-Optimal Playbook
+          </span>
         </div>
-        <h3 id="gt-strat-title" class="text-xl font-bold text-slate-900 mt-2"></h3>
-        <p id="gt-strat-summary" class="text-sm text-slate-700 mt-2 leading-relaxed"></p>
-        <div id="gt-strat-steps" class="auto-fit-grid-compact gap-4 mt-4"></div>
+        <h3 id="gt-strat-title" class="font-display text-xl sm:text-2xl font-extrabold text-white mt-2"></h3>
+        <p id="gt-strat-summary" class="text-sm text-slate-300 mt-2 leading-relaxed"></p>
+        <div id="gt-strat-steps" class="auto-fit-grid-compact gap-4 mt-5"></div>
       </div>
 
       <!-- 3. SYLLABUS MODULES 1-5 GAME THEORY MODELS BREAKDOWN -->
       <div class="auto-fit-grid gap-6">
-        
+
         <!-- Module 1 & 2: Payoff Matrix, Dominance, Nash & Pareto -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-900 mb-1">
-            📊 Strategic Payoff Matrix & Nash Equilibrium
-          </h3>
-          <p class="text-xs text-slate-500 mb-3">
-            Payoffs: <code>(Your Entrant Utility, Incumbent Utility)</code>
+        <div class="cyber-card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-display text-lg font-extrabold text-white">
+              📊 Normal-Form Payoff Matrix &amp; Nash Equilibrium
+            </h3>
+            <span class="text-[11px] font-mono-tech text-teal-300 bg-teal-500/10 border border-teal-400/25 px-2.5 py-0.5 rounded-full">Modules 1 &amp; 2</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">
+            Utility Tuple: <code class="font-mono-tech text-teal-300">(Your Entrant Utility, Incumbent Utility)</code>
           </p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs text-left border border-slate-200 rounded-lg">
-              <thead id="gt-matrix-head" class="bg-slate-100 text-slate-700"></thead>
-              <tbody id="gt-matrix-body" class="divide-y divide-slate-200"></tbody>
+          <div class="overflow-x-auto rounded-2xl border border-slate-800">
+            <table class="w-full text-xs text-left">
+              <thead id="gt-matrix-head" class="bg-slate-900/95 text-slate-300 font-mono-tech uppercase"></thead>
+              <tbody id="gt-matrix-body" class="divide-y divide-slate-800/80"></tbody>
             </table>
           </div>
-          <div id="gt-nash-details" class="mt-4 space-y-2 text-xs text-slate-700"></div>
+          <div id="gt-nash-details" class="mt-4 space-y-2.5 text-xs text-slate-300"></div>
         </div>
 
         <!-- Module 3: Zero-Sum Game, Maximin/Minimax & Mixed Strategy -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-900 mb-1">
-            ⚖️ Zero-Sum Market Share & Mixed-Strategy Optimization
-          </h3>
-          <p class="text-xs text-slate-500 mb-3">
-            Maximin-Minimax Principle & Linear Programming Resource Allocation
+        <div class="cyber-card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-display text-lg font-extrabold text-white">
+              ⚖️ Zero-Sum Share &amp; Mixed-Strategy LP Solver
+            </h3>
+            <span class="text-[11px] font-mono-tech text-violet-300 bg-violet-500/10 border border-violet-400/25 px-2.5 py-0.5 rounded-full">Module 3</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">
+            Von Neumann Maximin-Minimax Principle &amp; Linear Programming Resource Allocation
           </p>
-          <div id="gt-zerosum-details" class="space-y-2.5 text-xs text-slate-700"></div>
+          <div id="gt-zerosum-details" class="space-y-3 text-xs text-slate-300"></div>
         </div>
 
       </div>
 
       <!-- Module 4 & 5: Extensive-Form Backward Induction, Bayesian, Repeated & ESS -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <h3 class="text-base font-bold text-slate-900 mb-3">
-          🌳 Advanced Game Theory Models (Extensive-Form Tree, Bayesian, Repeated & ESS)
-        </h3>
-        <div id="gt-advanced-details" class="auto-fit-grid-compact gap-4 text-xs text-slate-700"></div>
+      <div class="cyber-card rounded-3xl p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <h3 class="font-display text-lg font-extrabold text-white">
+            🌳 Advanced Strategic Models (Backward Induction, Bayesian Signaling, Repeated &amp; ESS)
+          </h3>
+          <span class="text-[11px] font-mono-tech text-rose-300 bg-rose-500/10 border border-rose-400/25 px-2.5 py-0.5 rounded-full">Modules 4 &amp; 5</span>
+        </div>
+        <div id="gt-advanced-details" class="auto-fit-grid-compact gap-4 text-xs text-slate-300"></div>
       </div>
 
     </div>
 
     <!-- =============================================================== -->
-    <!-- TAB 1: SEARCH RESULTS (IR SYSTEM INTACT)                        -->
+    <!-- TAB 1: INTELLIGENCE SIGNALS FEED                                -->
     <!-- =============================================================== -->
     <div id="tab-results" class="tab-pane hidden space-y-4"></div>
 
-    <!-- TAB 2: TRUST BREAKDOWN -->
-    <div id="tab-trust" class="tab-pane hidden bg-white rounded-2xl p-5 border border-slate-200 overflow-x-auto">
-      <h3 class="text-base font-semibold mb-3">Source Trust & Pattern Scores</h3>
+    <!-- TAB 2: AUTHORITY & TRUST MATRIX -->
+    <div id="tab-trust" class="tab-pane hidden cyber-card rounded-3xl p-6 overflow-x-auto">
+      <h3 class="font-display text-lg font-extrabold text-white mb-4">Source Authority &amp; Credibility Matrix</h3>
       <table class="w-full text-left text-sm">
-        <thead class="bg-slate-50 text-slate-600 text-xs uppercase">
+        <thead class="bg-slate-900/90 text-slate-400 font-mono-tech text-xs uppercase border-b border-slate-800">
           <tr>
-            <th class="p-3">Source</th>
-            <th class="p-3">PageRank</th>
-            <th class="p-3">Authority</th>
-            <th class="p-3">Spam Filter</th>
-            <th class="p-3">Consensus</th>
-            <th class="p-3">Recency</th>
-            <th class="p-3">Trust Score</th>
+            <th class="p-3.5">Domain Source</th>
+            <th class="p-3.5">PageRank</th>
+            <th class="p-3.5">HITS Authority</th>
+            <th class="p-3.5">Signal Purity</th>
+            <th class="p-3.5">Consensus</th>
+            <th class="p-3.5">Recency</th>
+            <th class="p-3.5">Composite Trust</th>
           </tr>
         </thead>
-        <tbody id="trust-table-body" class="divide-y divide-slate-100"></tbody>
+        <tbody id="trust-table-body" class="divide-y divide-slate-800/70 font-mono-tech text-xs"></tbody>
       </table>
     </div>
 
-    <!-- TAB 3: SIDE-BY-SIDE KEYWORD COMPARE -->
+    <!-- TAB 3: SIDE-BY-SIDE RANKING COMPARE -->
     <div id="tab-compare" class="tab-pane hidden auto-fit-grid gap-6">
-      <div>
-        <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-3">MarketAura Ranking (Relevance + Trust)</h3>
+      <div class="cyber-card rounded-3xl p-5">
+        <h3 class="text-xs font-mono-tech font-bold uppercase tracking-wider text-teal-300 mb-3">✦ MarketAura Hybrid Signal Ranking (Relevance + Authority)</h3>
         <div id="compare-hybrid" class="space-y-3"></div>
       </div>
-      <div>
-        <h3 class="text-sm font-bold uppercase tracking-wider text-amber-700 mb-3">Standard Search (Keywords Only)</h3>
+      <div class="cyber-card rounded-3xl p-5">
+        <h3 class="text-xs font-mono-tech font-bold uppercase tracking-wider text-amber-300 mb-3">⚡ Unweighted Lexical Baseline (BM25 Only)</h3>
         <div id="compare-standard" class="space-y-3"></div>
       </div>
     </div>
 
-    <!-- TAB 4: INDEX VIEW -->
-    <div id="tab-index" class="tab-pane hidden bg-white rounded-2xl p-5 border border-slate-200 space-y-3 text-sm">
-      <h3 class="text-base font-semibold">Term Index & Compression Preview</h3>
-      <p><strong>Root Term:</strong> <code id="idx-stem" class="bg-slate-100 px-2 py-0.5 rounded"></code></p>
-      <p><strong>Matched Documents:</strong> <code id="idx-inv" class="bg-slate-100 px-2 py-0.5 rounded"></code></p>
-      <p><strong>Compressed Gaps:</strong> <code id="idx-comp" class="bg-slate-100 px-2 py-0.5 rounded"></code></p>
+    <!-- TAB 4: TOKEN & INDEX CORE -->
+    <div id="tab-index" class="tab-pane hidden cyber-card rounded-3xl p-6 space-y-3.5 text-sm">
+      <h3 class="font-display text-lg font-extrabold text-white">Corpus Token &amp; Gap-Encoding Inspector</h3>
+      <p class="text-slate-300"><strong>Normalized Root Stem:</strong> <code id="idx-stem" class="font-mono-tech bg-slate-900 border border-slate-700 text-teal-300 px-2.5 py-0.5 rounded"></code></p>
+      <p class="text-slate-300"><strong>Matched Document Postings:</strong> <code id="idx-inv" class="font-mono-tech bg-slate-900 border border-slate-700 text-violet-300 px-2.5 py-0.5 rounded"></code></p>
+      <p class="text-slate-300"><strong>Delta Compressed Gaps:</strong> <code id="idx-comp" class="font-mono-tech bg-slate-900 border border-slate-700 text-amber-300 px-2.5 py-0.5 rounded"></code></p>
       <div>
-        <strong>Word Positions:</strong>
-        <pre id="idx-pos" class="bg-slate-900 text-slate-100 p-3 rounded-xl text-xs mt-1 overflow-x-auto"></pre>
+        <strong class="text-slate-300">Positional Posting Offsets:</strong>
+        <pre id="idx-pos" class="font-mono-tech bg-slate-950 border border-slate-800 text-teal-300 p-4 rounded-2xl text-xs mt-2 overflow-x-auto"></pre>
       </div>
     </div>
 
-    <!-- TAB 5: ACCURACY METRICS -->
-    <div id="tab-metrics" class="tab-pane hidden bg-white rounded-2xl p-5 border border-slate-200">
-      <h3 class="text-base font-semibold mb-3">Retrieval Quality Comparison (Top 3 Results)</h3>
+    <!-- TAB 5: BENCHMARK METRICS -->
+    <div id="tab-metrics" class="tab-pane hidden cyber-card rounded-3xl p-6">
+      <h3 class="font-display text-lg font-extrabold text-white mb-4">Signal Retrieval Precision Benchmarks (Top-3 Cut)</h3>
       <div id="metrics-cards" class="auto-fit-grid-compact gap-4"></div>
     </div>
 
   </main>
 
   <script>
+    // 1. SLOWER BOOTLOADER TIMING (2600ms hold + 950ms smooth fade)
     window.addEventListener('DOMContentLoaded', () => {
       const boot = document.getElementById('boot-loader');
       const finishBoot = () => {
         boot.setAttribute('aria-busy', 'false');
         boot.classList.add('is-hiding');
         document.body.classList.remove('is-booting');
-        window.setTimeout(() => { boot.hidden = true; }, 380);
+        window.setTimeout(() => { boot.hidden = true; }, 980);
       };
-      // Keep the splash visible briefly so its animation is perceptible, then fade out.
-      window.setTimeout(finishBoot, 650);
+      window.setTimeout(finishBoot, 2600);
     });
 
     const alphaSlider = document.getElementById('alpha-slider');
@@ -860,7 +1066,7 @@
     const fileBadge = document.getElementById('file-badge');
     fileInput.addEventListener('change', () => {
       if (fileInput.files.length > 0) {
-        fileBadge.textContent = 'Attached: ' + fileInput.files[0].name;
+        fileBadge.textContent = '📎 ' + fileInput.files[0].name;
         fileBadge.classList.remove('hidden');
       } else {
         fileBadge.classList.add('hidden');
@@ -882,7 +1088,6 @@
       if (activeButton) activeButton.classList.add('nav-active');
     }
 
-    // Collapse the sidebar on desktop; on small screens it opens as an overlay.
     document.getElementById('loader-dismiss').addEventListener('click', () => {
       document.getElementById('search-loader').classList.add('hidden');
       document.body.classList.remove('is-loading');
@@ -896,15 +1101,19 @@
       document.getElementById('sidebar-toggle').setAttribute('aria-expanded', String(isMobile ? expanded : !document.body.classList.contains('sidebar-collapsed')));
     });
 
+    const waitMs = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     document.getElementById('search-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const query = document.getElementById('query-input').value.trim();
       if (!query && fileInput.files.length === 0) return;
 
       const wrapper = document.getElementById('app-wrapper');
-      wrapper.classList.remove('flex-1', 'justify-center');
-      wrapper.classList.add('pt-6', 'pb-4', 'border-b', 'border-slate-200', 'bg-white');
+      wrapper.classList.remove('flex-1', 'justify-center', 'py-8');
+      wrapper.classList.add('pt-5', 'pb-4', 'border-b', 'border-slate-800/80', 'bg-slate-950/75', 'backdrop-blur-xl');
       document.getElementById('brand-header').classList.add('mb-3');
+      const pillars = document.getElementById('landing-pillars');
+      if (pillars) pillars.classList.add('hidden');
 
       const loader = document.getElementById('search-loader');
       const resultsBox = document.getElementById('results-container');
@@ -915,24 +1124,21 @@
       resultsBox.classList.add('hidden');
       loader.dataset.state = 'loading';
       loader.setAttribute('aria-busy', 'true');
-      loaderTitle.textContent = 'Analyzing your industry';
-      loaderLiveLabel.textContent = 'Processing live';
-      loaderStepText.textContent = 'Connecting to live industry and web sources...';
+      loaderTitle.textContent = 'Simulating Industry Dynamics';
+      loaderLiveLabel.textContent = 'SOLVING EQUILIBRIA';
+      loaderStepText.textContent = 'Ingesting live competitive intelligence and market signals...';
       document.getElementById('loader-dismiss').classList.add('hidden');
-      loaderPhase.textContent = 'Preparing analysis';
+      loaderPhase.textContent = 'STAGE 01 // SIGNAL INGESTION';
       loader.classList.remove('hidden');
       document.body.classList.add('is-loading');
 
-      // The API currently returns one completed response (not streamed progress).
-      // Cycle through transparent stage descriptions and use an indeterminate bar
-      // rather than displaying a misleading percentage.
+      // SLOWER, DELIBERATE STEP CYCLING (3200ms per stage)
       const steps = [
-        { phase: 'Source discovery', text: 'Collecting relevant industry information and live web sources...' },
-        { phase: 'Information retrieval', text: 'Building the document index and calculating relevance scores...' },
-        { phase: 'Trust evaluation', text: 'Evaluating source reliability, authority, recency and consensus...' },
-        { phase: 'Game theory analysis', text: 'Comparing market players and evaluating strategic responses...' },
-        { phase: 'Strategy modelling', text: 'Computing payoff outcomes, Nash equilibrium and entry strategies...' },
-        { phase: 'Finalising results', text: 'Organising insights, comparisons and evaluation metrics...' }
+        { phase: 'STAGE 01 // MARKET DISCOVERY', text: 'Crawling live industry briefs, incumbent filings & challenger signals...' },
+        { phase: 'STAGE 02 // AUTHORITY VERIFICATION', text: 'Computing PageRank, HITS authority & signal credibility weights...' },
+        { phase: 'STAGE 03 // NORMAL-FORM PAYOFFS', text: 'Constructing 3x3 strategic payoff matrices & eliminating dominated actions (IESDS)...' },
+        { phase: 'STAGE 04 // NASH & ZERO-SUM LP', text: 'Solving Pure Strategy Nash Equilibria, Maximin/Minimax & Mixed-Strategy LP...' },
+        { phase: 'STAGE 05 // BACKWARD INDUCTION', text: 'Synthesizing Subgame Perfect Game Trees, Bayesian Signals & Judo Entry Playbook...' }
       ];
       let sIdx = 0;
       const stepTimer = setInterval(() => {
@@ -940,7 +1146,7 @@
         loaderPhase.textContent = step.phase;
         loaderStepText.textContent = step.text;
         sIdx++;
-      }, 1800);
+      }, 3200);
 
       const formData = new FormData();
       formData.append('query', query);
@@ -950,6 +1156,9 @@
       if (fileInput.files.length > 0) {
         formData.append('file', fileInput.files[0]);
       }
+
+      const startTime = performance.now();
+      const MIN_LOADER_DURATION_MS = 3800; // Ensures the slow animation is appreciated even on fast local responses
 
       let responseReceived = false;
       try {
@@ -968,6 +1177,12 @@
           const detail = typeof data.detail === 'string' ? data.detail : null;
           throw new Error(detail || `Backend returned HTTP ${res.status}.`);
         }
+
+        const elapsed = performance.now() - startTime;
+        if (elapsed < MIN_LOADER_DURATION_MS) {
+          await waitMs(MIN_LOADER_DURATION_MS - elapsed);
+        }
+
         clearInterval(stepTimer);
         loader.setAttribute('aria-busy', 'false');
         loader.classList.add('hidden');
@@ -976,22 +1191,29 @@
         document.getElementById('workspace-sidebar').classList.remove('hidden');
         document.body.classList.add('dashboard-active');
         resultsBox.classList.remove('hidden');
-        switchTab('tab-results');
+        // Default directly to MarketAura's flagship Game Theory Strategy tab
+        switchTab('tab-strategy');
       } catch (err) {
         clearInterval(stepTimer);
         const message = err instanceof Error ? err.message : String(err);
         loader.dataset.state = 'error';
         loader.setAttribute('aria-busy', 'false');
         document.body.classList.remove('is-loading');
-        loaderTitle.textContent = 'Analysis could not be completed';
-        loaderPhase.textContent = 'Action required';
-        loaderLiveLabel.textContent = 'Error';
+        loaderTitle.textContent = 'Simulation Interrupted';
+        loaderPhase.textContent = 'ACTION REQUIRED';
+        loaderLiveLabel.textContent = 'OFFLINE';
         document.getElementById('loader-dismiss').classList.remove('hidden');
         loaderStepText.textContent = responseReceived
-          ? `Search failed: ${message}`
-          : `Cannot reach backend. Check that the API server is running and accessible. (${message})`;
+          ? `Simulation failed: ${message}`
+          : `Cannot reach MarketAura backend engine. Check that Uvicorn is running. (${message})`;
       }
     });
+
+    function parseSharePercent(shareStr) {
+      if (!shareStr) return 22;
+      const match = String(shareStr).match(/(\d+(\.\d+)?)/);
+      return match ? Math.min(100, Math.max(8, parseFloat(match[1]))) : 22;
+    }
 
     function renderResults(data) {
       document.getElementById('out-active-query').textContent = data.active_query;
@@ -1000,7 +1222,10 @@
 
       document.getElementById('out-answer').textContent = data.direct_answer.answer;
       document.getElementById('out-answer-meta').textContent =
-        `Source: ${data.direct_answer.source_domain} | Confidence Score: ${data.direct_answer.confidence}`;
+        `Primary Anchor: ${data.direct_answer.source_domain} // Confidence Index: ${data.direct_answer.confidence}`;
+
+      document.getElementById('hud-confidence').textContent =
+        `Anchor Confidence: ${Math.round((data.direct_answer.confidence || 0.85) * 100)}%`;
 
       // =========================================================
       // RENDER TAB 0: GAME THEORY & INDUSTRY BRAND INTELLIGENCE
@@ -1008,20 +1233,28 @@
       const gt = data.game_theory_analysis;
       if (gt) {
         document.getElementById('gt-industry-title').textContent = gt.industry_name;
+        document.getElementById('hud-sector').textContent = gt.industry_name;
 
         const topBox = document.getElementById('gt-top-brands');
         topBox.innerHTML = '';
         gt.top_brands.forEach(b => {
+          const shareNum = parseSharePercent(b.market_share);
           topBox.innerHTML += `
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-slate-900 text-sm">${b.name}</span>
-                <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">Share: ${b.market_share}</span>
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-teal-400/40 transition">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-display font-bold text-white text-base">${b.name}</span>
+                <span class="text-xs font-mono-tech font-bold bg-teal-500/15 text-teal-300 border border-teal-400/30 px-2.5 py-0.5 rounded-full">
+                  Share: ${b.market_share}
+                </span>
               </div>
-              <p class="text-xs text-slate-600 mt-1.5"><strong>Current Status:</strong> ${b.status}</p>
-              <p class="text-xs text-indigo-700 mt-1 bg-indigo-50/80 p-2 rounded-lg border border-indigo-100">
-                <strong>Active Strategy:</strong> ${b.current_strategy}
-              </p>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2.5 mb-2.5">
+                <div class="bg-gradient-to-r from-teal-400 to-cyan-400 h-full rounded-full" style="width: ${shareNum}%"></div>
+              </div>
+              <p class="text-xs text-slate-300 mt-1"><strong class="text-slate-100">Market Posture:</strong> ${b.status}</p>
+              <div class="text-xs text-teal-200 mt-2 bg-teal-950/50 p-2.5 rounded-xl border border-teal-500/25">
+                <strong class="font-mono-tech uppercase text-[10px] text-teal-400 block mb-0.5">Active Game Strategy:</strong>
+                ${b.current_strategy}
+              </div>
             </div>
           `;
         });
@@ -1029,16 +1262,23 @@
         const midBox = document.getElementById('gt-mid-brands');
         midBox.innerHTML = '';
         gt.mid_low_brands.forEach(b => {
+          const shareNum = parseSharePercent(b.market_share);
           midBox.innerHTML += `
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-slate-900 text-sm">${b.name}</span>
-                <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">${b.tier} (${b.market_share})</span>
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-400/40 transition">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-display font-bold text-white text-base">${b.name}</span>
+                <span class="text-xs font-mono-tech font-bold bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full">
+                  ${b.tier} (${b.market_share})
+                </span>
               </div>
-              <p class="text-xs text-slate-600 mt-1.5"><strong>Current Status:</strong> ${b.status}</p>
-              <p class="text-xs text-amber-900 mt-1 bg-amber-50/80 p-2 rounded-lg border border-amber-100">
-                <strong>Active Strategy:</strong> ${b.current_strategy}
-              </p>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2.5 mb-2.5">
+                <div class="bg-gradient-to-r from-amber-400 to-rose-400 h-full rounded-full" style="width: ${shareNum}%"></div>
+              </div>
+              <p class="text-xs text-slate-300 mt-1"><strong class="text-slate-100">Market Posture:</strong> ${b.status}</p>
+              <div class="text-xs text-amber-200 mt-2 bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/25">
+                <strong class="font-mono-tech uppercase text-[10px] text-amber-400 block mb-0.5">Active Challenger Strategy:</strong>
+                ${b.current_strategy}
+              </div>
             </div>
           `;
         });
@@ -1048,11 +1288,14 @@
         document.getElementById('gt-strat-summary').textContent = gt.immediate_strategy.executive_summary;
         const stepsBox = document.getElementById('gt-strat-steps');
         stepsBox.innerHTML = '';
-        gt.immediate_strategy.four_step_immediate_actions.forEach(s => {
+        gt.immediate_strategy.four_step_immediate_actions.forEach((s, idx) => {
           stepsBox.innerHTML += `
-            <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
-              <div class="font-bold text-emerald-800 text-xs uppercase tracking-wide">${s.step}</div>
-              <p class="text-xs text-slate-700 mt-1.5 leading-relaxed">${s.action}</p>
+            <div class="bg-slate-950/85 p-4 rounded-2xl border border-teal-400/30 hover:border-teal-300 transition shadow-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono-tech font-bold text-teal-300 text-xs uppercase tracking-wider">${s.step}</span>
+                <span class="font-mono-tech text-[10px] bg-teal-500/15 text-teal-300 px-2 py-0.5 rounded-full">PHASE 0${idx + 1}</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${s.action}</p>
             </div>
           `;
         });
@@ -1063,76 +1306,84 @@
         const mBody = document.getElementById('gt-matrix-body');
         mHead.innerHTML = `
           <tr>
-            <th class="p-2 border-r border-slate-200">Your Strategy \\ Incumbent</th>
-            ${m12.incumbent_strategies.map(s => `<th class="p-2">${s}</th>`).join('')}
+            <th class="p-3 border-r border-slate-800 text-teal-300">Entrant \\ Incumbent</th>
+            ${m12.incumbent_strategies.map(s => `<th class="p-3">${s}</th>`).join('')}
           </tr>
         `;
         mBody.innerHTML = '';
         m12.payoff_matrix.forEach((row, rIdx) => {
-          const isDom = rIdx === 2 ? 'bg-emerald-50/70 font-semibold' : '';
+          const isDom = rIdx === 2
+            ? 'bg-teal-500/15 text-teal-200 font-semibold'
+            : 'bg-slate-950/60 text-slate-300';
           mBody.innerHTML += `
             <tr class="${isDom}">
-              <td class="p-2 border-r border-slate-200 font-medium">${m12.entrant_strategies[rIdx]}</td>
-              ${row.map(cell => `<td class="p-2 font-mono">(${cell[0]}, ${cell[1]})</td>`).join('')}
+              <td class="p-3 border-r border-slate-800 font-medium">${m12.entrant_strategies[rIdx]}</td>
+              ${row.map(cell => `<td class="p-3 font-mono-tech text-cyan-300">(${cell[0]}, ${cell[1]})</td>`).join('')}
             </tr>
           `;
         });
 
         const eq = m12.nash_equilibria[0];
+        document.getElementById('hud-equilibrium').textContent = `Nash (${eq.payoffs[0]}, ${eq.payoffs[1]})`;
+        document.getElementById('hud-posture').textContent = m12.dominant_strategy_entrant;
+
         document.getElementById('gt-nash-details').innerHTML = `
-          <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
-            <strong>Pure Strategy Nash Equilibrium & Pareto Optimum:</strong>
-            You play <code>${eq.entrant_strategy}</code> & Incumbent plays <code>${eq.incumbent_strategy}</code>
-            with Payoffs <strong>(${eq.payoffs[0]}, ${eq.payoffs[1]})</strong>.
+          <div class="p-3.5 rounded-2xl bg-teal-500/10 border border-teal-400/30 text-teal-200">
+            <strong class="text-teal-300 block mb-0.5">✦ Pure Strategy Nash Equilibrium &amp; Pareto Optimum:</strong>
+            Entrant plays <code class="font-mono-tech bg-slate-900 px-1.5 py-0.5 rounded text-teal-300">${eq.entrant_strategy}</code> &amp; Incumbent plays <code class="font-mono-tech bg-slate-900 px-1.5 py-0.5 rounded text-violet-300">${eq.incumbent_strategy}</code>
+            yielding Equilibrium Payoffs <strong class="font-mono-tech text-white">(${eq.payoffs[0]}, ${eq.payoffs[1]})</strong>.
           </div>
-          <div><strong>Strictly Dominant Strategy:</strong> <code>${m12.dominant_strategy_entrant}</code></div>
-          <div><strong>Eliminated via IESDS:</strong> ${m12.eliminated_dominated_strategy}</div>
-          <div><strong>Prisoner's Dilemma Insight:</strong> ${m12.classic_games_insight["Prisoner's Dilemma"]}</div>
+          <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-white">Strictly Dominant Strategy:</strong> <code class="font-mono-tech text-teal-300">${m12.dominant_strategy_entrant}</code></div>
+          <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-white">Eliminated via IESDS:</strong> <span class="text-rose-300">${m12.eliminated_dominated_strategy}</span></div>
+          <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-white">Prisoner's Dilemma Insight:</strong> ${m12.classic_games_insight["Prisoner's Dilemma"]}</div>
         `;
 
         // Module 3: Zero-Sum & Mixed Strategy
         const zs = gt.module3_zero_sum;
         document.getElementById('gt-zerosum-details').innerHTML = `
-          <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div><strong>Maximin (Lower Value):</strong> ${zs.maximin_value}</div>
-            <div><strong>Minimax (Upper Value):</strong> ${zs.minimax_value}</div>
-            <div><strong>Saddle Point Exists:</strong> ${zs.saddle_point_exists ? 'Yes (Pure)' : 'No (Requires Mixed Strategy)'}</div>
-            <div><strong>Expected Game Value:</strong> <span class="text-blue-600 font-bold">${zs.expected_game_value}</span></div>
+          <div class="grid grid-cols-2 gap-2.5 bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 font-mono-tech">
+            <div><span class="text-slate-400 block text-[10px] uppercase">Maximin (Lower)</span><span class="text-white font-bold text-sm">${zs.maximin_value}</span></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase">Minimax (Upper)</span><span class="text-white font-bold text-sm">${zs.minimax_value}</span></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase">Saddle Point</span><span class="text-amber-300 font-bold">${zs.saddle_point_exists ? 'Yes (Pure)' : 'No (Mixed Required)'}</span></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase">Expected Value (v*)</span><span class="text-teal-300 font-bold text-sm">${zs.expected_game_value}</span></div>
           </div>
-          <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
-            <strong>Optimal Mixed Strategy Allocation:</strong><br/>
-            • Community-Led Viral Marketing: <strong>${zs.optimal_mixed_strategy.Community_Viral_Prob}</strong><br/>
-            • Targeted Direct Outbound: <strong>${zs.optimal_mixed_strategy.Direct_Outbound_Prob}</strong>
+          <div class="p-3.5 rounded-2xl bg-violet-500/10 border border-violet-400/30 text-violet-100">
+            <strong class="text-violet-300 font-mono-tech uppercase text-[11px] block mb-1">Optimal Mixed-Strategy Probability Vector:</strong>
+            • Community-Led Viral Loops: <strong class="font-mono-tech text-teal-300">${zs.optimal_mixed_strategy.Community_Viral_Prob}</strong><br/>
+            • Targeted Enterprise Outbound: <strong class="font-mono-tech text-cyan-300">${zs.optimal_mixed_strategy.Direct_Outbound_Prob}</strong>
           </div>
-          <div class="text-slate-500"><strong>Linear Programming (LP) Formulation:</strong> <code>${zs.lp_formulation}</code></div>
+          <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400">
+            <strong class="text-slate-200 block mb-1">Linear Programming (LP) Formulation:</strong>
+            <code class="font-mono-tech text-teal-300 text-[11px]">${zs.lp_formulation}</code>
+          </div>
         `;
 
         // Module 4 & 5: Advanced Models
         const adv = gt.module4_and_5_advanced;
         document.getElementById('gt-advanced-details').innerHTML = `
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="font-bold text-slate-900 mb-1">1. Extensive-Form Game Tree & Backward Induction</div>
-            <p>${adv.extensive_form_backward_induction.subgame_perfect_equilibrium}</p>
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="font-mono-tech text-[11px] text-teal-400 uppercase mb-1">01 // Extensive-Form Tree &amp; Backward Induction</div>
+            <p class="text-slate-200 leading-relaxed">${adv.extensive_form_backward_induction.subgame_perfect_equilibrium}</p>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="font-bold text-slate-900 mb-1">2. Bayesian Game & Signaling Strategy</div>
-            <p>${adv.bayesian_and_signaling.incomplete_information}</p>
-            <p class="mt-1 text-indigo-700">${adv.bayesian_and_signaling.signaling_strategy}</p>
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="font-mono-tech text-[11px] text-violet-400 uppercase mb-1">02 // Bayesian Game &amp; Cost Signaling</div>
+            <p class="text-slate-200 leading-relaxed">${adv.bayesian_and_signaling.incomplete_information}</p>
+            <p class="mt-2 text-violet-300">${adv.bayesian_and_signaling.signaling_strategy}</p>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="font-bold text-slate-900 mb-1">3. Repeated Games & Evolutionarily Stable Strategy (ESS)</div>
-            <p>${adv.repeated_and_evolutionary.repeated_game_strategy}</p>
-            <p class="mt-1 text-emerald-700">${adv.repeated_and_evolutionary.evolutionarily_stable_strategy_ess}</p>
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="font-mono-tech text-[11px] text-emerald-400 uppercase mb-1">03 // Repeated Games &amp; Evolutionary Stability (ESS)</div>
+            <p class="text-slate-200 leading-relaxed">${adv.repeated_and_evolutionary.repeated_game_strategy}</p>
+            <p class="mt-2 text-teal-300">${adv.repeated_and_evolutionary.evolutionarily_stable_strategy_ess}</p>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="font-bold text-slate-900 mb-1">4. Mechanism Design (Vickrey Auction) & Computing</div>
-            <p>${adv.mechanism_design_and_computing.vickrey_auction_bidding}</p>
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="font-mono-tech text-[11px] text-rose-400 uppercase mb-1">04 // Mechanism Design &amp; Vickrey Auction</div>
+            <p class="text-slate-200 leading-relaxed">${adv.mechanism_design_and_computing.vickrey_auction_bidding}</p>
           </div>
         `;
       }
 
       // =========================================================
-      // RENDER TAB 1-5: EXISTING IR SYSTEM TABS (UNCHANGED)
+      // RENDER TAB 1-5: SUPPORTING INTELLIGENCE VIEWS
       // =========================================================
       const tabResults = document.getElementById('tab-results');
       tabResults.innerHTML = '';
@@ -1140,26 +1391,26 @@
         const d = item.doc;
         const trustPct = Math.round(item.reliability_score * 100);
         const badgeColor = trustPct >= 70
-          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          ? 'bg-teal-500/15 text-teal-300 border-teal-400/30'
           : trustPct >= 45
-          ? 'bg-amber-50 text-amber-700 border-amber-200'
-          : 'bg-rose-50 text-rose-700 border-rose-200';
-        const badgeLabel = trustPct >= 70 ? 'Verified / High Trust' : trustPct >= 45 ? 'Moderate Trust' : 'Low Trust / Clickbait Risk';
+          ? 'bg-amber-500/15 text-amber-300 border-amber-400/30'
+          : 'bg-rose-500/15 text-rose-300 border-rose-400/30';
+        const badgeLabel = trustPct >= 70 ? 'Verified Signal' : trustPct >= 45 ? 'Moderate Signal' : 'Low-Trust Signal';
 
         tabResults.innerHTML += `
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:border-blue-300 transition">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-              <span class="text-xs font-medium text-slate-400">#${idx + 1} • ${d.source} • ${d.date}</span>
-              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border ${badgeColor}">
+          <div class="cyber-card p-5 rounded-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+              <span class="text-xs font-mono-tech text-slate-400">SIGNAL #${idx + 1} • ${d.source} • ${d.date}</span>
+              <span class="text-xs font-mono-tech font-semibold px-3 py-0.5 rounded-full border ${badgeColor}">
                 ${badgeLabel} (${trustPct}%)
               </span>
             </div>
-            <a href="${d.url || '#'}" target="_blank" class="text-lg font-semibold text-blue-600 hover:underline block">${d.title}</a>
-            <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">${d.text}</p>
-            <div class="flex flex-wrap gap-4 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
-              <span><strong>Overall Score:</strong> ${item.hybrid_score}</span>
-              <span><strong>Relevance:</strong> ${item.relevance_score}</span>
-              <span><strong>Trust Score:</strong> ${item.reliability_score}</span>
+            <a href="${d.url || '#'}" target="_blank" class="font-display text-lg font-bold text-teal-300 hover:underline block">${d.title}</a>
+            <p class="text-sm text-slate-300 mt-1.5 leading-relaxed">${d.text}</p>
+            <div class="flex flex-wrap gap-5 mt-3.5 pt-3 border-t border-slate-800/80 text-xs font-mono-tech text-slate-400">
+              <span><strong class="text-white">Aura Score:</strong> ${item.hybrid_score}</span>
+              <span><strong class="text-cyan-300">Relevance:</strong> ${item.relevance_score}</span>
+              <span><strong class="text-teal-300">Authority:</strong> ${item.reliability_score}</span>
             </div>
           </div>
         `;
@@ -1170,14 +1421,14 @@
       data.hybrid_results.forEach(item => {
         const r = item.reliability_details;
         trustBody.innerHTML += `
-          <tr>
-            <td class="p-3 font-medium text-slate-800">${r.source}</td>
-            <td class="p-3">${r.pagerank}</td>
-            <td class="p-3">${r.hits_authority}</td>
-            <td class="p-3">${r.nb_trust_prob}</td>
-            <td class="p-3">${r.claim_consensus}</td>
-            <td class="p-3">${r.recency_score}</td>
-            <td class="p-3 font-bold text-blue-600">${r.total_reliability}</td>
+          <tr class="hover:bg-slate-900/60">
+            <td class="p-3.5 font-semibold text-white">${r.source}</td>
+            <td class="p-3.5 text-slate-300">${r.pagerank}</td>
+            <td class="p-3.5 text-slate-300">${r.hits_authority}</td>
+            <td class="p-3.5 text-slate-300">${r.nb_trust_prob}</td>
+            <td class="p-3.5 text-slate-300">${r.claim_consensus}</td>
+            <td class="p-3.5 text-slate-300">${r.recency_score}</td>
+            <td class="p-3.5 font-bold text-teal-300">${r.total_reliability}</td>
           </tr>
         `;
       });
@@ -1188,16 +1439,16 @@
       compStd.innerHTML = '';
       data.hybrid_results.forEach((item, i) => {
         compHybrid.innerHTML += `
-          <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-sm">
-            <div class="font-semibold text-slate-800">#${i + 1} ${item.doc.title}</div>
-            <div class="text-xs text-slate-500 mt-1">${item.doc.source} • Hybrid: <strong>${item.hybrid_score}</strong></div>
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-sm">
+            <div class="font-semibold text-white">#${i + 1} ${item.doc.title}</div>
+            <div class="text-xs font-mono-tech text-slate-400 mt-1">${item.doc.source} • Aura Hybrid: <strong class="text-teal-300">${item.hybrid_score}</strong></div>
           </div>`;
       });
       data.standard_results.forEach((item, i) => {
         compStd.innerHTML += `
-          <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-sm">
-            <div class="font-semibold text-slate-800">#${i + 1} ${item.doc.title}</div>
-            <div class="text-xs text-slate-500 mt-1">${item.doc.source} • Keyword BM25: <strong>${item.retrieval_details.bm25}</strong></div>
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-sm">
+            <div class="font-semibold text-white">#${i + 1} ${item.doc.title}</div>
+            <div class="text-xs font-mono-tech text-slate-400 mt-1">${item.doc.source} • Lexical BM25: <strong class="text-amber-300">${item.retrieval_details.bm25}</strong></div>
           </div>`;
       });
 
@@ -1210,22 +1461,22 @@
       const mStd = data.evaluation.standard_bm25;
       const mHyb = data.evaluation.credence_hybrid;
       mCards.innerHTML = `
-        <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200">
-          <div class="font-bold text-emerald-800 mb-2">MarketAura Hybrid Ranking</div>
-          <div class="text-sm space-y-1 text-slate-700">
-            <div>Precision@3: <strong>${mHyb['Precision@3']}</strong></div>
-            <div>Recall@3: <strong>${mHyb['Recall@3']}</strong></div>
-            <div>F1-Score@3: <strong>${mHyb['F1-Score@3']}</strong></div>
-            <div>Average Precision: <strong>${mHyb['Average Precision (AP)']}</strong></div>
+        <div class="p-5 rounded-2xl bg-teal-500/10 border border-teal-400/30">
+          <div class="font-display font-bold text-teal-300 text-base mb-2.5">✦ MarketAura Hybrid Signal Ranking</div>
+          <div class="text-xs font-mono-tech space-y-1.5 text-slate-200">
+            <div>Precision@3: <strong class="text-teal-300">${mHyb['Precision@3']}</strong></div>
+            <div>Recall@3: <strong class="text-teal-300">${mHyb['Recall@3']}</strong></div>
+            <div>F1-Score@3: <strong class="text-teal-300">${mHyb['F1-Score@3']}</strong></div>
+            <div>Average Precision: <strong class="text-teal-300">${mHyb['Average Precision (AP)']}</strong></div>
           </div>
         </div>
-        <div class="p-4 rounded-xl bg-slate-100 border border-slate-200">
-          <div class="font-bold text-slate-700 mb-2">Standard Keyword Ranking</div>
-          <div class="text-sm space-y-1 text-slate-600">
-            <div>Precision@3: <strong>${mStd['Precision@3']}</strong></div>
-            <div>Recall@3: <strong>${mStd['Recall@3']}</strong></div>
-            <div>F1-Score@3: <strong>${mStd['F1-Score@3']}</strong></div>
-            <div>Average Precision: <strong>${mStd['Average Precision (AP)']}</strong></div>
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
+          <div class="font-display font-bold text-slate-300 text-base mb-2.5">⚡ Standard Lexical Baseline</div>
+          <div class="text-xs font-mono-tech space-y-1.5 text-slate-400">
+            <div>Precision@3: <strong class="text-white">${mStd['Precision@3']}</strong></div>
+            <div>Recall@3: <strong class="text-white">${mStd['Recall@3']}</strong></div>
+            <div>F1-Score@3: <strong class="text-white">${mStd['F1-Score@3']}</strong></div>
+            <div>Average Precision: <strong class="text-white">${mStd['Average Precision (AP)']}</strong></div>
           </div>
         </div>
       `;
