@@ -5,41 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MarketAura — Strategic Game Theory & Product Intelligence Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Three.js for High-End Interactive 3D WebGL Equilibrium Mesh -->
+  <!-- Three.js for Real-Time Interactive 3D WebGL Background -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Outfit (Clean, non-stretched geometric display) + Plus Jakarta Sans + JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --sidebar-width: 260px;
-      --bg-primary: #060913;
-      --bg-elevated: rgba(13, 19, 34, 0.82);
-      --border-subtle: rgba(148, 163, 184, 0.14);
-      --accent-primary: #38bdf8;
-      --accent-secondary: #6366f1;
-      --accent-emerald: #10b981;
+      --bg-void: #050812;
     }
 
     * {
       box-sizing: border-box;
       scrollbar-width: thin;
-      scrollbar-color: rgba(56, 189, 248, 0.3) rgba(6, 9, 19, 0.9);
+      scrollbar-color: rgba(56, 189, 248, 0.35) rgba(5, 8, 18, 0.9);
+    }
+
+    /* CRITICAL FIX: html holds the dark base so #webgl-canvas (z-index: 1) is NEVER hidden behind an opaque body */
+    html {
+      background-color: var(--bg-void);
+      color-scheme: dark;
     }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-primary);
+      background: transparent !important;
       color: #e2e8f0;
       overflow-x: hidden;
-      letter-spacing: -0.01em;
+      position: relative;
+      z-index: 10;
     }
 
-    /* Clean, balanced, non-stretched executive display font */
     .font-heading {
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.02em;
     }
 
     .font-mono-code {
@@ -47,31 +47,56 @@
     }
 
     /* =====================================================================
-       3D WEBGL CANVAS BACKGROUND
+       VISIBLE 3D WEBGL STRATEGIC EQUILIBRIUM BACKGROUND
        ===================================================================== */
     #webgl-canvas {
       position: fixed;
       inset: 0;
       width: 100vw;
       height: 100vh;
-      z-index: -1;
+      z-index: 1;
       pointer-events: none;
-      opacity: 0.72;
+      opacity: 0.92;
     }
 
     .ambient-vignette {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: 2;
       pointer-events: none;
       background:
-        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
-        radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.08), transparent 50%),
-        radial-gradient(circle at 50% 50%, transparent 35%, rgba(6, 9, 19, 0.88) 100%);
+        radial-gradient(circle at 50% 15%, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(circle at 85% 80%, rgba(99, 102, 241, 0.12), transparent 50%),
+        radial-gradient(circle at 50% 50%, transparent 45%, rgba(5, 8, 18, 0.65) 100%);
+    }
+
+    #app-wrapper, #results-container, #workspace-sidebar {
+      position: relative;
+      z-index: 10;
     }
 
     /* =====================================================================
-       SLOWER, EXECUTIVE INITIAL BOOTLOADER
+       TERMINAL BLOCK CURSOR (█) FOR TYPEWRITER ANIMATIONS
+       ===================================================================== */
+    .terminal-cursor::after {
+      content: "█";
+      display: inline-block;
+      margin-left: 4px;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      animation: termBlink 0.75s step-end infinite;
+    }
+    .terminal-cursor.done-typing::after {
+      opacity: 0.85;
+    }
+    @keyframes termBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* =====================================================================
+       SLOWER INITIAL BOOTLOADER
        ===================================================================== */
     body.is-booting { overflow: hidden; }
     #boot-loader.boot-screen {
@@ -83,7 +108,8 @@
       width: 100%;
       min-height: 100dvh;
       padding: 24px;
-      background: radial-gradient(circle at 50% 35%, #0f172a 0%, #050811 75%);
+      background: radial-gradient(circle at 50% 35%, rgba(15, 23, 42, 0.96) 0%, rgba(5, 8, 18, 0.98) 75%);
+      backdrop-filter: blur(18px);
       opacity: 1;
       visibility: visible;
       transition: opacity 950ms cubic-bezier(0.22, 1, 0.36, 1), visibility 950ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -96,11 +122,10 @@
     .boot-card {
       width: min(100%, 440px);
       padding: 38px 32px;
-      border: 1px solid rgba(56, 189, 248, 0.22);
+      border: 1px solid rgba(56, 189, 248, 0.28);
       border-radius: 24px;
       background: rgba(11, 17, 30, 0.88);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.75);
       text-align: center;
     }
     .boot-mark {
@@ -111,8 +136,8 @@
       height: 72px;
       margin: 0 auto 20px;
       border-radius: 20px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(99, 102, 241, 0.14));
-      border: 1px solid rgba(56, 189, 248, 0.28);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16), rgba(99, 102, 241, 0.16));
+      border: 1px solid rgba(56, 189, 248, 0.32);
     }
     .boot-mark::before,
     .boot-mark::after {
@@ -137,25 +162,6 @@
       color: #f8fafc;
       font-size: 20px;
       font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .boot-brand {
-      font-family: 'Outfit', sans-serif;
-      margin: 0;
-      font-size: 32px;
-      line-height: 1.15;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      color: #f8fafc;
-    }
-    .boot-brand .market { color: #f8fafc; }
-    .boot-brand .aura { color: #38bdf8; }
-    .boot-description {
-      margin: 10px auto 0;
-      max-width: 34ch;
-      color: #94a3b8;
-      font-size: 13px;
-      line-height: 1.6;
     }
     .boot-progress {
       position: relative;
@@ -174,15 +180,6 @@
       background: linear-gradient(90deg, #38bdf8, #6366f1);
       animation: bootProgress 3.8s ease-in-out infinite;
     }
-    .boot-caption {
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: 14px;
-      color: #64748b;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
     @keyframes bootSpin { to { transform: rotate(360deg); } }
     @keyframes bootProgress {
       0% { transform: translateX(-115%); }
@@ -191,20 +188,19 @@
     }
 
     /* =====================================================================
-       SLOWER, DELIBERATE SEARCH ANALYSIS OVERLAY
+       SLOWER SEARCH ANALYSIS OVERLAY
        ===================================================================== */
     #search-loader {
       position: fixed;
       inset: 0;
-      z-index: 60;
+      z-index: 80;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100dvh;
       padding: clamp(16px, 4vw, 48px);
-      background: rgba(6, 9, 19, 0.86);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
+      background: rgba(5, 8, 18, 0.78);
+      backdrop-filter: blur(14px);
     }
     #search-loader.hidden { display: none; }
     body.is-loading { overflow: hidden; }
@@ -215,9 +211,9 @@
     .loader-panel {
       width: min(100%, 620px);
       padding: clamp(26px, 4vw, 40px);
-      border: 1px solid rgba(56, 189, 248, 0.24);
+      border: 1px solid rgba(56, 189, 248, 0.28);
       border-radius: 24px;
-      background: rgba(11, 17, 30, 0.94);
+      background: rgba(11, 17, 30, 0.92);
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.75);
       text-align: center;
     }
@@ -230,7 +226,7 @@
       place-items: center;
       border-radius: 20px;
       background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.28);
     }
     .loader-orbit::before,
     .loader-orbit::after {
@@ -241,7 +237,7 @@
       border-top-color: #38bdf8;
       border-right-color: #6366f1;
       border-radius: 50%;
-      animation: loaderSpin 4.6s linear infinite;
+      animation: bootSpin 4.6s linear infinite;
     }
     .loader-orbit::after {
       inset: 14px;
@@ -249,12 +245,6 @@
       border-right-color: transparent;
       animation-direction: reverse;
       animation-duration: 7.2s;
-    }
-    .loader-orbit span {
-      font-family: 'Outfit', sans-serif;
-      color: #38bdf8;
-      font-size: 17px;
-      font-weight: 700;
     }
     .loader-track {
       position: relative;
@@ -270,116 +260,48 @@
       width: 38%;
       border-radius: inherit;
       background: linear-gradient(90deg, #38bdf8, #6366f1, #10b981);
-      animation: loaderTravel 4.5s ease-in-out infinite;
-    }
-    .loader-meta {
-      font-family: 'JetBrains Mono', monospace;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 15px;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .loader-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #38bdf8;
-    }
-    .loader-live::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #38bdf8;
-      box-shadow: 0 0 10px #38bdf8;
-      animation: loaderPulse 3s ease-in-out infinite;
-    }
-    .loader-dismiss {
-      margin-top: 22px;
-      padding: 10px 20px;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.15);
-      color: #f8fafc;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    @keyframes loaderSpin { to { transform: rotate(360deg); } }
-    @keyframes loaderTravel {
-      0% { transform: translateX(-110%); }
-      50% { transform: translateX(175%); }
-      100% { transform: translateX(320%); }
-    }
-    @keyframes loaderPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.35; transform: scale(0.8); }
+      animation: bootProgress 4.5s ease-in-out infinite;
     }
 
     /* =====================================================================
-       EXECUTIVE PANELS & INTERACTIVE 3D TILT CARDS
+       GLASS PANELS, 3D TILT & SMOOTH VIEW EXPANSION TRANSITIONS
        ===================================================================== */
     .exec-panel {
-      background: rgba(13, 19, 34, 0.78);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      background: rgba(11, 17, 31, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .exec-panel:hover {
-      border-color: rgba(56, 189, 248, 0.28);
+      border-color: rgba(56, 189, 248, 0.38);
     }
 
     .tilt-card {
       transform-style: preserve-3d;
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
-      will-change: transform;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.35s ease;
     }
     .tilt-card:hover {
-      border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.65), 0 0 30px rgba(56, 189, 248, 0.12);
     }
 
-    .fade-in { animation: fadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .expand-stage {
+      animation: stageExpand 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes stageExpand {
+      0% { opacity: 0; transform: scale(0.94) translateY(16px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .auto-fit-grid:not(.hidden) {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
-      align-items: stretch;
-    }
-    .auto-fit-grid > * { min-width: 0; }
-    .auto-fit-grid-compact {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-      align-items: stretch;
-    }
-    .auto-fit-grid-compact > * { min-width: 0; }
-
-    #results-container {
-      width: 100% !important;
-      max-width: none !important;
-      min-width: 0;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      padding-left: clamp(16px, 2.4vw, 38px);
-      padding-right: clamp(16px, 2.4vw, 38px);
-      box-sizing: border-box;
-      align-self: stretch;
+    .company-row-fade {
+      opacity: 0.12 !important;
+      transform: scale(0.97) !important;
+      pointer-events: none;
     }
 
     /* =====================================================================
-       SIDEBAR NAVIGATION
+       LEFT SIDEBAR NAVIGATION
        ===================================================================== */
     #workspace-sidebar {
       position: fixed;
@@ -389,9 +311,9 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: rgba(8, 12, 24, 0.95);
+      background: rgba(7, 11, 22, 0.88);
       backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(148, 163, 184, 0.14);
+      border-right: 1px solid rgba(148, 163, 184, 0.15);
       transition: width 0.25s ease, transform 0.25s ease;
     }
     #workspace-sidebar.hidden { display: none; }
@@ -418,16 +340,14 @@
       background: rgba(30, 41, 59, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.15);
       border-radius: 9px;
-      transition: all 0.2s ease;
     }
-    .sidebar-toggle:hover { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
     .sidebar-brand {
       font-family: 'Outfit', sans-serif;
       color: #f8fafc;
       font-size: 20px;
       font-weight: 700;
-      letter-spacing: -0.025em;
       white-space: nowrap;
+      cursor: pointer;
     }
     .sidebar-brand span { color: #38bdf8; }
     .sidebar-section-label {
@@ -439,11 +359,11 @@
       letter-spacing: 0.12em;
       white-space: nowrap;
     }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
     .sidebar-nav .tab-btn {
       display: flex;
       align-items: center;
-      gap: 13px;
+      gap: 12px;
       width: 100%;
       min-height: 42px;
       padding: 0 13px;
@@ -451,7 +371,7 @@
       border-radius: 11px;
       background: transparent;
       color: #94a3b8;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 500;
       text-align: left;
       white-space: nowrap;
@@ -463,9 +383,9 @@
       color: #f8fafc;
     }
     .sidebar-nav .tab-btn.nav-active {
-      background: rgba(56, 189, 248, 0.12);
+      background: rgba(56, 189, 248, 0.14);
       color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.3);
+      border-color: rgba(56, 189, 248, 0.32);
       font-weight: 600;
     }
     .sidebar-nav .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; }
@@ -475,17 +395,13 @@
       width: calc(100% - var(--sidebar-width));
       margin-left: var(--sidebar-width);
       align-self: flex-start;
-      box-sizing: border-box;
     }
     body.dashboard-active #results-container {
       width: calc(100% - var(--sidebar-width)) !important;
       max-width: none !important;
       margin-left: var(--sidebar-width) !important;
-      margin-right: 0 !important;
-      padding-left: clamp(16px, 2.2vw, 34px);
-      padding-right: clamp(16px, 2.2vw, 34px);
-      align-self: flex-start;
-      box-sizing: border-box;
+      padding-left: clamp(16px, 2.5vw, 38px);
+      padding-right: clamp(16px, 2.5vw, 38px);
     }
 
     body.sidebar-collapsed { --sidebar-width: 74px; }
@@ -494,161 +410,168 @@
     body.sidebar-collapsed .sidebar-brand,
     body.sidebar-collapsed .sidebar-section-label,
     body.sidebar-collapsed .sidebar-nav .nav-label,
+    body.sidebar-collapsed .sidebar-currency-box,
     body.sidebar-collapsed .sidebar-footer { display: none; }
     body.sidebar-collapsed .sidebar-nav { padding: 0 10px; }
     body.sidebar-collapsed .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
 
-    /* Search Bar Styling */
     .search-shell {
-      background: rgba(13, 19, 34, 0.88);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(18px);
-      transition: all 0.22s ease;
+      background: rgba(13, 19, 34, 0.78);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      transition: all 0.25s ease;
     }
     .search-shell:focus-within {
       border-color: #38bdf8;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 3px rgba(56, 189, 248, 0.15);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 28px rgba(56, 189, 248, 0.22);
     }
-
     .btn-exec-primary {
       background: linear-gradient(135deg, #0ea5e9 0%, #4f46e5 100%);
       color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
       transition: all 0.2s ease;
     }
     .btn-exec-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 26px rgba(14, 165, 233, 0.45);
+      box-shadow: 0 10px 28px rgba(14, 165, 233, 0.55);
     }
 
     @media (max-width: 700px) {
       :root { --sidebar-width: 66px; }
       #workspace-sidebar { width: 66px; }
       .sidebar-top { padding: 0; justify-content: center; gap: 0; }
-      .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label, .sidebar-footer { display: none; }
+      .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label, .sidebar-currency-box, .sidebar-footer { display: none; }
       .sidebar-nav { padding: 0 8px; }
       .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
-      body.sidebar-expanded #workspace-sidebar {
-        width: 250px;
-        box-shadow: 16px 0 45px rgba(0, 0, 0, 0.8);
-      }
+      body.sidebar-expanded #workspace-sidebar { width: 256px; }
       body.sidebar-expanded .sidebar-top { padding: 0 20px; justify-content: flex-start; gap: 14px; }
       body.sidebar-expanded .sidebar-brand,
       body.sidebar-expanded .sidebar-section-label,
       body.sidebar-expanded .sidebar-nav .nav-label,
+      body.sidebar-expanded .sidebar-currency-box,
       body.sidebar-expanded .sidebar-footer { display: block; }
-      body.sidebar-expanded .sidebar-nav { padding: 0 12px; }
       body.sidebar-expanded .sidebar-nav .tab-btn { justify-content: flex-start; padding: 0 13px; }
-      #search-loader,
-      body.dashboard-active #search-loader {
-        inset: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        z-index: 100;
-      }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col is-booting selection:bg-sky-500 selection:text-white">
 
-  <!-- INTERACTIVE 3D WEBGL STRATEGIC EQUILIBRIUM MESH -->
+  <!-- 1. VISIBLE 3D WEBGL STRATEGIC EQUILIBRIUM MESH -->
   <canvas id="webgl-canvas"></canvas>
   <div class="ambient-vignette" aria-hidden="true"></div>
 
-  <!-- WORKSPACE SIDEBAR -->
-  <aside id="workspace-sidebar" class="hidden" aria-label="MarketAura workspace navigation">
+  <!-- 2. LEFT WORKSPACE SIDEBAR (CLEAN GT NAVIGATION + CURRENCY + SETTINGS) -->
+  <aside id="workspace-sidebar" class="hidden" aria-label="MarketAura navigation">
     <div class="sidebar-top">
-      <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation" aria-expanded="true">
+      <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <div class="sidebar-brand">Market<span>Aura</span></div>
+      <div class="sidebar-brand" onclick="openMainView('hub')">Market<span>Aura</span></div>
     </div>
 
-    <div class="sidebar-section-label">INTELLIGENCE VIEWS</div>
+    <div class="sidebar-section-label">GAME THEORY WORKSPACE</div>
     <nav class="sidebar-nav">
-      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn nav-active" type="button" title="Game Theory & Market Releases">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 7 1.6 3.3L17 12l-3.4 1.7L12 17l-1.6-3.3L7 12l3.4-1.7L12 7Z"/></svg>
-        <span class="nav-label">Strategy &amp; Product Intel</span>
+      <button onclick="openMainView('hub')" id="nav-btn-hub" class="tab-btn nav-active" type="button" title="Command Hub (2 Cards)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        <span class="nav-label">Sector Command Hub</span>
       </button>
-      <button onclick="switchTab('tab-results')" id="btn-tab-results" class="tab-btn" type="button" title="Verified Web Signals">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
-        <span class="nav-label">Market Signal Feed</span>
+      <button onclick="openMainView('companies')" id="nav-btn-companies" class="tab-btn" type="button" title="The Companies Strategies">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+        <span class="nav-label">Companies Strategies</span>
       </button>
-      <button onclick="switchTab('tab-trust')" id="btn-tab-trust" class="tab-btn" type="button" title="Authority & Trust Breakdown">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-        <span class="nav-label">Authority &amp; Trust</span>
+      <button onclick="openMainView('products')" id="nav-btn-products" class="tab-btn" type="button" title="The Product Reviews">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+        <span class="nav-label">Product Reviews &amp; Boom</span>
       </button>
-      <button onclick="switchTab('tab-compare')" id="btn-tab-compare" class="tab-btn" type="button" title="Ranking Comparison">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/><path d="M20 7 15 12M4 17l5-5"/></svg>
-        <span class="nav-label">Model Ranking Compare</span>
-      </button>
-      <button onclick="switchTab('tab-index')" id="btn-tab-index" class="tab-btn" type="button" title="Index & Token Inspector">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></svg>
-        <span class="nav-label">Corpus Index Core</span>
-      </button>
-      <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn" type="button" title="Benchmark Metrics">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12h4v8H4ZM10 20V7h4v13h-4ZM16 20V3h4v17h-4Z"/></svg>
-        <span class="nav-label">Precision Benchmarks</span>
+      <button onclick="openMainView('models')" id="nav-btn-models" class="tab-btn" type="button" title="Mathematical Nash & LP Models">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="m12 7 1.6 3.3L17 12l-3.4 1.7L12 17l-1.6-3.3L7 12l3.4-1.7L12 7Z"/></svg>
+        <span class="nav-label">Nash &amp; LP Solvers</span>
       </button>
     </nav>
 
-    <div class="sidebar-footer mt-auto p-3.5 m-3 rounded-xl bg-slate-900/90 border border-slate-800/90 text-[11px] text-slate-400">
-      <div class="flex items-center gap-2 text-sky-400 font-mono-code font-semibold mb-1">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>3D QUANT ENGINE ACTIVE</span>
+    <!-- CURRENCY SELECTOR (DEFAULT INR ₹) -->
+    <div class="sidebar-currency-box px-4 mt-5">
+      <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+        <label for="currency-select" class="block text-[10px] font-mono-code uppercase tracking-wider text-slate-400 mb-1.5">
+          Display Currency (Default INR)
+        </label>
+        <select id="currency-select" onchange="changeCurrency(this.value)" class="w-full bg-slate-950 border border-slate-700 text-xs font-mono-code text-sky-300 rounded-lg px-2.5 py-2 focus:outline-none focus:border-sky-400">
+          <option value="INR" selected>🇮🇳 INR (₹) — Indian Rupee</option>
+          <option value="USD">🇺🇸 USD ($) — US Dollar</option>
+          <option value="EUR">🇪🇺 EUR (€) — Euro</option>
+        </select>
       </div>
-      <div>Nash &amp; Product Spec Analyzer</div>
+    </div>
+
+    <!-- SETTINGS BUTTON (HIDES ALL BACKGROUND WEB/IR EXTRACTION ENGINE DETAILS) -->
+    <div class="mt-auto px-3 mb-2">
+      <button onclick="openMainView('settings')" id="nav-btn-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-xs font-medium text-slate-300 transition cursor-pointer">
+        <svg class="w-4 h-4 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="nav-label">⚙️ Settings &amp; Data Engine</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer p-3.5 m-3 mt-1 rounded-xl bg-slate-900/90 border border-slate-800/90 text-[11px] text-slate-400">
+      <div class="flex items-center gap-2 text-emerald-400 font-mono-code font-semibold mb-0.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>DUAL-ENGINE VERIFIED</span>
+      </div>
+      <div>Option A + B Consensus Active</div>
     </div>
   </aside>
 
-  <!-- 1. INITIAL BOOT SPLASH LOADER -->
+  <!-- 3. INITIAL BOOT SPLASH LOADER -->
   <div id="boot-loader" class="boot-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="boot-card">
       <div class="boot-mark" aria-hidden="true"><span>MA</span></div>
-      <h1 class="boot-brand"><span class="market">Market</span><span class="aura">Aura</span></h1>
-      <p class="boot-description">Initializing 3D Strategic Equilibrium Engine, Product Spec Matrix &amp; Market Telemetry...</p>
+      <h1 class="font-heading text-3xl font-bold text-white"><span class="text-white">Market</span><span class="text-sky-400">Aura</span></h1>
+      <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">Initializing 3D Strategic Equilibrium Mesh, Top-10 Company Ranker &amp; Product Intelligence...</p>
       <div class="boot-progress" aria-hidden="true"><span></span></div>
-      <p class="boot-caption">Loading Quantitative Workspace</p>
+      <p class="font-mono-code text-[10px] text-sky-400 uppercase tracking-widest mt-3.5">Calibrating Game Theory Core</p>
     </div>
   </div>
 
-  <!-- 2. MAIN HEADER & SEARCH BAR -->
+  <!-- 4. MAIN HEADER & SEARCH BAR (TRANSPARENT SO 3D BACKGROUND ALWAYS SHOWS) -->
   <div id="app-wrapper" class="flex-1 flex flex-col justify-center items-center px-4 py-8 transition-all duration-500">
 
-    <!-- BRAND HERO -->
-    <div id="brand-header" class="text-center mb-7 max-w-3xl">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/25 text-sky-300 text-xs font-mono-code uppercase tracking-wider mb-3.5">
-        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+    <!-- FULL HERO HEADER (SHRINKS TO TOP-LEFT CORNER WHEN SUB-CARDS EXPAND) -->
+    <div id="brand-header" class="text-center mb-7 max-w-3xl transition-all duration-500">
+      <div id="hero-badge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/25 text-sky-300 text-xs font-mono-code uppercase tracking-wider mb-3.5">
+        <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
         <span>Quantitative Game Theory &amp; Product Intelligence</span>
       </div>
 
-      <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white">
+      <h1 id="hero-title" class="font-heading text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white">
         Market<span class="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Aura</span>
       </h1>
-      <p class="text-sm sm:text-base text-slate-400 mt-2.5 max-w-2xl mx-auto leading-relaxed">
+      <p id="hero-subtitle" class="text-sm sm:text-base text-slate-300 mt-2.5 max-w-2xl mx-auto leading-relaxed">
         Analyze incumbent &amp; challenger brands, compare tiered product specifications, and compute the exact Nash-Optimal product blueprint capable of disrupting your target market.
       </p>
     </div>
 
-    <!-- SEARCH BAR -->
-    <form id="search-form" class="w-full max-w-3xl">
+    <!-- SEARCH BAR (NO IR SLIDERS HERE - MOVED TO SETTINGS) -->
+    <form id="search-form" class="w-full max-w-3xl transition-all duration-500">
       <div class="search-shell flex items-center rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3">
+        <!-- Compact Top-Left MarketAura Badge (Visible when inside deep-dive views) -->
+        <button type="button" id="compact-corner-brand" onclick="openMainView('hub')" class="hidden items-center gap-2 mr-4 pr-4 border-r border-slate-700 text-left cursor-pointer shrink-0">
+          <span class="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-400/40 flex items-center justify-center font-heading font-bold text-xs text-sky-300">MA</span>
+          <span class="font-heading font-bold text-base text-white">Market<span class="text-sky-400">Aura</span></span>
+        </button>
+
         <svg class="w-5 h-5 text-sky-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input
           id="query-input"
           type="text"
-          placeholder="Enter industry (e.g., Smartphones, Automobiles & EVs, Cloud Computing, AI)..."
-          class="w-full bg-transparent focus:outline-none text-slate-100 placeholder-slate-500 text-sm sm:text-base"
+          placeholder="Enter industry (e.g., Smartphones, Automobiles & EVs, E-Commerce, Cloud, AI)..."
+          class="w-full bg-transparent focus:outline-none text-slate-100 placeholder-slate-400 text-sm sm:text-base"
         />
-        <!-- File Upload Trigger -->
-        <label for="file-input" class="cursor-pointer text-slate-400 hover:text-sky-400 mx-2.5 p-1.5 rounded-lg hover:bg-slate-800/70 transition" title="Upload Market Brief (TXT, PDF, DOCX, XML)">
+        <label for="file-input" class="cursor-pointer text-slate-400 hover:text-sky-400 mx-2.5 p-1.5 rounded-lg hover:bg-slate-800/70 transition" title="Upload Market Brief">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
           </svg>
@@ -660,386 +583,430 @@
       </div>
 
       <!-- Quick Industry Chips -->
-      <div class="flex flex-wrap items-center justify-center gap-2 mt-3.5 text-xs">
-        <span class="text-slate-500 font-mono-code uppercase tracking-wider text-[11px]">Live Sectors:</span>
-        <button type="button" onclick="quickSearch('Smartphone Hardware Industry')" class="bg-slate-900/90 border border-slate-800 hover:border-sky-400/50 hover:text-sky-300 text-slate-300 px-3 py-1.5 rounded-lg transition">📱 Smartphones</button>
-        <button type="button" onclick="quickSearch('Automobiles & Electric Vehicles')" class="bg-slate-900/90 border border-slate-800 hover:border-emerald-400/50 hover:text-emerald-300 text-slate-300 px-3 py-1.5 rounded-lg transition">🚗 Automobiles &amp; EVs</button>
-        <button type="button" onclick="quickSearch('Cloud Computing Industry')" class="bg-slate-900/90 border border-slate-800 hover:border-indigo-400/50 hover:text-indigo-300 text-slate-300 px-3 py-1.5 rounded-lg transition">☁️ Cloud Computing</button>
-        <button type="button" onclick="quickSearch('Artificial Intelligence Industry')" class="bg-slate-900/90 border border-slate-800 hover:border-purple-400/50 hover:text-purple-300 text-slate-300 px-3 py-1.5 rounded-lg transition">🤖 AI &amp; Foundation Models</button>
-        <button type="button" onclick="quickSearch('E-Commerce & Quick Retail')" class="bg-slate-900/90 border border-slate-800 hover:border-amber-400/50 hover:text-amber-300 text-slate-300 px-3 py-1.5 rounded-lg transition">🛒 E-Commerce</button>
+      <div id="sector-chips-row" class="flex flex-wrap items-center justify-center gap-2 mt-3.5 text-xs">
+        <span class="text-slate-400 font-mono-code uppercase tracking-wider text-[11px]">Live Sectors:</span>
+        <button type="button" onclick="quickSearch('Smartphone Hardware Industry')" class="bg-slate-900/75 backdrop-blur-md border border-slate-700/80 hover:border-sky-400/60 hover:text-sky-300 text-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer">📱 Smartphones</button>
+        <button type="button" onclick="quickSearch('Automobiles & Electric Vehicles')" class="bg-slate-900/75 backdrop-blur-md border border-slate-700/80 hover:border-emerald-400/60 hover:text-emerald-300 text-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer">🚗 Automobiles &amp; EVs</button>
+        <button type="button" onclick="quickSearch('E-Commerce & Quick Retail')" class="bg-slate-900/75 backdrop-blur-md border border-slate-700/80 hover:border-amber-400/60 hover:text-amber-300 text-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer">🛒 E-Commerce</button>
+        <button type="button" onclick="quickSearch('Cloud Computing Industry')" class="bg-slate-900/75 backdrop-blur-md border border-slate-700/80 hover:border-indigo-400/60 hover:text-indigo-300 text-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer">☁️ Cloud Computing</button>
+        <button type="button" onclick="quickSearch('Artificial Intelligence Industry')" class="bg-slate-900/75 backdrop-blur-md border border-slate-700/80 hover:border-purple-400/60 hover:text-purple-300 text-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer">🤖 AI &amp; Foundation Models</button>
       </div>
-
-      <!-- Controls -->
-      <div class="flex flex-wrap items-center justify-center gap-4 mt-3 text-xs text-slate-400">
-        <span id="file-badge" class="hidden bg-sky-500/15 border border-sky-400/40 text-sky-300 px-3 py-1 rounded-lg font-mono-code"></span>
-        <label class="flex items-center gap-2 cursor-pointer bg-slate-900/75 border border-slate-800/90 px-3 py-1.5 rounded-lg">
-          <span>Authority Weight:</span>
-          <input id="alpha-slider" type="range" min="0" max="1" step="0.05" value="0.50" class="w-20 accent-sky-400" />
-          <span id="alpha-label" class="font-mono-code font-semibold text-sky-300">50%</span>
-        </label>
-        <label class="flex items-center gap-1.5 cursor-pointer bg-slate-900/75 border border-slate-800/90 px-3 py-1.5 rounded-lg">
-          <input id="prf-check" type="checkbox" checked class="accent-sky-400 rounded" />
-          <span>Query Expansion</span>
-        </label>
+      <div class="text-center mt-2">
+        <span id="file-badge" class="hidden text-xs bg-sky-500/15 border border-sky-400/40 text-sky-300 px-3 py-1 rounded-lg font-mono-code"></span>
       </div>
     </form>
-
-    <!-- LANDING EXECUTIVE PILLARS -->
-    <div id="landing-pillars" class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full mt-9">
-      <div class="exec-panel tilt-card rounded-2xl p-4">
-        <div class="text-[11px] font-mono-code text-sky-400 uppercase tracking-wider">01 // Tiered Product Catalog</div>
-        <div class="font-heading text-base font-semibold text-white mt-1">Flagship, Mid-Range &amp; Value</div>
-        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Visualizes the latest market releases with full hardware/product specs and pricing tiers.</p>
-      </div>
-      <div class="exec-panel tilt-card rounded-2xl p-4">
-        <div class="text-[11px] font-mono-code text-indigo-400 uppercase tracking-wider">02 // Boom Model Blueprint</div>
-        <div class="font-heading text-base font-semibold text-white mt-1">Market-Disrupting Spec Sheet</div>
-        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Synthesizes a head-to-head comparison to recommend a winning model that triggers a market boom.</p>
-      </div>
-      <div class="exec-panel tilt-card rounded-2xl p-4">
-        <div class="text-[11px] font-mono-code text-emerald-400 uppercase tracking-wider">03 // Game Theory Engine</div>
-        <div class="font-heading text-base font-semibold text-white mt-1">Nash, Zero-Sum &amp; Backward Induction</div>
-        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Solves 3×3 Normal-Form matrices, Mixed-Strategy LP, and Subgame Perfect entry playbooks.</p>
-      </div>
-    </div>
   </div>
 
-  <!-- 3. SLOWER SEARCH LOADING OVERLAY -->
+  <!-- 5. SLOWER SEARCH LOADING OVERLAY -->
   <section id="search-loader" class="hidden" role="status" aria-live="polite" aria-busy="true" data-state="loading">
     <div class="loader-panel">
-      <div class="loader-orbit" aria-hidden="true"><span>MA</span></div>
+      <div class="loader-orbit" aria-hidden="true"><span class="font-heading font-bold text-sky-400">MA</span></div>
       <p class="font-mono-code text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1.5">MarketAura Quantitative Core</p>
-      <h2 id="loader-title" class="font-heading text-2xl sm:text-3xl font-bold text-white">Simulating Market &amp; Product Landscape</h2>
-      <p id="loader-step-text" class="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">Connecting to live industry intelligence and product spec repositories...</p>
+      <h2 id="loader-title" class="font-heading text-2xl sm:text-3xl font-bold text-white">Analyzing Industry &amp; Product Landscape</h2>
+      <p id="loader-step-text" class="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">Running Option A (Live Web Scraper) + Option B (Autonomous Synthesizer)...</p>
       <div class="loader-track" role="presentation"><div id="loader-bar"></div></div>
-      <div class="loader-meta">
-        <span id="loader-phase">STAGE 01 // SIGNAL INGESTION</span>
-        <span class="loader-live" id="loader-live-label">COMPUTING EQUILIBRIUM</span>
+      <div class="flex items-center justify-between mt-4 text-[11px] font-mono-code text-slate-400 uppercase">
+        <span id="loader-phase">STAGE 01 // DUAL-SOURCE EXTRACTION</span>
+        <span class="text-sky-400" id="loader-live-label">● COMPUTING EQUILIBRIUM</span>
       </div>
-      <button id="loader-dismiss" class="loader-dismiss hidden" type="button">Return to Search</button>
+      <button id="loader-dismiss" class="mt-5 px-5 py-2 rounded-full bg-sky-500/20 border border-sky-400/40 text-xs font-semibold text-white hidden cursor-pointer" type="button">Return to Search</button>
     </div>
   </section>
 
-  <!-- 4. RESULTS DASHBOARD -->
-  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-16 fade-in">
+  <!-- =======================================================================
+       6. MAIN RESULTS CONTAINER (TWO-CARD HUB + EXPANDABLE FULL-WINDOW STAGES)
+       ======================================================================= -->
+  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-20">
 
-    <!-- TOP EXECUTIVE KPI RIBBON -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mt-5 mb-5">
-      <div class="exec-panel rounded-2xl p-4 border-l-4 border-l-sky-400">
-        <div class="text-[10px] font-mono-code uppercase tracking-wider text-slate-400">Analyzed Sector</div>
-        <div id="hud-sector" class="font-heading text-base sm:text-lg font-bold text-white truncate mt-0.5">—</div>
-        <div class="text-[11px] text-sky-400 font-mono-code mt-0.5">Tiered Product &amp; Brand Topology</div>
+    <!-- =====================================================================
+         STAGE VIEW 1: THE TWO PRIMARY GATEWAY CARDS
+         ("The Companies Strategies"  &  "The Product Reviews")
+         ===================================================================== -->
+    <section id="view-hub" class="max-w-6xl mx-auto pt-4 expand-stage">
+      <div class="text-center mb-8">
+        <span id="hub-consensus-badge" class="inline-flex items-center gap-2 text-xs font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 px-3.5 py-1 rounded-full"></span>
+        <h2 id="hub-industry-heading" class="font-heading text-3xl sm:text-4xl font-bold text-white mt-2"></h2>
+        <p class="text-sm text-slate-400 mt-1">Select a strategic intelligence module below to expand the full-window interactive terminal</p>
       </div>
-      <div class="exec-panel rounded-2xl p-4 border-l-4 border-l-indigo-400">
-        <div class="text-[10px] font-mono-code uppercase tracking-wider text-slate-400">Nash Equilibrium Outcome</div>
-        <div id="hud-equilibrium" class="font-heading text-base sm:text-lg font-bold text-white truncate mt-0.5">Pure + Mixed Nash</div>
-        <div class="text-[11px] text-indigo-400 font-mono-code mt-0.5">Pareto-Optimal Co-opetition</div>
-      </div>
-      <div class="exec-panel rounded-2xl p-4 border-l-4 border-l-emerald-400">
-        <div class="text-[10px] font-mono-code uppercase tracking-wider text-slate-400">Recommended Boom Tier</div>
-        <div id="hud-boom-tier" class="font-heading text-base sm:text-lg font-bold text-white truncate mt-0.5">Flagship-Killer Disruptor</div>
-        <div class="text-[11px] text-emerald-400 font-mono-code mt-0.5">Asymmetric Value Sweet-Spot</div>
-      </div>
-      <div class="exec-panel rounded-2xl p-4 border-l-4 border-l-amber-400">
-        <div class="text-[10px] font-mono-code uppercase tracking-wider text-slate-400">Signal Verification</div>
-        <div id="hud-confidence" class="font-heading text-base sm:text-lg font-bold text-white mt-0.5">Verified Corpus</div>
-        <div class="text-[11px] text-amber-400 font-mono-code mt-0.5">Modules 1–5 Solvers Active</div>
-      </div>
-    </div>
 
-    <!-- EXECUTIVE INTELLIGENCE SYNTHESIS BANNER -->
-    <div class="exec-panel rounded-2xl p-5 mb-6">
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 mb-3">
-        <div class="flex items-center gap-2">
-          <span class="font-mono-code uppercase text-[11px] text-slate-400">Query Vector:</span>
-          <span id="out-active-query" class="bg-slate-900 border border-slate-700 px-2.5 py-0.5 rounded-md text-sky-300 font-mono-code"></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="font-mono-code uppercase text-[11px] text-slate-400">Expanded Terms:</span>
-          <span id="out-expanded-terms" class="text-indigo-300 font-mono-code"></span>
-        </div>
-      </div>
-      <div class="bg-slate-900/90 border border-sky-500/20 rounded-xl p-4">
-        <div class="text-xs font-mono-code font-semibold uppercase tracking-wider text-sky-400 mb-1">
-          Executive Market Synthesis
-        </div>
-        <p id="out-answer" class="text-slate-100 text-sm md:text-base font-normal leading-relaxed"></p>
-        <div id="out-answer-meta" class="text-xs font-mono-code text-slate-400 mt-2"></div>
-      </div>
-    </div>
+      <!-- TWO GIANT INTERACTIVE GATEWAY CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
 
-    <!-- =============================================================== -->
-    <!-- TAB 0: STRATEGY, LATEST RELEASES, SPEC COMPARE & BOOM MODEL     -->
-    <!-- =============================================================== -->
-    <div id="tab-strategy" class="tab-pane space-y-7">
-
-      <!-- Sector Hero Banner -->
-      <div class="exec-panel rounded-2xl p-6 sm:p-7 border border-sky-500/25 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-indigo-950/60">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-2 text-xs font-mono-code uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-400/25 px-3 py-1 rounded-md">
-              <span>Strategic Industry &amp; Product Intelligence</span>
-            </div>
-            <h2 id="gt-industry-title" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-2"></h2>
-            <p class="text-sm text-slate-300 mt-1 max-w-3xl">
-              Complete breakdown of Top Incumbents, Mid/Low-End Challengers, Latest Market Releases by Tier, Spec Comparison, and your Recommended "Boom Model" Blueprint.
-            </p>
+        <!-- CARD 1: THE COMPANIES STRATEGIES -->
+        <div onclick="openMainView('companies')" class="exec-panel tilt-card rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-sky-500/30 hover:border-sky-400">
+          <div class="absolute -right-12 -top-12 w-44 h-44 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-400/20 transition"></div>
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono-code text-xs uppercase tracking-widest text-sky-400 bg-sky-500/10 border border-sky-400/30 px-3 py-1 rounded-md">
+              MODULE 01 // CORPORATE GAME THEORY
+            </span>
+            <span class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-300 group-hover:translate-x-1 transition">
+              ↗
+            </span>
           </div>
-          <div class="bg-slate-950/85 border border-slate-800 rounded-xl px-4 py-3 text-right font-mono-code">
-            <div class="text-[10px] uppercase tracking-wider text-slate-400">Equilibrium Solver</div>
-            <div class="text-sm font-semibold text-sky-400 mt-0.5">Subgame Perfect Nash</div>
-            <div class="text-[11px] text-emerald-400">Pareto Frontier Verified</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================================= -->
-      <!-- NEW SECTION A: LATEST MARKET RELEASES & TIERED SPECS SHOWCASE -->
-      <!-- ============================================================= -->
-      <div class="exec-panel rounded-2xl p-6">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800/90">
-          <div>
-            <span class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 block">Live Product &amp; Release Radar (2026)</span>
-            <h3 id="showcase-heading" class="font-heading text-xl sm:text-2xl font-bold text-white mt-0.5">
-              Latest Market Releases &amp; Tiered Specifications
-            </h3>
-          </div>
-          <!-- Category Filter Pills -->
-          <div class="flex flex-wrap gap-2 text-xs font-mono-code">
-            <button type="button" onclick="filterProductCards('all')" id="flt-all" class="flt-btn bg-sky-500/20 text-sky-300 border border-sky-400/40 px-3 py-1.5 rounded-lg cursor-pointer transition">All Tiers (6)</button>
-            <button type="button" onclick="filterProductCards('Premium Flagship')" id="flt-premium" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Ultra-Premium</button>
-            <button type="button" onclick="filterProductCards('Mid-Range Disruptor')" id="flt-mid" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Mid-Range</button>
-            <button type="button" onclick="filterProductCards('Value / Entry Tier')" id="flt-value" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Value / Entry</button>
-          </div>
-        </div>
-
-        <!-- Visual Product Cards Grid -->
-        <div id="latest-products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-      </div>
-
-      <!-- ============================================================= -->
-      <!-- NEW SECTION B: HEAD-TO-HEAD SPEC COMPARISON & BOOM MODEL      -->
-      <!-- ============================================================= -->
-      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-
-        <!-- Cross-Tier Spec Comparison Table (7 cols on XL) -->
-        <div class="xl:col-span-7 exec-panel rounded-2xl p-6 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[11px] font-mono-code uppercase tracking-wider text-indigo-400">Cross-Tier Benchmarking</span>
-              <span class="text-[11px] font-mono-code bg-indigo-500/10 text-indigo-300 border border-indigo-400/25 px-2.5 py-0.5 rounded-md">Spec-to-Utility Matrix</span>
-            </div>
-            <h3 class="font-heading text-lg sm:text-xl font-bold text-white mb-4">
-              Head-to-Head Model &amp; Specification Comparison
-            </h3>
-            <div class="overflow-x-auto rounded-xl border border-slate-800">
-              <table class="w-full text-left text-xs">
-                <thead id="spec-compare-head" class="bg-slate-900/95 text-slate-300 font-mono-code uppercase border-b border-slate-800"></thead>
-                <tbody id="spec-compare-body" class="divide-y divide-slate-800/80"></tbody>
-              </table>
-            </div>
-          </div>
-          <p id="spec-compare-takeaway" class="text-xs text-slate-400 mt-4 bg-slate-900/70 border border-slate-800 p-3 rounded-xl leading-relaxed"></p>
-        </div>
-
-        <!-- RECOMMENDED "BOOM MODEL" BLUEPRINT (5 cols on XL) -->
-        <div class="xl:col-span-5 rounded-2xl p-6 border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-950/40 via-slate-900/95 to-sky-950/35 shadow-2xl flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="text-[11px] font-mono-code font-bold uppercase tracking-wider bg-emerald-500 text-slate-950 px-3 py-1 rounded-md">
-                ★ Market-Boom Model Blueprint
-              </span>
-              <span class="text-[11px] font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 px-2.5 py-0.5 rounded-md">
-                Nash Sweet-Spot
-              </span>
-            </div>
-
-            <h3 id="boom-model-name" class="font-heading text-xl sm:text-2xl font-bold text-white"></h3>
-            <p id="boom-model-tagline" class="text-xs sm:text-sm text-emerald-300 font-medium mt-1"></p>
-
-            <!-- Hero Visual + Price Target -->
-            <div class="relative rounded-xl overflow-hidden border border-emerald-500/30 my-4 h-44 bg-slate-950">
-              <img id="boom-model-img" src="" alt="Recommended Boom Model" class="w-full h-full object-cover opacity-85" />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-              <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
-                <div>
-                  <span class="text-[10px] font-mono-code uppercase tracking-wider text-emerald-300 block">Target Disruptor Price</span>
-                  <span id="boom-model-price" class="font-heading text-xl font-bold text-white"></span>
-                </div>
-                <span id="boom-model-share-target" class="text-xs font-mono-code font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 px-2.5 py-1 rounded-md"></span>
-              </div>
-            </div>
-
-            <!-- Winning Specifications Grid -->
-            <div class="text-xs font-mono-code uppercase tracking-wider text-slate-400 mb-2">Recommended Winning Spec Sheet:</div>
-            <div id="boom-model-specs" class="grid grid-cols-2 gap-2.5 mb-4"></div>
-          </div>
-
-          <div class="bg-slate-950/85 border border-emerald-500/25 rounded-xl p-3.5 text-xs text-slate-200 leading-relaxed">
-            <strong class="text-emerald-400 font-mono-code uppercase text-[11px] block mb-1">Why This Creates a Market Boom (Game Theory Proof):</strong>
-            <span id="boom-model-rationale"></span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ============================================================= -->
-      <!-- SECTION C: TOP BRANDS vs MIDDLE/LOW-END BRANDS GRID           -->
-      <!-- ============================================================= -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Top Brands Column -->
-        <div class="exec-panel rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
-            <div>
-              <h3 class="font-heading text-lg font-bold text-white">🏆 Current Top-Tier Incumbent Brands</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Scale leaders controlling ecosystem lock-in &amp; enterprise margins</p>
-            </div>
-            <span class="text-xs font-mono-code bg-sky-500/15 text-sky-300 font-semibold px-3 py-1 rounded-md border border-sky-400/30">Incumbents</span>
-          </div>
-          <div id="gt-top-brands" class="space-y-4"></div>
-        </div>
-
-        <!-- Middle / Low-End Brands Column -->
-        <div class="exec-panel rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
-            <div>
-              <h3 class="font-heading text-lg font-bold text-white">⚡ Middle &amp; Low-End Challengers</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Specialist &amp; value disruptors competing via aggressive pricing &amp; speed</p>
-            </div>
-            <span class="text-xs font-mono-code bg-amber-500/15 text-amber-300 font-semibold px-3 py-1 rounded-md border border-amber-400/30">Challengers</span>
-          </div>
-          <div id="gt-mid-brands" class="space-y-4"></div>
-        </div>
-      </div>
-
-      <!-- ============================================================= -->
-      <!-- SECTION D: IMMEDIATE ACTIONABLE ENTRY STRATEGY                -->
-      <!-- ============================================================= -->
-      <div class="exec-panel rounded-2xl p-6 border border-sky-500/30">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span class="text-xs font-mono-code font-semibold uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-400/30 px-3 py-1 rounded-md">
-            🚀 Ready-to-Use Strategic Execution Plan (Zero Extensive Research Required)
-          </span>
-          <span class="text-xs font-mono-code text-slate-400">Subgame Perfect &amp; Pareto-Optimal Playbook</span>
-        </div>
-        <h3 id="gt-strat-title" class="font-heading text-xl font-bold text-white mt-2"></h3>
-        <p id="gt-strat-summary" class="text-sm text-slate-300 mt-1.5 leading-relaxed"></p>
-        <div id="gt-strat-steps" class="auto-fit-grid-compact gap-4 mt-5"></div>
-      </div>
-
-      <!-- ============================================================= -->
-      <!-- SECTION E: SYLLABUS MODULES 1-5 GAME THEORY MODELS BREAKDOWN  -->
-      <!-- ============================================================= -->
-      <div class="auto-fit-grid gap-6">
-
-        <!-- Module 1 & 2: Payoff Matrix, Dominance, Nash & Pareto -->
-        <div class="exec-panel rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-1">
-            <h3 class="font-heading text-lg font-bold text-white">
-              📊 Normal-Form Payoff Matrix &amp; Nash Equilibrium
-            </h3>
-            <span class="text-[11px] font-mono-code text-sky-300 bg-sky-500/10 border border-sky-400/25 px-2.5 py-0.5 rounded-md">Modules 1 &amp; 2</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-4">
-            Utility Tuple: <code class="font-mono-code text-sky-300">(Your Entrant Utility, Incumbent Utility)</code>
+          <h3 class="font-heading text-2xl sm:text-3xl font-bold text-white mb-3">
+            The Companies Strategies
+          </h3>
+          <p class="text-sm text-slate-300 leading-relaxed mb-6">
+            Inspect the Top-10 ranked companies in this industry ordered by Market Share &amp; Valuation. Click any company to launch its chronological History Timeline, Strategic Pivots, Latest Products, and Market Share Graphs.
           </p>
+          <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800/80 text-xs font-mono-code">
+            <div>
+              <span class="text-slate-400 block text-[10px]">RANKED PLAYERS</span>
+              <span id="hub-comp-count" class="text-sky-300 font-bold">Top 10 Companies</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px]">DEEP-DIVE TABS</span>
+              <span class="text-emerald-300 font-bold">History • Products • Share</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: THE PRODUCT REVIEWS -->
+        <div onclick="openMainView('products')" class="exec-panel tilt-card rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-indigo-500/30 hover:border-indigo-400">
+          <div class="absolute -right-12 -top-12 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-400/20 transition"></div>
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono-code text-xs uppercase tracking-widest text-indigo-300 bg-indigo-500/10 border border-indigo-400/30 px-3 py-1 rounded-md">
+              MODULE 02 // PRODUCT &amp; LAUNCH RADAR
+            </span>
+            <span class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center text-indigo-300 group-hover:translate-x-1 transition">
+              ↗
+            </span>
+          </div>
+          <h3 class="font-heading text-2xl sm:text-3xl font-bold text-white mb-3">
+            The Product Reviews
+          </h3>
+          <p class="text-sm text-slate-300 leading-relaxed mb-6">
+            Explore Upcoming Market Launches (with expected release dates), Current Tiered Products (Flagship, Mid-Range, Value) in INR (₹), Terminal Spec + Strategy Popups, Direct Official Links, and the Market-Boom Blueprint.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800/80 text-xs font-mono-code">
+            <div>
+              <span class="text-slate-400 block text-[10px]">CATALOG COVERAGE</span>
+              <span id="hub-prod-count" class="text-indigo-300 font-bold">Upcoming + Current Tiers</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px]">NASH RECOMMENDATION</span>
+              <span class="text-emerald-300 font-bold">★ Market-Boom Blueprint</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         STAGE VIEW 2: "THE COMPANIES STRATEGIES" (FULL-WINDOW EXPANSION)
+         ===================================================================== -->
+    <section id="view-companies" class="hidden max-w-6xl mx-auto pt-4 expand-stage">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+        <div>
+          <div class="text-xs font-mono-code text-sky-400 uppercase tracking-widest">MODULE 01 // RANKED BY MARKET SHARE &amp; VALUATION</div>
+          <!-- Terminal Typewriter Header -->
+          <h2 id="typewriter-companies-header" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1 terminal-cursor"></h2>
+        </div>
+        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer transition">
+          ← Back to Sector Hub
+        </button>
+      </div>
+
+      <!-- LIST OF TOP-10 COMPANIES IN HORIZONTAL RECTANGULAR BOXES -->
+      <div id="companies-list-container" class="space-y-4"></div>
+
+      <!-- SINGLE COMPANY FULL-WINDOW DEEP-DIVE VIEW (SHOWN WHEN USER CLICKS ANY COMPANY) -->
+      <div id="company-detail-view" class="hidden exec-panel rounded-3xl p-6 sm:p-8 border-2 border-sky-500/35 expand-stage">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-800">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700 p-2.5 flex items-center justify-center shrink-0">
+              <img id="comp-detail-logo" src="" alt="Logo" class="w-11 h-11 object-contain rounded" />
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="comp-detail-rank" class="text-xs font-mono-code font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30 px-2.5 py-0.5 rounded-md"></span>
+                <span id="comp-detail-tier" class="text-xs font-mono-code bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md"></span>
+              </div>
+              <h3 id="comp-detail-name" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1"></h3>
+            </div>
+          </div>
+          <button onclick="closeCompanyDetail()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-sky-300 cursor-pointer transition">
+            ← Back to Top-10 Companies List
+          </button>
+        </div>
+
+        <!-- Terminal Typewriter Company Description -->
+        <div class="my-5 bg-slate-950/90 border border-slate-800 rounded-2xl p-5">
+          <div class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 mb-1.5">EXECUTIVE TERMINAL DOSSIER //</div>
+          <p id="comp-detail-typewriter-desc" class="font-mono-code text-xs sm:text-sm text-slate-200 leading-relaxed terminal-cursor"></p>
+        </div>
+
+        <!-- 3 SUB-TABS FOR SELECTED COMPANY: History | Latest Products | Market Value & Share Graphs -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3 mb-6">
+          <button onclick="switchCompanySubTab('ctab-history')" id="btn-ctab-history" class="comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/40 cursor-pointer transition">
+            📜 History &amp; Strategy Timeline
+          </button>
+          <button onclick="switchCompanySubTab('ctab-products')" id="btn-ctab-products" class="comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white cursor-pointer transition">
+            🚀 Latest Products Portfolio
+          </button>
+          <button onclick="switchCompanySubTab('ctab-market')" id="btn-ctab-market" class="comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white cursor-pointer transition">
+            📈 Market Value, Share &amp; Graphs
+          </button>
+        </div>
+
+        <!-- SUB-TAB 1: VERTICAL HISTORY TIMELINE -->
+        <div id="ctab-history" class="comp-subtab-pane space-y-5">
+          <div id="comp-timeline-box" class="relative border-l-2 border-sky-500/40 ml-4 pl-6 space-y-6"></div>
+        </div>
+
+        <!-- SUB-TAB 2: LATEST PRODUCTS -->
+        <div id="ctab-products" class="comp-subtab-pane hidden">
+          <div id="comp-latest-products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- SUB-TAB 3: MARKET VALUE, SHARE & VISUAL GRAPHS -->
+        <div id="ctab-market" class="comp-subtab-pane hidden space-y-5">
+          <div id="comp-market-graphs-box"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         STAGE VIEW 3: "THE PRODUCT REVIEWS" (FULL-WINDOW EXPANSION)
+         ===================================================================== -->
+    <section id="view-products" class="hidden max-w-7xl mx-auto pt-4 space-y-8 expand-stage">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+        <div>
+          <div class="text-xs font-mono-code text-indigo-400 uppercase tracking-widest">MODULE 02 // UPCOMING RELEASES, CURRENT TIERS &amp; BOOM BLUEPRINT</div>
+          <h2 id="typewriter-products-header" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1 terminal-cursor"></h2>
+        </div>
+        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer transition">
+          ← Back to Sector Hub
+        </button>
+      </div>
+
+      <!-- PART 1: UPCOMING LAUNCHES (WITH LAUNCH DATES) -->
+      <div class="exec-panel rounded-3xl p-6">
+        <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-[11px] font-mono-code uppercase tracking-wider text-amber-400 block">Pre-Launch Pipeline Radar</span>
+            <h3 class="font-heading text-xl font-bold text-white mt-0.5">⏳ Upcoming Top Products About to Launch</h3>
+          </div>
+          <span class="text-xs font-mono-code bg-amber-500/15 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-md">With Expected Launch Dates</span>
+        </div>
+        <div id="upcoming-products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <!-- PART 2: CURRENT MARKET PRODUCTS (WITH TIER RANGING FILTER) -->
+      <div class="exec-panel rounded-3xl p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 block">Active Market Catalog</span>
+            <h3 class="font-heading text-xl font-bold text-white mt-0.5">📱 Current Products Available in the Market</h3>
+          </div>
+          <!-- Tier Ranging Filter -->
+          <div class="flex flex-wrap gap-2 text-xs font-mono-code">
+            <button type="button" onclick="filterCurrentProducts('all')" id="flt-all" class="flt-btn bg-sky-500/20 text-sky-300 border border-sky-400/40 px-3 py-1.5 rounded-lg cursor-pointer transition">All Tiers</button>
+            <button type="button" onclick="filterCurrentProducts('Premium Flagship')" id="flt-premium" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Ultra-Premium</button>
+            <button type="button" onclick="filterCurrentProducts('Mid-Range Disruptor')" id="flt-mid" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Mid-Range</button>
+            <button type="button" onclick="filterCurrentProducts('Value / Entry Tier')" id="flt-value" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Value / Entry</button>
+          </div>
+        </div>
+        <div id="current-products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <!-- PART 3: RECOMMENDED "BOOM MODEL" BLUEPRINT -->
+      <div class="rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/45 bg-gradient-to-br from-emerald-950/40 via-slate-900/95 to-sky-950/35 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="text-xs font-mono-code font-bold uppercase tracking-wider bg-emerald-400 text-slate-950 px-3.5 py-1 rounded-md">
+            ★ Market-Boom Product Blueprint (Recommended Nash Sweet-Spot Model)
+          </span>
+          <span id="boom-model-share-target" class="text-xs font-mono-code text-emerald-300 bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 rounded-md"></span>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-5 relative rounded-2xl overflow-hidden border border-emerald-500/30 h-60 bg-slate-950">
+            <img id="boom-model-img" src="" alt="Boom Model" class="w-full h-full object-cover opacity-85" />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <span class="text-[10px] font-mono-code uppercase tracking-wider text-emerald-300 block">Target Disruptor Price</span>
+              <span id="boom-model-price" class="font-heading text-2xl font-bold text-white"></span>
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-4">
+            <div>
+              <h3 id="boom-model-name" class="font-heading text-2xl font-bold text-white"></h3>
+              <p id="boom-model-tagline" class="text-sm text-emerald-300 mt-1"></p>
+            </div>
+            <div id="boom-model-specs" class="grid grid-cols-2 gap-3"></div>
+            <div class="bg-slate-950/90 border border-emerald-500/30 rounded-xl p-4 text-xs text-slate-200 leading-relaxed">
+              <strong class="text-emerald-400 font-mono-code uppercase text-[11px] block mb-1">Game-Theoretic Proof (Why This Creates a Boom):</strong>
+              <span id="boom-model-rationale"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         STAGE VIEW 4: MATHEMATICAL NASH, ZERO-SUM LP & ADVANCED SOLVERS
+         ===================================================================== -->
+    <section id="view-models" class="hidden max-w-6xl mx-auto pt-4 space-y-6 expand-stage">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-wider">SYLLABUS MODULES 1–5 COMPUTATIONAL SOLVERS</span>
+          <h2 class="font-heading text-2xl font-bold text-white mt-0.5">Nash Equilibrium, Zero-Sum LP &amp; Backward Induction</h2>
+        </div>
+        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer">
+          ← Back to Sector Hub
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="exec-panel rounded-2xl p-6">
+          <h3 class="font-heading text-lg font-bold text-white mb-2">📊 3×3 Normal-Form Payoff Matrix &amp; Nash Equilibrium</h3>
           <div class="overflow-x-auto rounded-xl border border-slate-800">
             <table class="w-full text-xs text-left">
               <thead id="gt-matrix-head" class="bg-slate-900/95 text-slate-300 font-mono-code uppercase"></thead>
               <tbody id="gt-matrix-body" class="divide-y divide-slate-800/80"></tbody>
             </table>
           </div>
-          <div id="gt-nash-details" class="mt-4 space-y-2.5 text-xs text-slate-300"></div>
+          <div id="gt-nash-details" class="mt-4 space-y-2 text-xs text-slate-300"></div>
         </div>
 
-        <!-- Module 3: Zero-Sum Game, Maximin/Minimax & Mixed Strategy -->
         <div class="exec-panel rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-1">
-            <h3 class="font-heading text-lg font-bold text-white">
-              ⚖️ Zero-Sum Share &amp; Mixed-Strategy LP Solver
-            </h3>
-            <span class="text-[11px] font-mono-code text-indigo-300 bg-indigo-500/10 border border-indigo-400/25 px-2.5 py-0.5 rounded-md">Module 3</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-4">
-            Maximin-Minimax Principle &amp; Linear Programming Resource Allocation
-          </p>
+          <h3 class="font-heading text-lg font-bold text-white mb-2">⚖️ Zero-Sum Share &amp; Mixed-Strategy LP Solver</h3>
           <div id="gt-zerosum-details" class="space-y-3 text-xs text-slate-300"></div>
         </div>
-
       </div>
 
-      <!-- Module 4 & 5: Extensive-Form Backward Induction, Bayesian, Repeated & ESS -->
       <div class="exec-panel rounded-2xl p-6">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <h3 class="font-heading text-lg font-bold text-white">
-            🌳 Advanced Strategic Models (Backward Induction, Bayesian Signaling, Repeated &amp; ESS)
-          </h3>
-          <span class="text-[11px] font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/25 px-2.5 py-0.5 rounded-md">Modules 4 &amp; 5</span>
+        <h3 class="font-heading text-lg font-bold text-white mb-3">🌳 Extensive-Form Backward Induction, Bayesian Signaling &amp; ESS</h3>
+        <div id="gt-advanced-details" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300"></div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         STAGE VIEW 5: ⚙️ SETTINGS & BACKGROUND DATA EXTRACTION ENGINE
+         (Hides all IR controls, Dual-Engine Option A vs B comparison & logs)
+         ===================================================================== -->
+    <section id="view-settings" class="hidden max-w-6xl mx-auto pt-4 space-y-6 expand-stage">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <span class="text-xs font-mono-code text-sky-400 uppercase tracking-wider">SYSTEM CONFIGURATION &amp; BACKGROUND EXTRACTION ENGINE</span>
+          <h2 class="font-heading text-2xl font-bold text-white mt-0.5">⚙️ Settings, Dual-Engine Reliability &amp; Background Web Indexer</h2>
         </div>
-        <div id="gt-advanced-details" class="auto-fit-grid-compact gap-4 text-xs text-slate-300"></div>
+        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer">
+          ← Back to Sector Hub
+        </button>
       </div>
 
-    </div>
-
-    <!-- =============================================================== -->
-    <!-- TAB 1: MARKET SIGNAL FEED                                       -->
-    <!-- =============================================================== -->
-    <div id="tab-results" class="tab-pane hidden space-y-4"></div>
-
-    <!-- TAB 2: AUTHORITY & TRUST MATRIX -->
-    <div id="tab-trust" class="tab-pane hidden exec-panel rounded-2xl p-6 overflow-x-auto">
-      <h3 class="font-heading text-lg font-bold text-white mb-4">Source Authority &amp; Credibility Matrix</h3>
-      <table class="w-full text-left text-sm">
-        <thead class="bg-slate-900/90 text-slate-400 font-mono-code text-xs uppercase border-b border-slate-800">
-          <tr>
-            <th class="p-3.5">Domain Source</th>
-            <th class="p-3.5">PageRank</th>
-            <th class="p-3.5">HITS Authority</th>
-            <th class="p-3.5">Signal Purity</th>
-            <th class="p-3.5">Consensus</th>
-            <th class="p-3.5">Recency</th>
-            <th class="p-3.5">Composite Trust</th>
-          </tr>
-        </thead>
-        <tbody id="trust-table-body" class="divide-y divide-slate-800/70 font-mono-code text-xs"></tbody>
-      </table>
-    </div>
-
-    <!-- TAB 3: SIDE-BY-SIDE RANKING COMPARE -->
-    <div id="tab-compare" class="tab-pane hidden auto-fit-grid gap-6">
-      <div class="exec-panel rounded-2xl p-5">
-        <h3 class="text-xs font-mono-code font-semibold uppercase tracking-wider text-sky-400 mb-3">MarketAura Hybrid Signal Ranking (Relevance + Authority)</h3>
-        <div id="compare-hybrid" class="space-y-3"></div>
+      <!-- Engine Parameters Card -->
+      <div class="exec-panel rounded-2xl p-6">
+        <h3 class="font-heading text-lg font-bold text-white mb-4">1. Background Web Extraction &amp; Currency Parameters</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+            <span class="font-mono-code text-slate-400 uppercase block mb-2">Source Authority Weight</span>
+            <div class="flex items-center gap-3">
+              <input id="alpha-slider" type="range" min="0" max="1" step="0.05" value="0.50" class="w-full accent-sky-400" />
+              <span id="alpha-label" class="font-mono-code font-bold text-sky-300">50%</span>
+            </div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="font-mono-code text-slate-400 uppercase block">Autonomous Query Expansion</span>
+              <span class="text-slate-300">Pseudo-Relevance Feedback (PRF)</span>
+            </div>
+            <input id="prf-check" type="checkbox" checked class="w-4 h-4 accent-sky-400 rounded" />
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+            <span class="font-mono-code text-slate-400 uppercase block mb-1">Processed Vector &amp; Expanded Terms</span>
+            <div class="font-mono-code text-sky-300 truncate" id="out-active-query">—</div>
+            <div class="font-mono-code text-indigo-300 truncate mt-0.5" id="out-expanded-terms">—</div>
+          </div>
+        </div>
       </div>
-      <div class="exec-panel rounded-2xl p-5">
-        <h3 class="text-xs font-mono-code font-semibold uppercase tracking-wider text-amber-400 mb-3">Unweighted Lexical Baseline (BM25 Only)</h3>
-        <div id="compare-standard" class="space-y-3"></div>
-      </div>
-    </div>
 
-    <!-- TAB 4: CORPUS INDEX CORE -->
-    <div id="tab-index" class="tab-pane hidden exec-panel rounded-2xl p-6 space-y-3.5 text-sm">
-      <h3 class="font-heading text-lg font-bold text-white">Corpus Token &amp; Gap-Encoding Inspector</h3>
-      <p class="text-slate-300"><strong>Normalized Root Stem:</strong> <code id="idx-stem" class="font-mono-code bg-slate-900 border border-slate-700 text-sky-300 px-2.5 py-0.5 rounded"></code></p>
-      <p class="text-slate-300"><strong>Matched Document Postings:</strong> <code id="idx-inv" class="font-mono-code bg-slate-900 border border-slate-700 text-indigo-300 px-2.5 py-0.5 rounded"></code></p>
-      <p class="text-slate-300"><strong>Delta Compressed Gaps:</strong> <code id="idx-comp" class="font-mono-code bg-slate-900 border border-slate-700 text-emerald-300 px-2.5 py-0.5 rounded"></code></p>
-      <div>
-        <strong class="text-slate-300">Positional Posting Offsets:</strong>
-        <pre id="idx-pos" class="font-mono-code bg-slate-950 border border-slate-800 text-sky-300 p-4 rounded-xl text-xs mt-2 overflow-x-auto"></pre>
+      <!-- Option A vs Option B Dual-Engine Verification Comparison -->
+      <div class="exec-panel rounded-2xl p-6">
+        <h3 class="font-heading text-lg font-bold text-white mb-2">2. Option A (Web/Wikipedia Scraper) vs. Option B (LLM / Knowledge API) Comparison</h3>
+        <p id="dual-verdict-banner" class="text-xs font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 p-3 rounded-xl mb-4"></p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs" id="dual-engines-grid"></div>
       </div>
-    </div>
 
-    <!-- TAB 5: PRECISION BENCHMARKS -->
-    <div id="tab-metrics" class="tab-pane hidden exec-panel rounded-2xl p-6">
-      <h3 class="font-heading text-lg font-bold text-white mb-4">Signal Retrieval Precision Benchmarks (Top-3 Cut)</h3>
-      <div id="metrics-cards" class="auto-fit-grid-compact gap-4"></div>
-    </div>
+      <!-- Hidden Background IR Diagnostics (Trust Table, Index Preview, Metrics) -->
+      <div class="exec-panel rounded-2xl p-6 space-y-6">
+        <h3 class="font-heading text-lg font-bold text-white">3. Background Web Extraction Diagnostics (Crawled Sources &amp; Reliability)</h3>
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs font-mono-code">
+            <thead class="bg-slate-900 text-slate-400 uppercase border-b border-slate-800">
+              <tr>
+                <th class="p-3">Crawled Source</th>
+                <th class="p-3">PageRank</th>
+                <th class="p-3">HITS Authority</th>
+                <th class="p-3">Spam Filter</th>
+                <th class="p-3">Consensus</th>
+                <th class="p-3">Reliability</th>
+              </tr>
+            </thead>
+            <tbody id="trust-table-body" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+        <div id="metrics-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
 
   </main>
 
+  <!-- =======================================================================
+       7. FLOATING RECTANGULAR TERMINAL MODAL FOR PRODUCT "DETAIL" BUTTON
+       (Types out Specs + Launch Strategy with Terminal Block Cursor █)
+       ======================================================================= -->
+  <div id="product-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md">
+    <div class="w-full max-w-xl rounded-2xl bg-slate-950 border-2 border-sky-400/50 shadow-2xl overflow-hidden expand-stage">
+      <!-- Terminal Window Bar -->
+      <div class="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+          <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+          <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+          <span id="modal-terminal-title" class="ml-2 font-mono-code text-xs text-sky-300 font-semibold truncate">marketaura://spec-strategy-inspector</span>
+        </div>
+        <button onclick="closeProductDetailModal()" class="text-xs font-mono-code text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800 cursor-pointer">
+          [ESC / CLOSE ✕]
+        </button>
+      </div>
+
+      <!-- Terminal Body with Typewriter Output -->
+      <div class="p-5 space-y-4 max-h-[78vh] overflow-y-auto font-mono-code text-xs">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <div id="modal-prod-brand" class="text-[11px] text-sky-400 uppercase"></div>
+            <h4 id="modal-prod-name" class="font-heading text-xl font-bold text-white"></h4>
+          </div>
+          <span id="modal-prod-price" class="text-base font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-400/30 px-3 py-1 rounded-lg"></span>
+        </div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-indigo-400 mb-1.5">// 01. HARDWARE &amp; TECHNICAL SPECIFICATIONS</div>
+          <pre id="modal-typewriter-specs" class="whitespace-pre-wrap text-slate-200 bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl leading-relaxed terminal-cursor"></pre>
+        </div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-emerald-400 mb-1.5">// 02. COMPANY GAME-THEORY LAUNCH STRATEGY</div>
+          <p id="modal-typewriter-strategy" class="text-slate-200 bg-emerald-950/30 border border-emerald-500/30 p-3.5 rounded-xl leading-relaxed terminal-cursor"></p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <a id="modal-official-link" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
+            Visit Official Product Page ↗
+          </a>
+          <button onclick="closeProductDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer">
+            Close Terminal
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
-    // 1. REAL-TIME 3D WEBGL STRATEGIC EQUILIBRIUM SURFACE (THREE.JS)
+    // 1. REAL-TIME 3D WEBGL STRATEGIC EQUILIBRIUM MESH (VISIBLE AT ALL TIMES)
     // =========================================================================
     (function initThreeJsScene() {
       const canvas = document.getElementById('webgl-canvas');
@@ -1047,16 +1014,14 @@
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 14, 34);
-      camera.lookAt(0, 0, 0);
+      camera.position.set(0, 13, 32);
 
       const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Create a 3D Game-Theory Saddle/Equilibrium Wireframe Terrain
-      const planeGeo = new THREE.PlaneGeometry(90, 60, 48, 32);
-      planeGeo.rotateX(-Math.PI * 0.48);
+      const planeGeo = new THREE.PlaneGeometry(95, 65, 50, 34);
+      planeGeo.rotateX(-Math.PI * 0.47);
 
       const posAttr = planeGeo.attributes.position;
       const basePositions = new Float32Array(posAttr.array.length);
@@ -1066,33 +1031,31 @@
         color: 0x38bdf8,
         wireframe: true,
         transparent: true,
-        opacity: 0.12
+        opacity: 0.24
       });
       const terrainMesh = new THREE.Mesh(planeGeo, wireMat);
-      terrainMesh.position.y = -6;
+      terrainMesh.position.y = -5;
       scene.add(terrainMesh);
 
-      // Glowing Strategic Equilibrium Nodes Floating Above Terrain
-      const particlesCount = 90;
+      const particlesCount = 120;
       const pGeo = new THREE.BufferGeometry();
       const pCoords = new Float32Array(particlesCount * 3);
       for (let i = 0; i < particlesCount; i++) {
-        pCoords[i * 3] = (Math.random() - 0.5) * 75;
-        pCoords[i * 3 + 1] = (Math.random() - 0.5) * 28;
-        pCoords[i * 3 + 2] = (Math.random() - 0.5) * 40;
+        pCoords[i * 3] = (Math.random() - 0.5) * 80;
+        pCoords[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        pCoords[i * 3 + 2] = (Math.random() - 0.5) * 45;
       }
       pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
       const pMat = new THREE.PointsMaterial({
         color: 0x818cf8,
-        size: 0.42,
+        size: 0.55,
         transparent: true,
-        opacity: 0.65
+        opacity: 0.85
       });
       const pointCloud = new THREE.Points(pGeo, pMat);
       scene.add(pointCloud);
 
-      let mouseX = 0;
-      let mouseY = 0;
+      let mouseX = 0, mouseY = 0;
       window.addEventListener('mousemove', (e) => {
         mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
         mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -1107,782 +1070,451 @@
       let clock = 0;
       function animate() {
         requestAnimationFrame(animate);
-        clock += 0.012;
-
-        // Animate 3D wave heights (Saddle-point utility wave)
+        clock += 0.014;
         const arr = posAttr.array;
         for (let i = 0; i < arr.length; i += 3) {
           const x = basePositions[i];
           const z = basePositions[i + 2];
-          arr[i + 1] =
-            Math.sin(x * 0.11 + clock) * 1.45 +
-            Math.cos(z * 0.14 + clock * 0.8) * 1.25;
+          arr[i + 1] = Math.sin(x * 0.11 + clock) * 1.6 + Math.cos(z * 0.14 + clock * 0.85) * 1.3;
         }
         posAttr.needsUpdate = true;
-
-        pointCloud.rotation.y = clock * 0.06;
-        camera.position.x += (mouseX * 4.5 - camera.position.x) * 0.03;
-        camera.position.y += (14 - mouseY * 2.5 - camera.position.y) * 0.03;
+        pointCloud.rotation.y = clock * 0.05;
+        camera.position.x += (mouseX * 5 - camera.position.x) * 0.03;
+        camera.position.y += (13 - mouseY * 2.5 - camera.position.y) * 0.03;
         camera.lookAt(0, -2, 0);
-
         renderer.render(scene, camera);
       }
       animate();
     })();
 
     // =========================================================================
-    // 2. 3D PERSPECTIVE TILT EFFECT ON PRODUCT & STRATEGY CARDS
+    // 2. TERMINAL TYPEWRITER ENGINE (WITH █ CURSOR) & CURRENCY FORMATTER
     // =========================================================================
-    function attach3DTiltListeners() {
-      document.querySelectorAll('.tilt-card').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const rotateY = ((x / rect.width) - 0.5) * 7;
-          const rotateX = ((y / rect.height) - 0.5) * -7;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-3px)`;
-        });
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
-        });
-      });
+    const activeTimers = new WeakMap();
+
+    function typeTerminalText(element, fullText, speedMs = 16) {
+      if (!element) return;
+      if (activeTimers.has(element)) {
+        clearInterval(activeTimers.get(element));
+      }
+      element.textContent = '';
+      element.classList.add('terminal-cursor');
+      element.classList.remove('done-typing');
+
+      let i = 0;
+      const str = String(fullText || '');
+      const timer = setInterval(() => {
+        element.textContent += str.charAt(i);
+        i++;
+        if (i >= str.length) {
+          clearInterval(timer);
+          element.classList.add('done-typing');
+        }
+      }, speedMs);
+      activeTimers.set(element, timer);
     }
 
-    // =========================================================================
-    // 3. SECTOR PRODUCT RELEASES, TIERED SPECS & "BOOM MODEL" KNOWLEDGE ENGINE
-    // =========================================================================
-    const SECTOR_PRODUCT_CATALOG = {
-      smartphone: {
-        heading: "Latest Smartphone Releases & Tiered Hardware Specs (2026)",
-        takeaway: "Game Theory Synthesis: Ultra-Premium flagships ($1,199+) over-index on Titanium/Foldable margins, while Entry-Tier phones ($199) suffer from ad-bloat and weak silicon. Launching a $549–$599 Flagship-Killer with a 3nm NPU chip, 6,500mAh Silicon-Carbon battery, and zero-bloat OS captures the highest consumer surplus.",
-        products: [
-          {
-            name: "iPhone 17 Pro Max",
-            brand: "Apple",
-            category: "Premium Flagship",
-            price: "$1,199",
-            image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=80",
-            launch: "Late 2025 / 2026 Cycle",
-            specs: {
-              "Processor": "A19 Pro (3nm NPU)",
-              "Display": "6.9\" LTPO Super Retina XDR 120Hz",
-              "Camera": "Triple 48MP Periscope (5x Optical)",
-              "Battery": "4,700 mAh • 40W MagSafe"
-            },
-            edge: "Ecosystem lock-in & industry-leading video pipeline"
-          },
-          {
-            name: "Samsung Galaxy S26 Ultra",
-            brand: "Samsung",
-            category: "Premium Flagship",
-            price: "$1,299",
-            image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=900&q=80",
-            launch: "Q1 2026 Release",
-            specs: {
-              "Processor": "Snapdragon 8 Gen 5 for Galaxy",
-              "Display": "6.9\" Dynamic AMOLED 2X (2600 nits)",
-              "Camera": "200MP Main + Dual Telephoto AI",
-              "Battery": "5,000 mAh • 45W Fast Charge"
-            },
-            edge: "Integrated S-Pen productivity & Galaxy AI suite"
-          },
-          {
-            name: "OnePlus 14R / Nothing Phone (3)",
-            brand: "OnePlus / Nothing",
-            category: "Mid-Range Disruptor",
-            price: "$549",
-            image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Mid-Cycle",
-            specs: {
-              "Processor": "Snapdragon 8s Gen 4",
-              "Display": "6.78\" 1.5K LTPO AMOLED 120Hz",
-              "Camera": "50MP Sony LYT-808 OIS + 50MP Tele",
-              "Battery": "6,200 mAh Silicon-Carbon • 100W"
-            },
-            edge: "Enthusiast speed & distinctive industrial design"
-          },
-          {
-            name: "Google Pixel 10a",
-            brand: "Google",
-            category: "Mid-Range Disruptor",
-            price: "$499",
-            image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Series",
-            specs: {
-              "Processor": "Google Tensor G5",
-              "Display": "6.3\" Actua OLED 120Hz",
-              "Camera": "64MP Computational AI Camera",
-              "Battery": "5,100 mAh • 7-Year OS Updates"
-            },
-            edge: "Class-leading still photography & on-device Gemini Nano"
-          },
-          {
-            name: "Redmi Note 15 Pro+ / Poco X7 Pro",
-            brand: "Xiaomi / Poco",
-            category: "Value / Entry Tier",
-            price: "$279",
-            image: "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Mass Volume",
-            specs: {
-              "Processor": "MediaTek Dimensity 8400-Ultra",
-              "Display": "6.67\" 120Hz AMOLED (IP68)",
-              "Camera": "200MP OIS Main Sensor",
-              "Battery": "6,000 mAh • 90W HyperCharge"
-            },
-            edge: "Aggressive hardware-per-dollar via Bertrand pricing"
-          },
-          {
-            name: "CMF Phone 2 / Lava Agni 3",
-            brand: "CMF / Lava",
-            category: "Value / Entry Tier",
-            price: "$189",
-            image: "https://images.unsplash.com/photo-1567581935884-3349723552ca?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Entry Disruptor",
-            specs: {
-              "Processor": "Dimensity 7300X 5G",
-              "Display": "6.67\" Super AMOLED 120Hz",
-              "Camera": "50MP Sony Sensor + Modular Back",
-              "Battery": "5,000 mAh • Clean Bloat-Free OS"
-            },
-            edge: "Modular accessories & clean software under $200"
-          }
-        ],
-        boom_model: {
-          name: "AuraPhone Apex-1 (Flagship-Killer Concept)",
-          tagline: "Sub-$579 Silicon-Carbon Powerhouse with Dedicated On-Device AI & Zero Ad-Bloat",
-          price: "$569 (₹47,999)",
-          share_target: "Est. +6.8% Segment Capture",
-          image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1000&q=80",
-          specs: [
-            { label: "Silicon & NPU", val: "3nm Flagship SoC (65 TOPS NPU)" },
-            { label: "Battery Tech", val: "6,600 mAh Si-C + 100W GaN" },
-            { label: "Optics System", val: "Triple 50MP (3x Periscope OIS)" },
-            { label: "OS Guarantee", val: "Zero-Ad Stock OS + 6 Yr Updates" }
-          ],
-          rationale: "Incumbents (Apple/Samsung) cannot price a 3nm + Periscope phone at $569 without cannibalizing their $1,200 Ultra line (Backward Induction deterrence). Meanwhile, budget brands taint their OS with adware. This exact configuration sits at the Pareto-Optimal Nash sweet spot."
-        }
-      },
-
-      automobile: {
-        heading: "Latest Automobile & EV Releases & Tiered Specifications (2026)",
-        takeaway: "Game Theory Synthesis: Luxury EVs ($75,000+) face demand saturation, while sub-$20,000 city EVs trigger range anxiety. The highest-utility market boom lies in a $33,500–$36,500 800V Fast-Charging Crossover SUV offering 550+ km real-world range and L2+ ADAS without subscription paywalls.",
-        products: [
-          {
-            name: "Tesla Model Y 'Juniper' / Lucid Gravity",
-            brand: "Tesla / Lucid",
-            category: "Premium Flagship",
-            price: "$54,900 – $79,900",
-            image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=900&q=80",
-            launch: "2025/2026 Flagship",
-            specs: {
-              "Powertrain": "Dual-Motor AWD (800V Architecture)",
-              "Range (WLTP)": "620 km – 700 km Real-World",
-              "0-100 km/h": "3.4 Seconds • 250kW–350kW DC",
-              "Autonomy": "Full Self-Driving (FSD v13 Neural)"
-            },
-            edge: "Supercharger network & end-to-end neural autonomy"
-          },
-          {
-            name: "BMW iX3 Neue Klasse / Porsche Macan EV",
-            brand: "BMW / Porsche",
-            category: "Premium Flagship",
-            price: "$74,500",
-            image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Production",
-            specs: {
-              "Powertrain": "6th-Gen eDrive Cylindrical Cells",
-              "Range (WLTP)": "640 km • 800V Ultra-Fast Charge",
-              "0-100 km/h": "3.8 Seconds • Rear-Axle Steering",
-              "Autonomy": "Panoramic Vision HUD + L2+ Highway"
-            },
-            edge: "German chassis dynamics & 10-min 300km charge"
-          },
-          {
-            name: "Mahindra BE 6e / XEV 9e",
-            brand: "Mahindra Born Electric",
-            category: "Mid-Range Disruptor",
-            price: "$24,500 – $31,000",
-            image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 INGLO Platform",
-            specs: {
-              "Powertrain": "79 kWh BYD Blade LFP Battery",
-              "Range (WLTP)": "550 km Real-World Range",
-              "0-100 km/h": "6.7 Seconds • 175kW DC Charge",
-              "Autonomy": "Triple-Screen Cockpit + Level 2+ ADAS"
-            },
-            edge: "Radical coupe-SUV styling & LFP safety at mid-market price"
-          },
-          {
-            name: "Hyundai Creta EV / Kia EV5",
-            brand: "Hyundai / Kia",
-            category: "Mid-Range Disruptor",
-            price: "$26,000 – $35,000",
-            image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Global Rollout",
-            specs: {
-              "Powertrain": "51.4 kWh – 64 kWh E-GMP Modular",
-              "Range (WLTP)": "475 km – 530 km",
-              "0-100 km/h": "7.6 Seconds • V2L Bi-Directional",
-              "Autonomy": "360° SmartSense ADAS Suite"
-            },
-            edge: "Proven service network & Vehicle-to-Load (V2L) utility"
-          },
-          {
-            name: "Tata Curvv EV / Nexon EV 45",
-            brand: "Tata Motors",
-            category: "Value / Entry Tier",
-            price: "$19,500",
-            image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=80",
-            launch: "2025/2026 Mass Market",
-            specs: {
-              "Powertrain": "45 kWh – 55 kWh Acti.ev Platform",
-              "Range (WLTP)": "430 km Real-World",
-              "0-100 km/h": "8.6 Seconds • 1.2C Fast Charge",
-              "Autonomy": "5-Star BNCAP Safety + Level 2 ADAS"
-            },
-            edge: "5-star crash safety & mass-market SUV practicality"
-          },
-          {
-            name: "BYD Seagull (Dolphin Mini) / MG Windsor",
-            brand: "BYD / MG",
-            category: "Value / Entry Tier",
-            price: "$14,500 – $17,500",
-            image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Urban EV",
-            specs: {
-              "Powertrain": "38.8 kWh Blade LFP Battery",
-              "Range (WLTP)": "380 km Urban Cycle",
-              "0-100 km/h": "9.5 Seconds • Battery-as-a-Service",
-              "Autonomy": "15.6\" Rotating Display + Lounge Seats"
-            },
-            edge: "Ultra-low running cost & Battery-as-a-Service (BaaS) pricing"
-          }
-        ],
-        boom_model: {
-          name: "AuraMobility GT-Cross 800V (Disruptor SUV)",
-          tagline: "Mid-Size 800V LFP Crossover SUV with 600 km Range & Subscription-Free ADAS",
-          price: "$31,900 (₹26.5 Lakhs)",
-          share_target: "Est. +8.4% EV Segment Capture",
-          image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1000&q=80",
-          specs: [
-            { label: "Battery & Voltage", val: "75 kWh LFP Blade (800V Arch)" },
-            { label: "Real Range & Charge", val: "600 km • 10–80% in 16 Mins" },
-            { label: "Cabin & Utility", val: "V2L Power + Physical Controls" },
-            { label: "Safety & Autonomy", val: "LiDAR L2+ ADAS (Zero Monthly Fee)" }
-          ],
-          rationale: "Legacy luxury brands lock 800V fast-charging behind $70k+ models, while entry EVs take 45+ minutes to charge. Offering 16-minute 800V charging and lifetime subscription-free L2+ ADAS at $31,900 eliminates range anxiety and captures both ICE upgraders and EV intenders."
-        }
-      },
-
-      cloud: {
-        heading: "Latest Cloud & AI Infrastructure Tiers & Specifications (2026)",
-        takeaway: "Game Theory Synthesis: Hyperscalers (AWS/Azure) extract 40%+ margins on data egress fees and complex enterprise billing, while bare-bones VPS providers lack managed GPU/Kubernetes orchestration. A zero-egress, serverless GPU + K8s platform creates an immediate market boom.",
-        products: [
-          {
-            name: "AWS UltraCluster (Trainium3 / Graviton5)",
-            brand: "Amazon Web Services",
-            category: "Premium Flagship",
-            price: "Enterprise Custom ($12+/hr GPU)",
-            image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Hyperscale Tier",
-            specs: {
-              "Compute": "Graviton5 ARM + NVIDIA Blackwell B200",
-              "Network": "3.2 Tbps Elastic Fabric Adapter",
-              "Storage": "S3 Express One Zone (Sub-ms)",
-              "SLA & Lock-in": "99.999% Multi-AZ • High Egress Cost"
-            },
-            edge: "Unmatched global compliance & Fortune 500 ecosystem"
-          },
-          {
-            name: "Azure AI Foundry & Maia 200 Cluster",
-            brand: "Microsoft Azure",
-            category: "Premium Flagship",
-            price: "Enterprise EA Bundled",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Enterprise Cloud",
-            specs: {
-              "Compute": "Azure Maia AI Accelerator + Cobalt CPU",
-              "Network": "InfiniBand Quantum-2 Interconnect",
-              "Storage": "CosmosDB Global Active-Active",
-              "SLA & Lock-in": "Native OpenAI / Copilot Governance"
-            },
-            edge: "Seamless M365/Active Directory enterprise bundling"
-          },
-          {
-            name: "CoreWeave / Lambda GPU Cloud",
-            brand: "CoreWeave / Lambda",
-            category: "Mid-Range Disruptor",
-            price: "$2.49 – $4.20 / GPU-hr",
-            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 AI Native Cloud",
-            specs: {
-              "Compute": "Bare-Metal H200 / B200 GPU Nodes",
-              "Network": "Non-Blocking NVLink + RoCEv2",
-              "Storage": "High-Throughput Parallel File System",
-              "SLA & Lock-in": "Zero Egress Fees • Kubernetes Native"
-            },
-            edge: "Up to 50% lower GPU training cost than hyperscalers"
-          },
-          {
-            name: "Cloudflare Workers AI & R2 Storage",
-            brand: "Cloudflare",
-            category: "Mid-Range Disruptor",
-            price: "$0.015/GB (Zero Egress)",
-            image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Edge Serverless",
-            specs: {
-              "Compute": "V8 Isolates + Global Edge GPU",
-              "Network": "330+ Global Edge Cities (0ms Cold Start)",
-              "Storage": "R2 S3-Compatible (0% Egress Fee)",
-              "SLA & Lock-in": "Open Standards • Pay-per-ms"
-            },
-            edge: "Eliminates AWS S3 egress tax completely"
-          },
-          {
-            name: "Hetzner Dedicated / DigitalOcean Droplets",
-            brand: "Hetzner / DigitalOcean",
-            category: "Value / Entry Tier",
-            price: "$6 – $49 / month",
-            image: "https://images.unsplash.com/photo-1597852074816-d933c7d2b988?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Developer VPS",
-            specs: {
-              "Compute": "AMD EPYC Dedicated vCPU",
-              "Network": "20 TB Included Traffic",
-              "Storage": "Local Gen4 NVMe RAID",
-              "SLA & Lock-in": "Flat Monthly Predictable Billing"
-            },
-            edge: "Unbeatable raw CPU/NVMe performance per dollar"
-          },
-          {
-            name: "Fly.io / Railway Instant PaaS",
-            brand: "Fly.io / Railway",
-            category: "Value / Entry Tier",
-            price: "Usage-Based ($5+ / mo)",
-            image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Indie Dev Tier",
-            specs: {
-              "Compute": "Firecracker MicroVMs",
-              "Network": "Anycast Global WireGuard Mesh",
-              "Storage": "Instant Postgres + Ephemeral Volumes",
-              "SLA & Lock-in": "Git-Push Zero-DevOps Deployment"
-            },
-            edge: "Deploys full-stack apps in 30 seconds without DevOps"
-          }
-        ],
-        boom_model: {
-          name: "AuraCloud Sovereign-Mesh (Zero-Egress AI PaaS)",
-          tagline: "Multi-Cloud Arbitrage Orchestrator with Zero Egress Fees & Auto-Spot GPU Routing",
-          price: "Flat $0.89/hr GPU • $0 Egress",
-          share_target: "Est. +9.2% SMB & AI Startup Capture",
-          image: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=1000&q=80",
-          specs: [
-            { label: "Compute Engine", val: "Auto-Spot GPU/CPU Arbitrage" },
-            { label: "Bandwidth Policy", val: "100% Zero Data Egress Tax" },
-            { label: "Deployment", val: "1-Click Terraform / K8s Export" },
-            { label: "Cost Guardrail", val: "Hard Spend Caps (No Bill Shock)" }
-          ],
-          rationale: "Hyperscalers cannot abolish egress fees without destroying billions in high-margin lock-in revenue. By offering an S3/Kubernetes-compatible layer that automatically routes workloads across the cheapest verified spot GPUs with hard spend caps, you win startups and mid-market enterprises immediately."
-        }
-      },
-
-      ai: {
-        heading: "Latest AI Foundation Models & Agentic Platforms (2026)",
-        takeaway: "Game Theory Synthesis: Closed frontier models charge premium per-token rates and raise enterprise data-privacy concerns, while raw open-weight models require complex self-hosting. The market boom model is a Sovereign Vertical Agent Appliance with deterministic citations and fixed-seat pricing.",
-        products: [
-          {
-            name: "OpenAI GPT-5 / o3-Pro Reasoning",
-            brand: "OpenAI",
-            category: "Premium Flagship",
-            price: "$200/mo Pro • $15/1M Tokens",
-            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Frontier Release",
-            specs: {
-              "Architecture": "Test-Time Compute + Multimodal Agent",
-              "Context Window": "256K – 1M Tokens",
-              "Deployment": "Closed Cloud API & ChatGPT Enterprise",
-              "Specialty": "Deep PhD-Level Math, Code & Synthesis"
-            },
-            edge: "Highest test-time reasoning depth & consumer mindshare"
-          },
-          {
-            name: "Google Gemini 2.5 Ultra / Pro",
-            brand: "Google DeepMind",
-            category: "Premium Flagship",
-            price: "$20/mo • $3.50/1M Tokens",
-            image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Multimodal Core",
-            specs: {
-              "Architecture": "Native Multimodal MoE (TPU v6e)",
-              "Context Window": "2,000,000+ Tokens Native",
-              "Deployment": "Vertex AI + Google Workspace Native",
-              "Specialty": "Full-Repo Code & Hours-Long Video Recall"
-            },
-            edge: "2M+ context window & vertically integrated TPU cost advantage"
-          },
-          {
-            name: "Anthropic Claude 4 Sonnet / Opus",
-            brand: "Anthropic",
-            category: "Mid-Range Disruptor",
-            price: "$3.00 / 1M Input Tokens",
-            image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Enterprise Coding",
-            specs: {
-              "Architecture": "Constitutional AI + Computer Use Agent",
-              "Context Window": "500K High-Precision Recall",
-              "Deployment": "AWS Bedrock / GCP Vertex / API",
-              "Specialty": "Autonomous SWE-Bench Coding & Enterprise Workflows"
-            },
-            edge: "Industry gold standard for agentic coding & low hallucination"
-          },
-          {
-            name: "DeepSeek-R2 / Meta Llama 4 (405B)",
-            brand: "DeepSeek / Meta",
-            category: "Mid-Range Disruptor",
-            price: "Open-Weight ($0.25/1M Hosted)",
-            image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Open Frontier",
-            specs: {
-              "Architecture": "Sparse MoE + RL Reasoning Distillation",
-              "Context Window": "128K – 256K Tokens",
-              "Deployment": "Self-Hosted On-Premise or Fast Inference APIs",
-              "Specialty": "95% Frontier Quality at 1/15th the Cost"
-            },
-            edge: "Full weights ownership & zero external data leakage"
-          },
-          {
-            name: "Mistral Small 3 / Qwen 3 (32B)",
-            brand: "Mistral / Alibaba",
-            category: "Value / Entry Tier",
-            price: "Apache 2.0 Free / $0.08/1M",
-            image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Edge & Local AI",
-            specs: {
-              "Architecture": "Dense 24B–32B Quantized (4-bit)",
-              "Context Window": "128K Tokens",
-              "Deployment": "Runs Locally on Single Consumer GPU / Mac",
-              "Specialty": "Sub-100ms Latency & Air-Gapped Privacy"
-            },
-            edge: "Runs offline on a single workstation with zero API cost"
-          },
-          {
-            name: "Groq / Cerebras Wafer-Scale Inference",
-            brand: "Groq / Cerebras",
-            category: "Value / Entry Tier",
-            price: "$0.10 – $0.59 / 1M Tokens",
-            image: "https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Ultra-Fast Inference",
-            specs: {
-              "Architecture": "SRAM LPU / Wafer-Scale Engine",
-              "Context Window": "128K Tokens",
-              "Deployment": "Instant OpenAI-Compatible REST API",
-              "Specialty": "1,500+ Tokens/Sec Real-Time Voice & Code"
-            },
-            edge: "10x faster token generation speed for real-time agents"
-          }
-        ],
-        boom_model: {
-          name: "AuraAgent Sovereign-Box (Verified Enterprise AI)",
-          tagline: "On-Premise / VPC Hybrid AI Copilot with 100% Citation Grounding & Zero Token-Tax",
-          price: "$499/mo Flat Team License",
-          share_target: "Est. +11.0% Regulated B2B Capture",
-          image: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80",
-          specs: [
-            { label: "Model Routing", val: "Local 32B + Frontier Fallback" },
-            { label: "Hallucination Guard", val: "Mandatory IR Citation Locking" },
-            { label: "Data Privacy", val: "100% Zero-Data-Retention VPC" },
-            { label: "Pricing Model", val: "Unlimited Queries (No Token Tax)" }
-          ],
-          rationale: "Law firms, healthcare, and finance refuse to send proprietary documents to public APIs and hate unpredictable per-token billing. Combining distilled open-weight models (DeepSeek/Llama) with strict IR citation verification at a flat monthly fee creates an unassailable niche monopoly."
-        }
-      }
+    let currentCurrency = 'INR';
+    const CURRENCY_RATES = {
+      INR: { symbol: '₹', rate: 1, locale: 'en-IN' },
+      USD: { symbol: '$', rate: 1 / 84.0, locale: 'en-US' },
+      EUR: { symbol: '€', rate: 1 / 91.0, locale: 'de-DE' }
     };
 
-    function getSectorCatalog(queryText, industryName) {
-      const combined = `${queryText} ${industryName}`.toLowerCase();
-      if (/(phone|smartphone|mobile|ios|android|apple|samsung|oneplus|xiaomi)/.test(combined)) {
-        return SECTOR_PRODUCT_CATALOG.smartphone;
-      }
-      if (/(car|auto|vehicle|ev|electric|suv|sedan|tesla|mahindra|tata|hyundai|bmw|motor)/.test(combined)) {
-        return SECTOR_PRODUCT_CATALOG.automobile;
-      }
-      if (/(cloud|aws|azure|server|hosting|kubernetes|gpu|infra|saas)/.test(combined)) {
-        return SECTOR_PRODUCT_CATALOG.cloud;
-      }
-      if (/(ai|artificial intelligence|llm|gpt|model|agent|machine learning|openai|claude)/.test(combined)) {
-        return SECTOR_PRODUCT_CATALOG.ai;
-      }
-
-      // Dynamic Synthesizer for E-Commerce or Any Custom Industry typed by the user
-      const cleanName = industryName ? industryName.replace(/Industry$/i, '').trim() : 'Target Sector';
-      return {
-        heading: `Latest ${cleanName} Releases, Solutions & Tiered Specs (2026)`,
-        takeaway: `Game Theory Synthesis: In ${cleanName}, top incumbents overcharge for bloated enterprise bundles while low-end players sacrifice reliability in a race-to-the-bottom price war. Launching a modular, transparent mid-market flagship with AI-automated onboarding captures maximum Pareto efficiency.`,
-        products: [
-          {
-            name: `${cleanName} Enterprise Suite Pro`,
-            brand: "Global Incumbent #1",
-            category: "Premium Flagship",
-            price: "$1,499 / unit tier",
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Flagship Release",
-            specs: {
-              "Architecture": "Full-Stack Vertically Integrated Core",
-              "Throughput": "Enterprise-Grade Global Scale",
-              "Integration": "Proprietary Ecosystem Lock-In",
-              "Support": "24/7 Dedicated SLA Account Team"
-            },
-            edge: "Maximum institutional trust & global distribution network"
-          },
-          {
-            name: `${cleanName} OmniCloud Flagship`,
-            brand: "Global Incumbent #2",
-            category: "Premium Flagship",
-            price: "$1,199 / unit tier",
-            image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Enterprise Line",
-            specs: {
-              "Architecture": "Multi-Region High-Availability",
-              "Throughput": "99.99% Verified Reliability",
-              "Integration": "Cross-Suite Bundled Licensing",
-              "Support": "Compliance & Audit Certified"
-            },
-            edge: "Deep incumbent bundling across existing corporate contracts"
-          },
-          {
-            name: `${cleanName} Velocity-X (Disruptor)`,
-            brand: "Agile Mid-Tier Challenger",
-            category: "Mid-Range Disruptor",
-            price: "$449 / unit tier",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Challenger Release",
-            specs: {
-              "Architecture": "Modular API-First Architecture",
-              "Throughput": "High-Speed Automated Workflow",
-              "Integration": "1-Click Open Connectors",
-              "Support": "Transparent Flat-Rate Pricing"
-            },
-            edge: "85% of flagship capability at 35% of the total cost"
-          },
-          {
-            name: `${cleanName} NextGen Pulse`,
-            brand: "Specialist Innovator",
-            category: "Mid-Range Disruptor",
-            price: "$389 / unit tier",
-            image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Specialist Series",
-            specs: {
-              "Architecture": "AI-Native Vertical Optimization",
-              "Throughput": "Zero-Friction Self-Serve Setup",
-              "Integration": "Native Plugin Compatibility",
-              "Support": "Community + Priority Chat"
-            },
-            edge: "Built specifically for underserved high-growth teams"
-          },
-          {
-            name: `${cleanName} Lite Value Edition`,
-            brand: "Volume Value Brand",
-            category: "Value / Entry Tier",
-            price: "$129 / unit tier",
-            image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Mass Market",
-            specs: {
-              "Architecture": "Standardized Core Utility",
-              "Throughput": "Single-Node Basic Performance",
-              "Integration": "Manual CSV / Basic Webhook",
-              "Support": "Self-Service Documentation"
-            },
-            edge: "Lowest entry barrier for price-sensitive buyers"
-          },
-          {
-            name: `${cleanName} Starter Neo`,
-            brand: "Regional Entry Player",
-            category: "Value / Entry Tier",
-            price: "$79 / unit tier",
-            image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=900&q=80",
-            launch: "2026 Entry Tier",
-            specs: {
-              "Architecture": "Lightweight Cloud Wrapper",
-              "Throughput": "Capped Monthly Usage Quota",
-              "Integration": "Standalone Basic Interface",
-              "Support": "Community Forum Only"
-            },
-            edge: "Ultra-low upfront cost for first-time adopters"
-          }
-        ],
-        boom_model: {
-          name: `Aura-${cleanName.split(' ')[0]} Prime (Judo Flagship-Killer)`,
-          tagline: `High-Efficiency ${cleanName} Solution with Native Incumbent Compatibility & Zero Lock-In`,
-          price: "$399 (Disruptor Sweet-Spot)",
-          share_target: "Est. +7.5% Rapid Market Capture",
-          image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1000&q=80",
-          specs: [
-            { label: "Core Performance", val: "Flagship-Grade Speed & SLA" },
-            { label: "Compatibility", val: "100% Plug-and-Play Bridge" },
-            { label: "Pricing Model", val: "Transparent Flat-Tier (No Hidden Fees)" },
-            { label: "Onboarding", val: "Instant 60-Second Setup" }
-          ],
-          rationale: `By Backward Induction, top ${cleanName} incumbents cannot slash prices to match $399 without cannibalizing their existing $1,200+ enterprise contracts. Offering flagship performance with zero switching cost guarantees rapid adoption.`
-        }
-      };
+    function formatPrice(priceInr) {
+      const num = Number(priceInr || 0);
+      if (num === 0) return 'Free / Open Protocol';
+      const cfg = CURRENCY_RATES[currentCurrency] || CURRENCY_RATES.INR;
+      const converted = Math.round(num * cfg.rate);
+      return `${cfg.symbol}${converted.toLocaleString(cfg.locale)}`;
     }
 
-    let currentCatalogProducts = [];
+    function changeCurrency(newCurr) {
+      currentCurrency = newCurr;
+      if (lastAnalysisData) {
+        renderProductReviewsStage(lastAnalysisData.game_theory_analysis);
+      }
+    }
 
-    function renderProductCatalogAndBoomModel(queryText, industryName) {
-      const cat = getSectorCatalog(queryText, industryName);
-      currentCatalogProducts = cat.products;
+    // =========================================================================
+    // 3. STATE & NAVIGATION BETWEEN HUB, COMPANIES, PRODUCTS & SETTINGS
+    // =========================================================================
+    let lastAnalysisData = null;
 
-      document.getElementById('showcase-heading').textContent = cat.heading;
-      document.getElementById('spec-compare-takeaway').textContent = cat.takeaway;
-
-      // Render Product Cards
-      filterProductCards('all');
-
-      // Render Spec Comparison Table
-      const specKeys = Object.keys(cat.products[0].specs);
-      const sHead = document.getElementById('spec-compare-head');
-      const sBody = document.getElementById('spec-compare-body');
-
-      sHead.innerHTML = `
-        <tr>
-          <th class="p-3">Model / Release</th>
-          <th class="p-3">Tier</th>
-          <th class="p-3">Price</th>
-          <th class="p-3">${specKeys[0] || 'Core Spec'}</th>
-          <th class="p-3">${specKeys[1] || 'Performance'}</th>
-          <th class="p-3">Strategic Edge</th>
-        </tr>
-      `;
-
-      sBody.innerHTML = '';
-      cat.products.forEach(p => {
-        const tierBadge = p.category === 'Premium Flagship'
-          ? 'bg-sky-500/15 text-sky-300 border-sky-400/30'
-          : p.category === 'Mid-Range Disruptor'
-          ? 'bg-indigo-500/15 text-indigo-300 border-indigo-400/30'
-          : 'bg-amber-500/15 text-amber-300 border-amber-400/30';
-
-        sBody.innerHTML += `
-          <tr class="hover:bg-slate-900/70 transition">
-            <td class="p-3 font-semibold text-white">${p.name}</td>
-            <td class="p-3"><span class="text-[10px] font-mono-code px-2 py-0.5 rounded border ${tierBadge}">${p.category}</span></td>
-            <td class="p-3 font-mono-code text-emerald-400 font-semibold">${p.price}</td>
-            <td class="p-3 text-slate-300">${p.specs[specKeys[0]] || '—'}</td>
-            <td class="p-3 text-slate-300">${p.specs[specKeys[1]] || '—'}</td>
-            <td class="p-3 text-slate-400">${p.edge}</td>
-          </tr>
-        `;
+    function openMainView(viewName) {
+      const views = ['hub', 'companies', 'products', 'models', 'settings'];
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        if (el) el.classList.add('hidden');
+        const btn = document.getElementById('nav-btn-' + v);
+        if (btn) btn.classList.remove('nav-active');
       });
 
-      // Render Recommended Boom Model Blueprint
-      const bm = cat.boom_model;
-      document.getElementById('boom-model-name').textContent = bm.name;
-      document.getElementById('boom-model-tagline').textContent = bm.tagline;
-      document.getElementById('boom-model-price').textContent = bm.price;
-      document.getElementById('boom-model-share-target').textContent = bm.share_target;
-      document.getElementById('boom-model-img').src = bm.image;
-      document.getElementById('boom-model-rationale').textContent = bm.rationale;
-      document.getElementById('hud-boom-tier').textContent = bm.name.split('(')[0].trim();
+      const targetEl = document.getElementById('view-' + viewName);
+      if (targetEl) targetEl.classList.remove('hidden');
+      const targetBtn = document.getElementById('nav-btn-' + viewName);
+      if (targetBtn) targetBtn.classList.add('nav-active');
 
-      const bmSpecs = document.getElementById('boom-model-specs');
-      bmSpecs.innerHTML = '';
-      bm.specs.forEach(s => {
-        bmSpecs.innerHTML += `
-          <div class="bg-slate-950/90 border border-emerald-500/25 p-2.5 rounded-lg">
-            <div class="text-[10px] font-mono-code uppercase text-slate-400">${s.label}</div>
-            <div class="text-xs font-semibold text-emerald-300 mt-0.5">${s.val}</div>
+      // Morph MarketAura header to compact top-left corner when entering sub-views
+      const brandHeader = document.getElementById('brand-header');
+      const cornerBrand = document.getElementById('compact-corner-brand');
+      const chipsRow = document.getElementById('sector-chips-row');
+
+      if (viewName === 'hub') {
+        brandHeader.classList.remove('hidden');
+        cornerBrand.classList.add('hidden');
+        cornerBrand.classList.remove('inline-flex');
+        chipsRow.classList.remove('hidden');
+      } else {
+        brandHeader.classList.add('hidden');
+        cornerBrand.classList.remove('hidden');
+        cornerBrand.classList.add('inline-flex');
+        chipsRow.classList.add('hidden');
+      }
+
+      if (lastAnalysisData && lastAnalysisData.game_theory_analysis) {
+        const gt = lastAnalysisData.game_theory_analysis;
+        if (viewName === 'companies') {
+          closeCompanyDetail();
+          typeTerminalText(
+            document.getElementById('typewriter-companies-header'),
+            `Top-${gt.companies_top10.length} Companies in ${gt.industry_name} (Ranked by Market Share)`,
+            18
+          );
+        } else if (viewName === 'products') {
+          typeTerminalText(
+            document.getElementById('typewriter-products-header'),
+            `Product Reviews & Upcoming Launch Radar — ${gt.industry_name}`,
+            18
+          );
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 4. RENDER "THE COMPANIES STRATEGIES" & SINGLE COMPANY DEEP-DIVE
+    // =========================================================================
+    function renderCompaniesStage(gt) {
+      const listBox = document.getElementById('companies-list-container');
+      listBox.innerHTML = '';
+      const companies = gt.companies_top10 || [];
+
+      document.getElementById('hub-comp-count').textContent = `Top ${companies.length} Ranked Players`;
+
+      companies.forEach((c, idx) => {
+        const row = document.createElement('div');
+        row.className = 'company-row exec-panel tilt-card rounded-2xl p-5 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-800 hover:border-sky-400/60 transition-all duration-300';
+        row.onclick = () => selectCompanyDeepDive(idx);
+        row.innerHTML = `
+          <div class="flex items-start sm:items-center gap-4 min-w-0">
+            <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-700 p-2.5 flex items-center justify-center shrink-0">
+              <img src="${c.logo}" alt="${c.name}" class="w-9 h-9 object-contain rounded" onerror="this.src='https://www.google.com/s2/favicons?domain=google.com&sz=64'" />
+            </div>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono-code text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30 px-2 py-0.5 rounded">
+                  #${c.rank}
+                </span>
+                <h4 class="font-heading text-lg sm:text-xl font-bold text-white truncate">${c.name}</h4>
+                <span class="text-[11px] font-mono-code bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded">${c.tier}</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-300 mt-1.5 line-clamp-2 leading-relaxed">${c.description}</p>
+            </div>
+          </div>
+          <div class="flex sm:flex-col items-end justify-between w-full sm:w-auto shrink-0 border-t sm:border-t-0 border-slate-800 pt-3 sm:pt-0">
+            <div class="text-left sm:text-right font-mono-code">
+              <span class="text-[10px] text-slate-400 uppercase block">Market Share</span>
+              <span class="text-sm font-bold text-emerald-400">${c.market_share}</span>
+            </div>
+            <span class="text-xs font-mono-code text-sky-400 mt-1">Inspect Timeline &amp; Strategy →</span>
           </div>
         `;
+        listBox.appendChild(row);
       });
     }
 
-    function filterProductCards(categoryFilter) {
+    function selectCompanyDeepDive(companyIndex) {
+      const gt = lastAnalysisData.game_theory_analysis;
+      const c = gt.companies_top10[companyIndex];
+      if (!c) return;
+
+      // Smoothly decrease opacity of other company cards before full takeover
+      const allRows = document.querySelectorAll('#companies-list-container .company-row');
+      allRows.forEach((r, i) => {
+        if (i !== companyIndex) r.classList.add('company-row-fade');
+      });
+
+      setTimeout(() => {
+        document.getElementById('companies-list-container').classList.add('hidden');
+        const detailView = document.getElementById('company-detail-view');
+        detailView.classList.remove('hidden');
+
+        document.getElementById('comp-detail-logo').src = c.logo;
+        document.getElementById('comp-detail-rank').textContent = `RANK #${c.rank} • SHARE: ${c.market_share}`;
+        document.getElementById('comp-detail-tier').textContent = `${c.tier} • Valuation: ${c.market_value_inr}`;
+        document.getElementById('comp-detail-name').textContent = c.name;
+
+        typeTerminalText(
+          document.getElementById('comp-detail-typewriter-desc'),
+          `${c.description} | Active Game Strategy: ${c.current_strategy}`,
+          14
+        );
+
+        // Populate Tab 1: Vertical History Timeline
+        const tBox = document.getElementById('comp-timeline-box');
+        tBox.innerHTML = '';
+        (c.history || []).forEach(h => {
+          tBox.innerHTML += `
+            <div class="relative bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+              <span class="absolute -left-[33px] top-5 w-4 h-4 rounded-full bg-sky-400 border-4 border-slate-950"></span>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                <span class="font-heading font-bold text-white text-base">${h.title}</span>
+                <span class="font-mono-code text-xs font-bold text-sky-300 bg-sky-500/15 border border-sky-400/30 px-2.5 py-0.5 rounded">${h.year}</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${h.event}</p>
+              <div class="mt-2.5 p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-xs text-indigo-200 font-mono-code">
+                ⚡ ${h.strategy_shift}
+              </div>
+            </div>
+          `;
+        });
+
+        // Populate Tab 2: Latest Products
+        const pGrid = document.getElementById('comp-latest-products-grid');
+        pGrid.innerHTML = '';
+        (c.latest_products || []).forEach((prodName, pIdx) => {
+          pGrid.innerHTML += `
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono-code uppercase text-sky-400">Flagship / Core Line #0${pIdx + 1}</span>
+                <div class="font-heading text-base font-bold text-white mt-0.5">${prodName}</div>
+              </div>
+              <a href="https://${c.domain}" target="_blank" class="text-xs font-mono-code text-sky-300 hover:underline">Official Site ↗</a>
+            </div>
+          `;
+        });
+
+        // Populate Tab 3: Market Value, Share & Visual Graphs
+        const gBox = document.getElementById('comp-market-graphs-box');
+        const trend = c.quarterly_share_trend || [10, 12, 14, c.market_share_num];
+        const maxShare = Math.max(...gt.companies_top10.map(x => x.market_share_num || 10), 45);
+
+        gBox.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
+              <div class="text-xs font-mono-code uppercase text-slate-400">Market Valuation &amp; Capitalization</div>
+              <div class="font-heading text-2xl font-bold text-emerald-400 mt-1">${c.market_value_inr}</div>
+              <div class="text-xs text-slate-400 mt-2">Verified Industry Share: <strong class="text-white">${c.market_share}</strong></div>
+              <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-3">
+                <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-full rounded-full" style="width: ${Math.min(100, (c.market_share_num / maxShare) * 100)}%"></div>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
+              <div class="text-xs font-mono-code uppercase text-slate-400 mb-3">4-Quarter Market Share Trajectory (%)</div>
+              <div class="grid grid-cols-4 gap-3 items-end h-28 pt-4 px-2 bg-slate-950 rounded-xl border border-slate-800">
+                ${trend.map((val, qIdx) => `
+                  <div class="flex flex-col items-center">
+                    <span class="font-mono-code text-[10px] text-sky-300 mb-1">${val}%</span>
+                    <div class="w-full bg-gradient-to-t from-indigo-600 to-sky-400 rounded-t-md" style="height: ${Math.max(14, Math.min(72, val * 1.8))}px"></div>
+                    <span class="font-mono-code text-[10px] text-slate-500 mt-1">Q${qIdx + 1}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+
+        switchCompanySubTab('ctab-history');
+      }, 240);
+    }
+
+    function closeCompanyDetail() {
+      document.getElementById('company-detail-view').classList.add('hidden');
+      const listContainer = document.getElementById('companies-list-container');
+      listContainer.classList.remove('hidden');
+      listContainer.querySelectorAll('.company-row').forEach(r => r.classList.remove('company-row-fade'));
+    }
+
+    function switchCompanySubTab(tabId) {
+      document.querySelectorAll('.comp-subtab-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+      document.querySelectorAll('.comp-subtab-btn').forEach(btn => {
+        btn.className = 'comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white cursor-pointer transition';
+      });
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.className = 'comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/40 cursor-pointer transition';
+      }
+    }
+
+    // =========================================================================
+    // 5. RENDER "THE PRODUCT REVIEWS" + FLOATING TERMINAL SPEC/STRATEGY MODAL
+    // =========================================================================
+    let activeCurrentProducts = [];
+    let activeUpcomingProducts = [];
+
+    function renderProductReviewsStage(gt) {
+      activeUpcomingProducts = gt.upcoming_products || [];
+      activeCurrentProducts = gt.current_products || [];
+
+      document.getElementById('hub-prod-count').textContent =
+        `${activeUpcomingProducts.length} Upcoming + ${activeCurrentProducts.length} Active Models`;
+
+      // Render Upcoming Products
+      const upGrid = document.getElementById('upcoming-products-grid');
+      upGrid.innerHTML = '';
+      activeUpcomingProducts.forEach((p, idx) => {
+        upGrid.innerHTML += buildProductCardHTML(p, idx, true);
+      });
+
+      // Render Current Products
+      filterCurrentProducts('all');
+
+      // Render Boom Model Blueprint
+      const bm = gt.boom_model;
+      if (bm) {
+        document.getElementById('boom-model-name').textContent = bm.name;
+        document.getElementById('boom-model-tagline').textContent = bm.tagline;
+        document.getElementById('boom-model-price').textContent = formatPrice(bm.price_inr);
+        document.getElementById('boom-model-share-target').textContent = bm.share_target;
+        document.getElementById('boom-model-img').src = bm.image;
+        document.getElementById('boom-model-rationale').textContent = bm.rationale;
+
+        const bmSpecs = document.getElementById('boom-model-specs');
+        bmSpecs.innerHTML = '';
+        (bm.specs || []).forEach(s => {
+          bmSpecs.innerHTML += `
+            <div class="bg-slate-950/90 border border-emerald-500/30 p-3 rounded-xl">
+              <div class="text-[10px] font-mono-code uppercase text-slate-400">${s.label}</div>
+              <div class="text-xs font-semibold text-emerald-300 mt-0.5">${s.val}</div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function buildProductCardHTML(p, idx, isUpcoming) {
+      const badgeClass = isUpcoming
+        ? 'bg-amber-500/20 text-amber-300 border-amber-400/40'
+        : p.category === 'Premium Flagship'
+        ? 'bg-sky-500/20 text-sky-300 border-sky-400/40'
+        : p.category === 'Mid-Range Disruptor'
+        ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40'
+        : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40';
+
+      const poolType = isUpcoming ? 'upcoming' : 'current';
+
+      return `
+        <div class="exec-panel tilt-card rounded-2xl overflow-hidden flex flex-col justify-between border border-slate-800">
+          <div>
+            <div class="relative h-48 bg-slate-950 overflow-hidden">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover opacity-85 hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+              <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono-code font-semibold px-2.5 py-1 rounded-md border backdrop-blur-md ${badgeClass}">
+                  ${isUpcoming ? '⏳ ' + p.launch_date : p.category}
+                </span>
+                <span class="text-xs font-mono-code font-bold bg-slate-950/90 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-md">
+                  ${formatPrice(p.price_inr)}
+                </span>
+              </div>
+              <div class="absolute bottom-3 left-3.5 right-3.5">
+                <div class="text-[11px] font-mono-code text-sky-300">${p.brand}</div>
+                <h4 class="font-heading text-lg font-bold text-white leading-snug">${p.name}</h4>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">${p.short_desc}</p>
+            </div>
+          </div>
+
+          <!-- Two Action Buttons: 1. Detail (Floating Terminal Popup) | 2. Direct Official Website -->
+          <div class="p-4 pt-0 grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onclick="openProductDetailModal('${poolType}', ${idx})"
+              class="px-3 py-2.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/30 border border-sky-400/40 text-sky-300 font-mono-code text-xs font-semibold cursor-pointer transition text-center"
+            >
+              &gt;_ Detail &amp; Specs
+            </button>
+            <a
+              href="${p.official_url || '#'}"
+              target="_blank"
+              class="px-3 py-2.5 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white font-mono-code text-xs font-semibold transition text-center block"
+            >
+              Official Site ↗
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function filterCurrentProducts(categoryFilter) {
       document.querySelectorAll('.flt-btn').forEach(btn => {
         btn.className = 'flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition';
       });
-      const activeBtnId = categoryFilter === 'all'
-        ? 'flt-all'
-        : categoryFilter === 'Premium Flagship'
-        ? 'flt-premium'
-        : categoryFilter === 'Mid-Range Disruptor'
-        ? 'flt-mid'
-        : 'flt-value';
-      const activeBtn = document.getElementById(activeBtnId);
+      const activeId = categoryFilter === 'all' ? 'flt-all'
+        : categoryFilter === 'Premium Flagship' ? 'flt-premium'
+        : categoryFilter === 'Mid-Range Disruptor' ? 'flt-mid' : 'flt-value';
+      const activeBtn = document.getElementById(activeId);
       if (activeBtn) {
         activeBtn.className = 'flt-btn bg-sky-500/20 text-sky-300 border border-sky-400/40 px-3 py-1.5 rounded-lg cursor-pointer transition';
       }
 
-      const grid = document.getElementById('latest-products-grid');
+      const grid = document.getElementById('current-products-grid');
       grid.innerHTML = '';
-
-      const filtered = categoryFilter === 'all'
-        ? currentCatalogProducts
-        : currentCatalogProducts.filter(p => p.category === categoryFilter);
-
-      filtered.forEach(p => {
-        const tierBadge = p.category === 'Premium Flagship'
-          ? 'bg-sky-500/20 text-sky-300 border-sky-400/40'
-          : p.category === 'Mid-Range Disruptor'
-          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40'
-          : 'bg-amber-500/20 text-amber-300 border-amber-400/40';
-
-        const specEntries = Object.entries(p.specs).map(([k, v]) => `
-          <div class="flex items-center justify-between py-1 border-b border-slate-800/70 text-xs">
-            <span class="text-slate-400">${k}</span>
-            <span class="text-slate-200 font-medium text-right ml-2">${v}</span>
-          </div>
-        `).join('');
-
-        grid.innerHTML += `
-          <div class="exec-panel tilt-card rounded-2xl overflow-hidden flex flex-col justify-between">
-            <div>
-              <div class="relative h-44 bg-slate-950 overflow-hidden">
-                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover opacity-85 hover:scale-105 transition duration-500" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
-                <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  <span class="text-[10px] font-mono-code font-semibold px-2.5 py-1 rounded-md border backdrop-blur-md ${tierBadge}">
-                    ${p.category}
-                  </span>
-                  <span class="text-xs font-mono-code font-bold bg-slate-950/85 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-md">
-                    ${p.price}
-                  </span>
-                </div>
-                <div class="absolute bottom-2.5 left-3 right-3">
-                  <div class="text-[11px] font-mono-code text-sky-300">${p.brand} • ${p.launch}</div>
-                  <h4 class="font-heading text-lg font-bold text-white leading-snug">${p.name}</h4>
-                </div>
-              </div>
-              <div class="p-4 space-y-1">
-                ${specEntries}
-              </div>
-            </div>
-            <div class="px-4 pb-4 pt-1">
-              <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300">
-                <strong class="text-sky-400 font-mono-code uppercase text-[10px] block">Competitive Posture:</strong>
-                ${p.edge}
-              </div>
-            </div>
-          </div>
-        `;
+      activeCurrentProducts.forEach((p, idx) => {
+        if (categoryFilter === 'all' || p.category === categoryFilter) {
+          grid.innerHTML += buildProductCardHTML(p, idx, false);
+        }
       });
-
-      attach3DTiltListeners();
     }
 
+    function openProductDetailModal(poolType, idx) {
+      const list = poolType === 'upcoming' ? activeUpcomingProducts : activeCurrentProducts;
+      const p = list[idx];
+      if (!p) return;
+
+      const modal = document.getElementById('product-detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      document.getElementById('modal-prod-brand').textContent = `${p.brand} • ${p.launch_date || p.category}`;
+      document.getElementById('modal-prod-name').textContent = p.name;
+      document.getElementById('modal-prod-price').textContent = formatPrice(p.price_inr);
+      document.getElementById('modal-official-link').href = p.official_url || '#';
+
+      const specLines = Object.entries(p.specs || {})
+        .map(([k, v]) => `> ${k.padEnd(16, ' ')} : ${v}`)
+        .join('\n');
+
+      typeTerminalText(document.getElementById('modal-typewriter-specs'), specLines, 12);
+      typeTerminalText(document.getElementById('modal-typewriter-strategy'), p.launch_strategy, 14);
+    }
+
+    function closeProductDetailModal() {
+      const modal = document.getElementById('product-detail-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProductDetailModal();
+    });
+
     // =========================================================================
-    // 4. BOOTLOADER, SEARCH WORKFLOW & GAME THEORY RENDERING
+    // 6. BOOTLOADER & FORM SUBMISSION
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
-      attach3DTiltListeners();
       const boot = document.getElementById('boot-loader');
-      const finishBoot = () => {
+      setTimeout(() => {
         boot.setAttribute('aria-busy', 'false');
         boot.classList.add('is-hiding');
         document.body.classList.remove('is-booting');
-        window.setTimeout(() => { boot.hidden = true; }, 980);
-      };
-      window.setTimeout(finishBoot, 2500);
+        setTimeout(() => { boot.hidden = true; }, 980);
+      }, 2400);
     });
 
     const alphaSlider = document.getElementById('alpha-slider');
@@ -1907,27 +1539,9 @@
       document.getElementById('search-form').dispatchEvent(new Event('submit'));
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-      document.getElementById(tabId).classList.remove('hidden');
-      document.querySelectorAll('#workspace-sidebar .tab-btn').forEach(btn => {
-        btn.classList.remove('nav-active');
-      });
-      const activeButton = document.getElementById('btn-' + tabId);
-      if (activeButton) activeButton.classList.add('nav-active');
-    }
-
-    document.getElementById('loader-dismiss').addEventListener('click', () => {
-      document.getElementById('search-loader').classList.add('hidden');
-      document.body.classList.remove('is-loading');
-    });
-
     document.getElementById('sidebar-toggle').addEventListener('click', () => {
       const isMobile = window.matchMedia('(max-width: 700px)').matches;
-      const className = isMobile ? 'sidebar-expanded' : 'sidebar-collapsed';
-      document.body.classList.toggle(className);
-      const expanded = document.body.classList.contains(className) === (isMobile ? true : false);
-      document.getElementById('sidebar-toggle').setAttribute('aria-expanded', String(isMobile ? expanded : !document.body.classList.contains('sidebar-collapsed')));
+      document.body.classList.toggle(isMobile ? 'sidebar-expanded' : 'sidebar-collapsed');
     });
 
     const waitMs = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -1939,42 +1553,27 @@
 
       const wrapper = document.getElementById('app-wrapper');
       wrapper.classList.remove('flex-1', 'justify-center', 'py-8');
-      wrapper.classList.add('pt-5', 'pb-4', 'border-b', 'border-slate-800/80', 'bg-slate-950/80', 'backdrop-blur-xl');
-      document.getElementById('brand-header').classList.add('mb-3');
-      const pillars = document.getElementById('landing-pillars');
-      if (pillars) pillars.classList.add('hidden');
+      wrapper.classList.add('pt-4', 'pb-3', 'border-b', 'border-slate-800/70');
 
       const loader = document.getElementById('search-loader');
       const resultsBox = document.getElementById('results-container');
-      const loaderTitle = document.getElementById('loader-title');
-      const loaderStepText = document.getElementById('loader-step-text');
-      const loaderPhase = document.getElementById('loader-phase');
-      const loaderLiveLabel = document.getElementById('loader-live-label');
       resultsBox.classList.add('hidden');
-      loader.dataset.state = 'loading';
-      loader.setAttribute('aria-busy', 'true');
-      loaderTitle.textContent = 'Simulating Market & Product Landscape';
-      loaderLiveLabel.textContent = 'COMPUTING EQUILIBRIUM';
-      loaderStepText.textContent = 'Ingesting live competitive intelligence and product specification data...';
-      document.getElementById('loader-dismiss').classList.add('hidden');
-      loaderPhase.textContent = 'STAGE 01 // SIGNAL INGESTION';
       loader.classList.remove('hidden');
       document.body.classList.add('is-loading');
 
       const steps = [
-        { phase: 'STAGE 01 // PRODUCT & BRAND RADAR', text: 'Cataloging Flagship, Mid-Range, and Entry-Tier releases & specifications...' },
-        { phase: 'STAGE 02 // AUTHORITY VERIFICATION', text: 'Computing PageRank, HITS authority & source credibility weights...' },
-        { phase: 'STAGE 03 // NORMAL-FORM PAYOFFS', text: 'Constructing 3x3 strategic payoff matrices & eliminating dominated actions...' },
-        { phase: 'STAGE 04 // NASH & ZERO-SUM LP', text: 'Solving Pure Strategy Nash Equilibria, Maximin/Minimax & Mixed-Strategy LP...' },
-        { phase: 'STAGE 05 // BOOM MODEL SYNTHESIS', text: 'Designing the Nash-Optimal Product Blueprint & Subgame Perfect Entry Playbook...' }
+        { phase: 'STAGE 01 // OPTION A + B EXTRACTION', text: 'Running Live Wikipedia/Web Scraper + Autonomous Knowledge Synthesizer...' },
+        { phase: 'STAGE 02 // TOP-10 MARKET SHARE RANKING', text: 'Sorting Top-10 industry players by market share, valuation & history...' },
+        { phase: 'STAGE 03 // PRODUCT & LAUNCH RADAR', text: 'Compiling upcoming product launch dates, INR prices & launch strategies...' },
+        { phase: 'STAGE 04 // NASH & BOOM BLUEPRINT', text: 'Solving 3x3 Normal-Form Nash Equilibrium & Market-Boom Product Blueprint...' }
       ];
       let sIdx = 0;
       const stepTimer = setInterval(() => {
         const step = steps[sIdx % steps.length];
-        loaderPhase.textContent = step.phase;
-        loaderStepText.textContent = step.text;
+        document.getElementById('loader-phase').textContent = step.phase;
+        document.getElementById('loader-step-text').textContent = step.text;
         sIdx++;
-      }, 3200);
+      }, 2800);
 
       const formData = new FormData();
       formData.append('query', query);
@@ -1986,322 +1585,154 @@
       }
 
       const startTime = performance.now();
-      const MIN_LOADER_DURATION_MS = 3800;
+      const MIN_LOADER_MS = 3200;
 
-      let responseReceived = false;
       try {
         const res = await fetch('/api/search', { method: 'POST', body: formData });
-        responseReceived = true;
-        const responseText = await res.text();
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch {
-          throw new Error(res.ok
-            ? 'Backend returned an invalid response.'
-            : `Backend returned HTTP ${res.status}.`);
-        }
-        if (!res.ok) {
-          const detail = typeof data.detail === 'string' ? data.detail : null;
-          throw new Error(detail || `Backend returned HTTP ${res.status}.`);
-        }
-
+        const data = await res.json();
         const elapsed = performance.now() - startTime;
-        if (elapsed < MIN_LOADER_DURATION_MS) {
-          await waitMs(MIN_LOADER_DURATION_MS - elapsed);
-        }
+        if (elapsed < MIN_LOADER_MS) await waitMs(MIN_LOADER_MS - elapsed);
 
         clearInterval(stepTimer);
-        loader.setAttribute('aria-busy', 'false');
         loader.classList.add('hidden');
         document.body.classList.remove('is-loading');
-        renderResults(data, query);
+
+        lastAnalysisData = data;
+        renderAllData(data);
+
         document.getElementById('workspace-sidebar').classList.remove('hidden');
         document.body.classList.add('dashboard-active');
         resultsBox.classList.remove('hidden');
-        switchTab('tab-strategy');
+        openMainView('hub');
       } catch (err) {
         clearInterval(stepTimer);
-        const message = err instanceof Error ? err.message : String(err);
-        loader.dataset.state = 'error';
-        loader.setAttribute('aria-busy', 'false');
-        document.body.classList.remove('is-loading');
-        loaderTitle.textContent = 'Simulation Interrupted';
-        loaderPhase.textContent = 'ACTION REQUIRED';
-        loaderLiveLabel.textContent = 'OFFLINE';
+        document.getElementById('loader-title').textContent = 'Simulation Interrupted';
+        document.getElementById('loader-step-text').textContent = 'Check that Uvicorn backend server is running.';
         document.getElementById('loader-dismiss').classList.remove('hidden');
-        loaderStepText.textContent = responseReceived
-          ? `Simulation failed: ${message}`
-          : `Cannot reach MarketAura backend engine. Check that Uvicorn is running. (${message})`;
       }
     });
 
-    function parseSharePercent(shareStr) {
-      if (!shareStr) return 22;
-      const match = String(shareStr).match(/(\d+(\.\d+)?)/);
-      return match ? Math.min(100, Math.max(8, parseFloat(match[1]))) : 22;
-    }
+    document.getElementById('loader-dismiss').addEventListener('click', () => {
+      document.getElementById('search-loader').classList.add('hidden');
+      document.body.classList.remove('is-loading');
+    });
 
-    function renderResults(data, rawQueryText) {
-      document.getElementById('out-active-query').textContent = data.active_query;
-      document.getElementById('out-expanded-terms').textContent =
-        data.added_terms && data.added_terms.length ? '+' + data.added_terms.join(', +') : 'None';
-
-      document.getElementById('out-answer').textContent = data.direct_answer.answer;
-      document.getElementById('out-answer-meta').textContent =
-        `Primary Anchor: ${data.direct_answer.source_domain} // Confidence Index: ${data.direct_answer.confidence}`;
-
-      document.getElementById('hud-confidence').textContent =
-        `Confidence: ${Math.round((data.direct_answer.confidence || 0.85) * 100)}%`;
-
+    function renderAllData(data) {
       const gt = data.game_theory_analysis;
-      if (gt) {
-        document.getElementById('gt-industry-title').textContent = gt.industry_name;
-        document.getElementById('hud-sector').textContent = gt.industry_name;
+      if (!gt) return;
 
-        // Render Latest Releases, Spec Comparison & Recommended Boom Model
-        renderProductCatalogAndBoomModel(rawQueryText || data.active_query, gt.industry_name);
+      document.getElementById('hub-industry-heading').textContent = gt.industry_name;
+      const dv = gt.dual_source_verification;
+      if (dv) {
+        document.getElementById('hub-consensus-badge').textContent =
+          `✓ Dual-Engine Verified (${Math.round(dv.consensus_reliability_score * 100)}% Consensus Confidence)`;
+        document.getElementById('dual-verdict-banner').textContent = dv.verification_verdict;
 
-        const topBox = document.getElementById('gt-top-brands');
-        topBox.innerHTML = '';
-        gt.top_brands.forEach(b => {
-          const shareNum = parseSharePercent(b.market_share);
-          topBox.innerHTML += `
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-sky-400/40 transition">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-heading font-bold text-white text-base">${b.name}</span>
-                <span class="text-xs font-mono-code font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30 px-2.5 py-0.5 rounded-md">
-                  Share: ${b.market_share}
-                </span>
-              </div>
-              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2.5 mb-2.5">
-                <div class="bg-gradient-to-r from-sky-400 to-indigo-400 h-full rounded-full" style="width: ${shareNum}%"></div>
-              </div>
-              <p class="text-xs text-slate-300 mt-1"><strong class="text-slate-100">Market Status:</strong> ${b.status}</p>
-              <div class="text-xs text-sky-200 mt-2 bg-sky-950/40 p-2.5 rounded-lg border border-sky-500/20">
-                <strong class="font-mono-code uppercase text-[10px] text-sky-400 block mb-0.5">Active Strategy:</strong>
-                ${b.current_strategy}
-              </div>
-            </div>
-          `;
-        });
-
-        const midBox = document.getElementById('gt-mid-brands');
-        midBox.innerHTML = '';
-        gt.mid_low_brands.forEach(b => {
-          const shareNum = parseSharePercent(b.market_share);
-          midBox.innerHTML += `
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-400/40 transition">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-heading font-bold text-white text-base">${b.name}</span>
-                <span class="text-xs font-mono-code font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-md">
-                  ${b.tier} (${b.market_share})
-                </span>
-              </div>
-              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2.5 mb-2.5">
-                <div class="bg-gradient-to-r from-amber-400 to-orange-400 h-full rounded-full" style="width: ${shareNum}%"></div>
-              </div>
-              <p class="text-xs text-slate-300 mt-1"><strong class="text-slate-100">Market Status:</strong> ${b.status}</p>
-              <div class="text-xs text-amber-200 mt-2 bg-amber-950/35 p-2.5 rounded-lg border border-amber-500/20">
-                <strong class="font-mono-code uppercase text-[10px] text-amber-400 block mb-0.5">Active Strategy:</strong>
-                ${b.current_strategy}
-              </div>
-            </div>
-          `;
-        });
-
-        // Immediate Strategy Playbook
-        document.getElementById('gt-strat-title').textContent = gt.immediate_strategy.strategy_title;
-        document.getElementById('gt-strat-summary').textContent = gt.immediate_strategy.executive_summary;
-        const stepsBox = document.getElementById('gt-strat-steps');
-        stepsBox.innerHTML = '';
-        gt.immediate_strategy.four_step_immediate_actions.forEach((s, idx) => {
-          stepsBox.innerHTML += `
-            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-sky-400/40 transition">
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="font-mono-code font-semibold text-sky-300 text-xs">${s.step}</span>
-                <span class="font-mono-code text-[10px] bg-sky-500/15 text-sky-300 px-2 py-0.5 rounded">STEP 0${idx + 1}</span>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">${s.action}</p>
-            </div>
-          `;
-        });
-
-        // Module 1 & 2: Payoff Matrix
-        const m12 = gt.module1_and_2_nash;
-        const mHead = document.getElementById('gt-matrix-head');
-        const mBody = document.getElementById('gt-matrix-body');
-        mHead.innerHTML = `
-          <tr>
-            <th class="p-3 border-r border-slate-800 text-sky-300">Entrant \\ Incumbent</th>
-            ${m12.incumbent_strategies.map(s => `<th class="p-3">${s}</th>`).join('')}
-          </tr>
-        `;
-        mBody.innerHTML = '';
-        m12.payoff_matrix.forEach((row, rIdx) => {
-          const isDom = rIdx === 2
-            ? 'bg-emerald-500/15 text-emerald-200 font-semibold'
-            : 'bg-slate-950/60 text-slate-300';
-          mBody.innerHTML += `
-            <tr class="${isDom}">
-              <td class="p-3 border-r border-slate-800 font-medium">${m12.entrant_strategies[rIdx]}</td>
-              ${row.map(cell => `<td class="p-3 font-mono-code text-sky-300">(${cell[0]}, ${cell[1]})</td>`).join('')}
-            </tr>
-          `;
-        });
-
-        const eq = m12.nash_equilibria[0];
-        document.getElementById('hud-equilibrium').textContent = `Nash (${eq.payoffs[0]}, ${eq.payoffs[1]})`;
-
-        document.getElementById('gt-nash-details').innerHTML = `
-          <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-200">
-            <strong class="text-emerald-300 block mb-0.5">Pure Strategy Nash Equilibrium &amp; Pareto Optimum:</strong>
-            Entrant plays <code class="font-mono-code bg-slate-900 px-1.5 py-0.5 rounded text-emerald-300">${eq.entrant_strategy}</code> &amp; Incumbent plays <code class="font-mono-code bg-slate-900 px-1.5 py-0.5 rounded text-sky-300">${eq.incumbent_strategy}</code>
-            yielding Payoffs <strong class="font-mono-code text-white">(${eq.payoffs[0]}, ${eq.payoffs[1]})</strong>.
+        const a = dv.option_a_scraper;
+        const b = dv.option_b_llm;
+        document.getElementById('dual-engines-grid').innerHTML = `
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+            <div class="font-mono-code font-bold text-sky-300">${a.engine_name}</div>
+            <div class="text-slate-400">Status: <strong class="text-emerald-400">${a.status}</strong> • Score: <strong>${a.reliability_score}</strong></div>
+            <div class="text-slate-300">Crawled Web Nodes: ${a.crawled_doc_count} | Wikipedia Matches: ${a.wikipedia_nodes_matched}</div>
           </div>
-          <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800"><strong class="text-white">Strictly Dominant Strategy:</strong> <code class="font-mono-code text-sky-300">${m12.dominant_strategy_entrant}</code></div>
-          <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800"><strong class="text-white">Eliminated via IESDS:</strong> <span class="text-rose-300">${m12.eliminated_dominated_strategy}</span></div>
-          <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800"><strong class="text-white">Prisoner's Dilemma Insight:</strong> ${m12.classic_games_insight["Prisoner's Dilemma"]}</div>
-        `;
-
-        // Module 3: Zero-Sum & Mixed Strategy
-        const zs = gt.module3_zero_sum;
-        document.getElementById('gt-zerosum-details').innerHTML = `
-          <div class="grid grid-cols-2 gap-2.5 bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 font-mono-code">
-            <div><span class="text-slate-400 block text-[10px] uppercase">Maximin (Lower)</span><span class="text-white font-bold text-sm">${zs.maximin_value}</span></div>
-            <div><span class="text-slate-400 block text-[10px] uppercase">Minimax (Upper)</span><span class="text-white font-bold text-sm">${zs.minimax_value}</span></div>
-            <div><span class="text-slate-400 block text-[10px] uppercase">Saddle Point</span><span class="text-amber-300 font-bold">${zs.saddle_point_exists ? 'Yes (Pure)' : 'No (Mixed Required)'}</span></div>
-            <div><span class="text-slate-400 block text-[10px] uppercase">Expected Value (v*)</span><span class="text-sky-300 font-bold text-sm">${zs.expected_game_value}</span></div>
-          </div>
-          <div class="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-400/30 text-indigo-100">
-            <strong class="text-indigo-300 font-mono-code uppercase text-[11px] block mb-1">Optimal Mixed-Strategy Allocation:</strong>
-            • Community-Led Viral Loops: <strong class="font-mono-code text-sky-300">${zs.optimal_mixed_strategy.Community_Viral_Prob}</strong><br/>
-            • Targeted Enterprise Outbound: <strong class="font-mono-code text-emerald-300">${zs.optimal_mixed_strategy.Direct_Outbound_Prob}</strong>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-400">
-            <strong class="text-slate-200 block mb-1">Linear Programming (LP) Formulation:</strong>
-            <code class="font-mono-code text-sky-300 text-[11px]">${zs.lp_formulation}</code>
-          </div>
-        `;
-
-        // Module 4 & 5: Advanced Models
-        const adv = gt.module4_and_5_advanced;
-        document.getElementById('gt-advanced-details').innerHTML = `
-          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="font-mono-code text-[11px] text-sky-400 uppercase mb-1">01 // Extensive-Form Tree &amp; Backward Induction</div>
-            <p class="text-slate-200 leading-relaxed">${adv.extensive_form_backward_induction.subgame_perfect_equilibrium}</p>
-          </div>
-          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="font-mono-code text-[11px] text-indigo-400 uppercase mb-1">02 // Bayesian Game &amp; Cost Signaling</div>
-            <p class="text-slate-200 leading-relaxed">${adv.bayesian_and_signaling.incomplete_information}</p>
-            <p class="mt-2 text-indigo-300">${adv.bayesian_and_signaling.signaling_strategy}</p>
-          </div>
-          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="font-mono-code text-[11px] text-emerald-400 uppercase mb-1">03 // Repeated Games &amp; Evolutionary Stability (ESS)</div>
-            <p class="text-slate-200 leading-relaxed">${adv.repeated_and_evolutionary.repeated_game_strategy}</p>
-            <p class="mt-2 text-emerald-300">${adv.repeated_and_evolutionary.evolutionarily_stable_strategy_ess}</p>
-          </div>
-          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="font-mono-code text-[11px] text-amber-400 uppercase mb-1">04 // Mechanism Design &amp; Vickrey Auction</div>
-            <p class="text-slate-200 leading-relaxed">${adv.mechanism_design_and_computing.vickrey_auction_bidding}</p>
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+            <div class="font-mono-code font-bold text-indigo-300">${b.engine_name}</div>
+            <div class="text-slate-400">Status: <strong class="text-emerald-400">${b.status}</strong> • Score: <strong>${b.reliability_score}</strong></div>
+            <div class="text-slate-300">${b.live_insight}</div>
           </div>
         `;
       }
 
-      // Render Supporting Tabs (1 to 5)
-      const tabResults = document.getElementById('tab-results');
-      tabResults.innerHTML = '';
-      data.hybrid_results.forEach((item, idx) => {
-        const d = item.doc;
-        const trustPct = Math.round(item.reliability_score * 100);
-        const badgeColor = trustPct >= 70
-          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'
-          : trustPct >= 45
-          ? 'bg-amber-500/15 text-amber-300 border-amber-400/30'
-          : 'bg-rose-500/15 text-rose-300 border-rose-400/30';
-        const badgeLabel = trustPct >= 70 ? 'Verified Signal' : trustPct >= 45 ? 'Moderate Signal' : 'Low-Trust Signal';
+      renderCompaniesStage(gt);
+      renderProductReviewsStage(gt);
 
-        tabResults.innerHTML += `
-          <div class="exec-panel p-5 rounded-2xl">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-              <span class="text-xs font-mono-code text-slate-400">SIGNAL #${idx + 1} • ${d.source} • ${d.date}</span>
-              <span class="text-xs font-mono-code font-semibold px-3 py-0.5 rounded-md border ${badgeColor}">
-                ${badgeLabel} (${trustPct}%)
-              </span>
-            </div>
-            <a href="${d.url || '#'}" target="_blank" class="font-heading text-lg font-bold text-sky-300 hover:underline block">${d.title}</a>
-            <p class="text-sm text-slate-300 mt-1.5 leading-relaxed">${d.text}</p>
-            <div class="flex flex-wrap gap-5 mt-3.5 pt-3 border-t border-slate-800/80 text-xs font-mono-code text-slate-400">
-              <span><strong class="text-white">Composite Score:</strong> ${item.hybrid_score}</span>
-              <span><strong class="text-sky-300">Relevance:</strong> ${item.relevance_score}</span>
-              <span><strong class="text-emerald-300">Authority:</strong> ${item.reliability_score}</span>
-            </div>
-          </div>
-        `;
-      });
-
-      const trustBody = document.getElementById('trust-table-body');
-      trustBody.innerHTML = '';
-      data.hybrid_results.forEach(item => {
-        const r = item.reliability_details;
-        trustBody.innerHTML += `
-          <tr class="hover:bg-slate-900/60">
-            <td class="p-3.5 font-semibold text-white">${r.source}</td>
-            <td class="p-3.5 text-slate-300">${r.pagerank}</td>
-            <td class="p-3.5 text-slate-300">${r.hits_authority}</td>
-            <td class="p-3.5 text-slate-300">${r.nb_trust_prob}</td>
-            <td class="p-3.5 text-slate-300">${r.claim_consensus}</td>
-            <td class="p-3.5 text-slate-300">${r.recency_score}</td>
-            <td class="p-3.5 font-bold text-sky-300">${r.total_reliability}</td>
+      // Render Game Theory Mathematical Solvers (View 4)
+      const m12 = gt.module1_and_2_nash;
+      document.getElementById('gt-matrix-head').innerHTML = `
+        <tr>
+          <th class="p-3 border-r border-slate-800 text-sky-300">Entrant \\ Incumbent</th>
+          ${m12.incumbent_strategies.map(s => `<th class="p-3">${s}</th>`).join('')}
+        </tr>
+      `;
+      const mBody = document.getElementById('gt-matrix-body');
+      mBody.innerHTML = '';
+      m12.payoff_matrix.forEach((row, rIdx) => {
+        const cls = rIdx === 2 ? 'bg-emerald-500/15 text-emerald-200 font-semibold' : 'bg-slate-950/60 text-slate-300';
+        mBody.innerHTML += `
+          <tr class="${cls}">
+            <td class="p-3 border-r border-slate-800">${m12.entrant_strategies[rIdx]}</td>
+            ${row.map(c => `<td class="p-3 font-mono-code text-sky-300">(${c[0]}, ${c[1]})</td>`).join('')}
           </tr>
         `;
       });
 
-      const compHybrid = document.getElementById('compare-hybrid');
-      const compStd = document.getElementById('compare-standard');
-      compHybrid.innerHTML = '';
-      compStd.innerHTML = '';
-      data.hybrid_results.forEach((item, i) => {
-        compHybrid.innerHTML += `
-          <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 text-sm">
-            <div class="font-semibold text-white">#${i + 1} ${item.doc.title}</div>
-            <div class="text-xs font-mono-code text-slate-400 mt-1">${item.doc.source} • Hybrid: <strong class="text-sky-300">${item.hybrid_score}</strong></div>
-          </div>`;
-      });
-      data.standard_results.forEach((item, i) => {
-        compStd.innerHTML += `
-          <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 text-sm">
-            <div class="font-semibold text-white">#${i + 1} ${item.doc.title}</div>
-            <div class="text-xs font-mono-code text-slate-400 mt-1">${item.doc.source} • Lexical BM25: <strong class="text-amber-300">${item.retrieval_details.bm25}</strong></div>
-          </div>`;
-      });
-
-      document.getElementById('idx-stem').textContent = data.index_preview.stem;
-      document.getElementById('idx-inv').textContent = JSON.stringify(data.index_preview.inverted);
-      document.getElementById('idx-comp').textContent = JSON.stringify(data.index_preview.compressed_gaps);
-      document.getElementById('idx-pos').textContent = JSON.stringify(data.index_preview.positional, null, 2);
-
-      const mCards = document.getElementById('metrics-cards');
-      const mStd = data.evaluation.standard_bm25;
-      const mHyb = data.evaluation.credence_hybrid;
-      mCards.innerHTML = `
-        <div class="p-5 rounded-xl bg-sky-500/10 border border-sky-400/30">
-          <div class="font-heading font-bold text-sky-300 text-base mb-2.5">MarketAura Hybrid Signal Ranking</div>
-          <div class="text-xs font-mono-code space-y-1.5 text-slate-200">
-            <div>Precision@3: <strong class="text-sky-300">${mHyb['Precision@3']}</strong></div>
-            <div>Recall@3: <strong class="text-sky-300">${mHyb['Recall@3']}</strong></div>
-            <div>F1-Score@3: <strong class="text-sky-300">${mHyb['F1-Score@3']}</strong></div>
-            <div>Average Precision: <strong class="text-sky-300">${mHyb['Average Precision (AP)']}</strong></div>
-          </div>
+      const eq = m12.nash_equilibria[0];
+      document.getElementById('gt-nash-details').innerHTML = `
+        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-200">
+          <strong>Pure Strategy Nash Equilibrium:</strong> (${eq.entrant_strategy}, ${eq.incumbent_strategy}) → Payoff <strong>(${eq.payoffs[0]}, ${eq.payoffs[1]})</strong>
         </div>
-        <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800">
-          <div class="font-heading font-bold text-slate-300 text-base mb-2.5">Standard Lexical Baseline</div>
-          <div class="text-xs font-mono-code space-y-1.5 text-slate-400">
-            <div>Precision@3: <strong class="text-white">${mStd['Precision@3']}</strong></div>
-            <div>Recall@3: <strong class="text-white">${mStd['Recall@3']}</strong></div>
-            <div>F1-Score@3: <strong class="text-white">${mStd['F1-Score@3']}</strong></div>
-            <div>Average Precision: <strong class="text-white">${mStd['Average Precision (AP)']}</strong></div>
-          </div>
+        <div><strong>Strictly Dominant Strategy:</strong> <code class="font-mono-code text-sky-300">${m12.dominant_strategy_entrant}</code></div>
+        <div><strong>IESDS Elimination:</strong> ${m12.eliminated_dominated_strategy}</div>
+      `;
+
+      const zs = gt.module3_zero_sum;
+      document.getElementById('gt-zerosum-details').innerHTML = `
+        <div class="grid grid-cols-2 gap-2.5 bg-slate-900 p-3.5 rounded-xl border border-slate-800 font-mono-code">
+          <div>Maximin: <strong class="text-white">${zs.maximin_value}</strong></div>
+          <div>Minimax: <strong class="text-white">${zs.minimax_value}</strong></div>
+          <div>Saddle Point: <strong class="text-amber-300">${zs.saddle_point_exists ? 'Yes' : 'No (Mixed)'}</strong></div>
+          <div>Game Value: <strong class="text-sky-300">${zs.expected_game_value}</strong></div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-400/30">
+          <strong>Mixed Strategy Allocation:</strong> Community Viral (${zs.optimal_mixed_strategy.Community_Viral_Prob}) / Direct Outbound (${zs.optimal_mixed_strategy.Direct_Outbound_Prob})
+        </div>
+        <div class="text-slate-400 font-mono-code text-[11px]">LP: ${zs.lp_formulation}</div>
+      `;
+
+      const adv = gt.module4_and_5_advanced;
+      document.getElementById('gt-advanced-details').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+          <strong class="text-sky-400 block mb-1">Backward Induction (SPNE)</strong>
+          ${adv.extensive_form_backward_induction.subgame_perfect_equilibrium}
+        </div>
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+          <strong class="text-indigo-400 block mb-1">Bayesian Signaling</strong>
+          ${adv.bayesian_and_signaling.signaling_strategy}
+        </div>
+      `;
+
+      // Populate Hidden Settings & Background Extraction Diagnostics (View 5)
+      document.getElementById('out-active-query').textContent = `Query: ${data.active_query}`;
+      document.getElementById('out-expanded-terms').textContent =
+        `Expanded: ${data.added_terms && data.added_terms.length ? data.added_terms.join(', ') : 'None'}`;
+
+      const trustBody = document.getElementById('trust-table-body');
+      trustBody.innerHTML = '';
+      (data.hybrid_results || []).forEach(item => {
+        const r = item.reliability_details;
+        trustBody.innerHTML += `
+          <tr>
+            <td class="p-3 text-white font-semibold">${r.source}</td>
+            <td class="p-3">${r.pagerank}</td>
+            <td class="p-3">${r.hits_authority}</td>
+            <td class="p-3">${r.nb_trust_prob}</td>
+            <td class="p-3">${r.claim_consensus}</td>
+            <td class="p-3 text-sky-300 font-bold">${r.total_reliability}</td>
+          </tr>
+        `;
+      });
+
+      const mHyb = data.evaluation.credence_hybrid;
+      const mStd = data.evaluation.standard_bm25;
+      document.getElementById('metrics-cards').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono-code">
+          <div class="text-sky-300 font-bold mb-1">Hybrid Extraction Precision</div>
+          <div>P@3: ${mHyb['Precision@3']} | R@3: ${mHyb['Recall@3']} | AP: ${mHyb['Average Precision (AP)']}</div>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono-code">
+          <div class="text-slate-400 font-bold mb-1">Lexical Baseline</div>
+          <div>P@3: ${mStd['Precision@3']} | R@3: ${mStd['Recall@3']} | AP: ${mStd['Average Precision (AP)']}</div>
         </div>
       `;
     }
