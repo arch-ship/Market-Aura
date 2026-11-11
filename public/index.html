@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --sidebar-width: 260px;
+      --sidebar-width: 264px;
       --bg-void: #050812;
     }
 
@@ -22,7 +22,6 @@
       scrollbar-color: rgba(56, 189, 248, 0.35) rgba(5, 8, 18, 0.9);
     }
 
-    /* CRITICAL FIX: html holds the dark base so #webgl-canvas (z-index: 1) is NEVER hidden behind an opaque body */
     html {
       background-color: var(--bg-void);
       color-scheme: dark;
@@ -47,7 +46,7 @@
     }
 
     /* =====================================================================
-       VISIBLE 3D WEBGL STRATEGIC EQUILIBRIUM BACKGROUND
+       1. VISIBLE 3D WEBGL STRATEGIC EQUILIBRIUM BACKGROUND
        ===================================================================== */
     #webgl-canvas {
       position: fixed;
@@ -76,19 +75,16 @@
     }
 
     /* =====================================================================
-       TERMINAL BLOCK CURSOR (█) FOR TYPEWRITER ANIMATIONS
+       2. TERMINAL BLOCK CURSOR (█) — ONLY SHOWN ON ACTIVE TYPING ELEMENT
        ===================================================================== */
     .terminal-cursor::after {
       content: "█";
       display: inline-block;
-      margin-left: 4px;
+      margin-left: 5px;
       color: #38bdf8;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
-      animation: termBlink 0.75s step-end infinite;
-    }
-    .terminal-cursor.done-typing::after {
-      opacity: 0.85;
+      animation: termBlink 0.68s step-end infinite;
     }
     @keyframes termBlink {
       0%, 100% { opacity: 1; }
@@ -96,7 +92,271 @@
     }
 
     /* =====================================================================
-       SLOWER INITIAL BOOTLOADER
+       3. PPT-STYLE MORPH & ENLARGE TRANSITIONS + SCROLL LAZY REVEAL
+       ===================================================================== */
+    .exec-panel {
+      background: rgba(11, 17, 31, 0.74);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      transition:
+        transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.25s ease,
+        box-shadow 0.35s ease;
+    }
+    .exec-panel:hover {
+      border-color: rgba(56, 189, 248, 0.38);
+    }
+
+    /* PPT Gateway Card Enlargement & Sibling Fade */
+    .ppt-card-enlarge {
+      transform: scale(1.06) translateY(-10px) !important;
+      border-color: rgba(56, 189, 248, 0.85) !important;
+      box-shadow: 0 35px 90px rgba(14, 165, 233, 0.35), 0 0 60px rgba(56, 189, 248, 0.25) !important;
+      z-index: 30;
+    }
+    .ppt-card-fade-out {
+      opacity: 0.06 !important;
+      transform: scale(0.9) translateY(15px) !important;
+      pointer-events: none;
+    }
+
+    /* Smooth PPT Slide-Up & Expand Stage */
+    .ppt-stage-enter {
+      animation: pptStageZoomIn 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform-origin: top center;
+    }
+    @keyframes pptStageZoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(28px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Company Row Click Enlargement & Sibling Fade */
+    .company-row-selected {
+      transform: scale(1.03) !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.28) !important;
+      z-index: 20;
+    }
+    .company-row-fade {
+      opacity: 0.08 !important;
+      transform: scale(0.95) !important;
+      pointer-events: none;
+    }
+
+    /* Scroll-Triggered Lazy Reveal (Only loads when scrolled into viewport) */
+    .scroll-reveal-item {
+      opacity: 0;
+      transform: translateY(42px) scale(0.96);
+      transition:
+        opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
+    }
+    .scroll-reveal-item.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* =====================================================================
+       4. FLOATING NON-BLURRING SPEC WINDOW + RANDOM-EDGE CHARACTER BOT
+       ===================================================================== */
+    #floating-spec-assistant {
+      position: fixed;
+      z-index: 90;
+      pointer-events: none;
+      inset: 0;
+      overflow: hidden;
+    }
+    #floating-spec-assistant.hidden {
+      display: none;
+    }
+
+    #floating-spec-card {
+      pointer-events: auto;
+      position: fixed;
+      width: min(92vw, 490px);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 20px;
+      background: rgba(8, 13, 26, 0.96);
+      border: 1.5px solid rgba(56, 189, 248, 0.55);
+      box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(56, 189, 248, 0.2);
+      transition:
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.5s ease;
+    }
+
+    /* Character Bot Wrapper & Idle Float */
+    .aura-bot-avatar {
+      animation: botHover 2.8s ease-in-out infinite alternate;
+      filter: drop-shadow(0 10px 20px rgba(56, 189, 248, 0.35));
+    }
+    @keyframes botHover {
+      0% { transform: translateY(0px) rotate(-2deg); }
+      100% { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    /* Directional Entry Animations from Random Screen Edges */
+    .enter-from-right {
+      animation: flyFromRight 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .enter-from-left {
+      animation: flyFromLeft 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .enter-from-bottom {
+      animation: flyFromBottom 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .enter-from-top {
+      animation: flyFromTop 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes flyFromRight {
+      0% { opacity: 0; transform: translateX(120%) scale(0.85); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes flyFromLeft {
+      0% { opacity: 0; transform: translateX(-120%) scale(0.85); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes flyFromBottom {
+      0% { opacity: 0; transform: translateY(120%) scale(0.85); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes flyFromTop {
+      0% { opacity: 0; transform: translateY(-120%) scale(0.85); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* =====================================================================
+       5. FIXED SIDEBAR & CUSTOM FLAG CURRENCY PICKER
+       ===================================================================== */
+    #workspace-sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      width: var(--sidebar-width);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(7, 11, 22, 0.92);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148, 163, 184, 0.15);
+      transition: width 0.25s ease, transform 0.25s ease;
+    }
+    #workspace-sidebar.hidden { display: none; }
+    #workspace-sidebar:not(.hidden) { display: flex; }
+
+    .sidebar-top {
+      height: 70px;
+      flex: 0 0 70px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .sidebar-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      color: #94a3b8;
+      cursor: pointer;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 9px;
+    }
+    .sidebar-toggle:hover { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+    .sidebar-brand {
+      font-family: 'Outfit', sans-serif;
+      color: #f8fafc;
+      font-size: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .sidebar-brand span { color: #38bdf8; }
+    .sidebar-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      padding: 18px 20px 8px;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
+    .sidebar-nav .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 42px;
+      padding: 0 13px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      outline: none !important;
+      transition: all 0.18s ease;
+    }
+    .sidebar-nav .tab-btn:hover {
+      background: rgba(30, 41, 59, 0.65);
+      color: #f8fafc;
+    }
+    .sidebar-nav .tab-btn.nav-active {
+      background: rgba(56, 189, 248, 0.14);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.35);
+      font-weight: 600;
+    }
+    .sidebar-nav .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; }
+
+    body.dashboard-active #app-wrapper {
+      flex: 0 0 auto;
+      width: calc(100% - var(--sidebar-width));
+      margin-left: var(--sidebar-width);
+      align-self: flex-start;
+    }
+    body.dashboard-active #results-container {
+      width: calc(100% - var(--sidebar-width)) !important;
+      max-width: none !important;
+      margin-left: var(--sidebar-width) !important;
+      padding-left: clamp(16px, 2.5vw, 38px);
+      padding-right: clamp(16px, 2.5vw, 38px);
+    }
+
+    body.sidebar-collapsed { --sidebar-width: 74px; }
+    body.sidebar-collapsed #workspace-sidebar { width: 74px; }
+    body.sidebar-collapsed .sidebar-top { padding: 0; justify-content: center; gap: 0; }
+    body.sidebar-collapsed .sidebar-brand,
+    body.sidebar-collapsed .sidebar-section-label,
+    body.sidebar-collapsed .sidebar-nav .nav-label,
+    body.sidebar-collapsed .sidebar-currency-box,
+    body.sidebar-collapsed .sidebar-footer { display: none; }
+    body.sidebar-collapsed .sidebar-nav { padding: 0 10px; }
+    body.sidebar-collapsed .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
+
+    /* =====================================================================
+       6. BOOTLOADER & SEARCH LOADER
        ===================================================================== */
     body.is-booting { overflow: hidden; }
     #boot-loader.boot-screen {
@@ -157,12 +417,6 @@
       animation-duration: 6.8s;
       animation-direction: reverse;
     }
-    .boot-mark span {
-      font-family: 'Outfit', sans-serif;
-      color: #f8fafc;
-      font-size: 20px;
-      font-weight: 700;
-    }
     .boot-progress {
       position: relative;
       width: min(100%, 260px);
@@ -187,9 +441,6 @@
       100% { transform: translateX(320%); }
     }
 
-    /* =====================================================================
-       SLOWER SEARCH ANALYSIS OVERLAY
-       ===================================================================== */
     #search-loader {
       position: fixed;
       inset: 0;
@@ -263,158 +514,6 @@
       animation: bootProgress 4.5s ease-in-out infinite;
     }
 
-    /* =====================================================================
-       GLASS PANELS, 3D TILT & SMOOTH VIEW EXPANSION TRANSITIONS
-       ===================================================================== */
-    .exec-panel {
-      background: rgba(11, 17, 31, 0.72);
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(14px);
-      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .exec-panel:hover {
-      border-color: rgba(56, 189, 248, 0.38);
-    }
-
-    .tilt-card {
-      transform-style: preserve-3d;
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.35s ease;
-    }
-    .tilt-card:hover {
-      border-color: rgba(56, 189, 248, 0.45);
-      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.65), 0 0 30px rgba(56, 189, 248, 0.12);
-    }
-
-    .expand-stage {
-      animation: stageExpand 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    @keyframes stageExpand {
-      0% { opacity: 0; transform: scale(0.94) translateY(16px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .company-row-fade {
-      opacity: 0.12 !important;
-      transform: scale(0.97) !important;
-      pointer-events: none;
-    }
-
-    /* =====================================================================
-       LEFT SIDEBAR NAVIGATION
-       ===================================================================== */
-    #workspace-sidebar {
-      position: fixed;
-      inset: 0 auto 0 0;
-      z-index: 40;
-      width: var(--sidebar-width);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      background: rgba(7, 11, 22, 0.88);
-      backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(148, 163, 184, 0.15);
-      transition: width 0.25s ease, transform 0.25s ease;
-    }
-    #workspace-sidebar.hidden { display: none; }
-    #workspace-sidebar:not(.hidden) { display: flex; }
-
-    .sidebar-top {
-      height: 70px;
-      flex: 0 0 70px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 0 20px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-    }
-    .sidebar-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 34px;
-      color: #94a3b8;
-      cursor: pointer;
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 9px;
-    }
-    .sidebar-brand {
-      font-family: 'Outfit', sans-serif;
-      color: #f8fafc;
-      font-size: 20px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .sidebar-brand span { color: #38bdf8; }
-    .sidebar-section-label {
-      font-family: 'JetBrains Mono', monospace;
-      padding: 18px 20px 8px;
-      color: #64748b;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      white-space: nowrap;
-    }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
-    .sidebar-nav .tab-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      min-height: 42px;
-      padding: 0 13px;
-      border: 1px solid transparent;
-      border-radius: 11px;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 13px;
-      font-weight: 500;
-      text-align: left;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-    .sidebar-nav .tab-btn:hover {
-      background: rgba(30, 41, 59, 0.6);
-      color: #f8fafc;
-    }
-    .sidebar-nav .tab-btn.nav-active {
-      background: rgba(56, 189, 248, 0.14);
-      color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.32);
-      font-weight: 600;
-    }
-    .sidebar-nav .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; }
-
-    body.dashboard-active #app-wrapper {
-      flex: 0 0 auto;
-      width: calc(100% - var(--sidebar-width));
-      margin-left: var(--sidebar-width);
-      align-self: flex-start;
-    }
-    body.dashboard-active #results-container {
-      width: calc(100% - var(--sidebar-width)) !important;
-      max-width: none !important;
-      margin-left: var(--sidebar-width) !important;
-      padding-left: clamp(16px, 2.5vw, 38px);
-      padding-right: clamp(16px, 2.5vw, 38px);
-    }
-
-    body.sidebar-collapsed { --sidebar-width: 74px; }
-    body.sidebar-collapsed #workspace-sidebar { width: 74px; }
-    body.sidebar-collapsed .sidebar-top { padding: 0; justify-content: center; gap: 0; }
-    body.sidebar-collapsed .sidebar-brand,
-    body.sidebar-collapsed .sidebar-section-label,
-    body.sidebar-collapsed .sidebar-nav .nav-label,
-    body.sidebar-collapsed .sidebar-currency-box,
-    body.sidebar-collapsed .sidebar-footer { display: none; }
-    body.sidebar-collapsed .sidebar-nav { padding: 0 10px; }
-    body.sidebar-collapsed .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
-
     .search-shell {
       background: rgba(13, 19, 34, 0.78);
       border: 1px solid rgba(56, 189, 248, 0.28);
@@ -445,7 +544,7 @@
       .sidebar-brand, .sidebar-section-label, .sidebar-nav .nav-label, .sidebar-currency-box, .sidebar-footer { display: none; }
       .sidebar-nav { padding: 0 8px; }
       .sidebar-nav .tab-btn { justify-content: center; padding: 0; }
-      body.sidebar-expanded #workspace-sidebar { width: 256px; }
+      body.sidebar-expanded #workspace-sidebar { width: 260px; }
       body.sidebar-expanded .sidebar-top { padding: 0 20px; justify-content: flex-start; gap: 14px; }
       body.sidebar-expanded .sidebar-brand,
       body.sidebar-expanded .sidebar-section-label,
@@ -462,7 +561,7 @@
   <canvas id="webgl-canvas"></canvas>
   <div class="ambient-vignette" aria-hidden="true"></div>
 
-  <!-- 2. LEFT WORKSPACE SIDEBAR (CLEAN GT NAVIGATION + CURRENCY + SETTINGS) -->
+  <!-- 2. LEFT WORKSPACE SIDEBAR -->
   <aside id="workspace-sidebar" class="hidden" aria-label="MarketAura navigation">
     <div class="sidebar-top">
       <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation">
@@ -475,15 +574,15 @@
 
     <div class="sidebar-section-label">GAME THEORY WORKSPACE</div>
     <nav class="sidebar-nav">
-      <button onclick="openMainView('hub')" id="nav-btn-hub" class="tab-btn nav-active" type="button" title="Command Hub (2 Cards)">
+      <button onclick="openMainView('hub')" id="nav-btn-hub" class="tab-btn nav-active" type="button" title="Sector Command Hub">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
         <span class="nav-label">Sector Command Hub</span>
       </button>
-      <button onclick="openMainView('companies')" id="nav-btn-companies" class="tab-btn" type="button" title="The Companies Strategies">
+      <button onclick="transitionToViewFromHub('companies')" id="nav-btn-companies" class="tab-btn" type="button" title="The Companies Strategies">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
         <span class="nav-label">Companies Strategies</span>
       </button>
-      <button onclick="openMainView('products')" id="nav-btn-products" class="tab-btn" type="button" title="The Product Reviews">
+      <button onclick="transitionToViewFromHub('products')" id="nav-btn-products" class="tab-btn" type="button" title="The Product Reviews">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg>
         <span class="nav-label">Product Reviews &amp; Boom</span>
       </button>
@@ -493,29 +592,50 @@
       </button>
     </nav>
 
-    <!-- CURRENCY SELECTOR (DEFAULT INR ₹) -->
-    <div class="sidebar-currency-box px-4 mt-5">
-      <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-        <label for="currency-select" class="block text-[10px] font-mono-code uppercase tracking-wider text-slate-400 mb-1.5">
+    <!-- CUSTOM CURRENCY SELECTOR WITH REAL COUNTRY FLAG IMAGES (10 CURRENCIES) -->
+    <div class="sidebar-currency-box px-3.5 mt-5 relative">
+      <div class="p-3 rounded-xl bg-slate-900/85 border border-slate-800/90">
+        <span class="block text-[10px] font-mono-code uppercase tracking-wider text-slate-400 mb-2">
           Display Currency (Default INR)
-        </label>
-        <select id="currency-select" onchange="changeCurrency(this.value)" class="w-full bg-slate-950 border border-slate-700 text-xs font-mono-code text-sky-300 rounded-lg px-2.5 py-2 focus:outline-none focus:border-sky-400">
-          <option value="INR" selected>🇮🇳 INR (₹) — Indian Rupee</option>
-          <option value="USD">🇺🇸 USD ($) — US Dollar</option>
-          <option value="EUR">🇪🇺 EUR (€) — Euro</option>
-        </select>
+        </span>
+        <!-- Trigger Button -->
+        <button
+          type="button"
+          id="currency-dropdown-btn"
+          onclick="toggleCurrencyDropdown(event)"
+          class="w-full flex items-center justify-between gap-2 bg-slate-950 hover:bg-slate-900 border border-slate-700/90 hover:border-sky-400/60 text-xs font-mono-code text-sky-300 rounded-xl px-3 py-2.5 cursor-pointer transition"
+        >
+          <span class="flex items-center gap-2.5 truncate">
+            <img id="selected-curr-flag" src="https://flagcdn.com/w40/in.png" alt="IN" class="w-5 h-3.5 object-cover rounded-xs border border-slate-700 shrink-0" />
+            <span id="selected-curr-label" class="truncate font-semibold">INR (₹) — Indian Rupee</span>
+          </span>
+          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <!-- Custom Flag Options Menu -->
+        <div
+          id="currency-dropdown-menu"
+          class="hidden absolute left-3.5 right-3.5 bottom-full mb-2 max-h-64 overflow-y-auto rounded-xl bg-slate-950 border border-sky-500/40 shadow-2xl z-50 divide-y divide-slate-800/70"
+        ></div>
       </div>
     </div>
 
-    <!-- SETTINGS BUTTON (HIDES ALL BACKGROUND WEB/IR EXTRACTION ENGINE DETAILS) -->
-    <div class="mt-auto px-3 mb-2">
-      <button onclick="openMainView('settings')" id="nav-btn-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-xs font-medium text-slate-300 transition cursor-pointer">
-        <svg class="w-4 h-4 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span class="nav-label">⚙️ Settings &amp; Data Engine</span>
-      </button>
+    <!-- FIXED SETTINGS & DATA ENGINE BUTTON (CLEAN SINGLE ICON, NO OVERFLOW) -->
+    <div class="mt-auto pt-3 border-t border-slate-800/60">
+      <div class="sidebar-nav">
+        <button onclick="openMainView('settings')" id="nav-btn-settings" class="tab-btn" type="button" title="Settings & Data Engine">
+          <svg class="nav-icon text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span class="nav-label">Settings &amp; Data Engine</span>
+        </button>
+      </div>
     </div>
 
-    <div class="sidebar-footer p-3.5 m-3 mt-1 rounded-xl bg-slate-900/90 border border-slate-800/90 text-[11px] text-slate-400">
+    <div class="sidebar-footer p-3.5 m-3 mt-2 rounded-xl bg-slate-900/90 border border-slate-800/90 text-[11px] text-slate-400">
       <div class="flex items-center gap-2 text-emerald-400 font-mono-code font-semibold mb-0.5">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span>DUAL-ENGINE VERIFIED</span>
@@ -527,7 +647,7 @@
   <!-- 3. INITIAL BOOT SPLASH LOADER -->
   <div id="boot-loader" class="boot-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="boot-card">
-      <div class="boot-mark" aria-hidden="true"><span>MA</span></div>
+      <div class="boot-mark" aria-hidden="true"><span class="font-heading font-bold text-white text-xl">MA</span></div>
       <h1 class="font-heading text-3xl font-bold text-white"><span class="text-white">Market</span><span class="text-sky-400">Aura</span></h1>
       <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">Initializing 3D Strategic Equilibrium Mesh, Top-10 Company Ranker &amp; Product Intelligence...</p>
       <div class="boot-progress" aria-hidden="true"><span></span></div>
@@ -535,7 +655,7 @@
     </div>
   </div>
 
-  <!-- 4. MAIN HEADER & SEARCH BAR (TRANSPARENT SO 3D BACKGROUND ALWAYS SHOWS) -->
+  <!-- 4. MAIN HEADER & SEARCH BAR -->
   <div id="app-wrapper" class="flex-1 flex flex-col justify-center items-center px-4 py-8 transition-all duration-500">
 
     <!-- FULL HERO HEADER (SHRINKS TO TOP-LEFT CORNER WHEN SUB-CARDS EXPAND) -->
@@ -553,7 +673,7 @@
       </p>
     </div>
 
-    <!-- SEARCH BAR (NO IR SLIDERS HERE - MOVED TO SETTINGS) -->
+    <!-- SEARCH BAR -->
     <form id="search-form" class="w-full max-w-3xl transition-all duration-500">
       <div class="search-shell flex items-center rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3">
         <!-- Compact Top-Left MarketAura Badge (Visible when inside deep-dive views) -->
@@ -614,26 +734,26 @@
   </section>
 
   <!-- =======================================================================
-       6. MAIN RESULTS CONTAINER (TWO-CARD HUB + EXPANDABLE FULL-WINDOW STAGES)
+       6. MAIN RESULTS CONTAINER (PPT-STYLE MORPHING GATEWAY + STAGES)
        ======================================================================= -->
-  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-20">
+  <main id="results-container" class="hidden w-full max-w-none mx-0 pb-24">
 
     <!-- =====================================================================
          STAGE VIEW 1: THE TWO PRIMARY GATEWAY CARDS
          ("The Companies Strategies"  &  "The Product Reviews")
          ===================================================================== -->
-    <section id="view-hub" class="max-w-6xl mx-auto pt-4 expand-stage">
+    <section id="view-hub" class="max-w-6xl mx-auto pt-4 ppt-stage-enter">
       <div class="text-center mb-8">
         <span id="hub-consensus-badge" class="inline-flex items-center gap-2 text-xs font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 px-3.5 py-1 rounded-full"></span>
         <h2 id="hub-industry-heading" class="font-heading text-3xl sm:text-4xl font-bold text-white mt-2"></h2>
-        <p class="text-sm text-slate-400 mt-1">Select a strategic intelligence module below to expand the full-window interactive terminal</p>
+        <p class="text-sm text-slate-400 mt-1">Click either intelligence card below to enlarge and transition into the full-window terminal</p>
       </div>
 
-      <!-- TWO GIANT INTERACTIVE GATEWAY CARDS -->
+      <!-- TWO GIANT INTERACTIVE GATEWAY CARDS WITH PPT MORPH ANIMATION -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
 
         <!-- CARD 1: THE COMPANIES STRATEGIES -->
-        <div onclick="openMainView('companies')" class="exec-panel tilt-card rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-sky-500/30 hover:border-sky-400">
+        <div id="hub-card-companies" onclick="transitionToViewFromHub('companies')" class="exec-panel rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-sky-500/30 hover:border-sky-400">
           <div class="absolute -right-12 -top-12 w-44 h-44 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-400/20 transition"></div>
           <div class="flex items-center justify-between mb-6">
             <span class="font-mono-code text-xs uppercase tracking-widest text-sky-400 bg-sky-500/10 border border-sky-400/30 px-3 py-1 rounded-md">
@@ -647,7 +767,7 @@
             The Companies Strategies
           </h3>
           <p class="text-sm text-slate-300 leading-relaxed mb-6">
-            Inspect the Top-10 ranked companies in this industry ordered by Market Share &amp; Valuation. Click any company to launch its chronological History Timeline, Strategic Pivots, Latest Products, and Market Share Graphs.
+            Inspect the Top-10 ranked companies in this industry ordered by Market Share &amp; Valuation. Click any company to enlarge its profile with a reversed chronological History Timeline (latest first), Strategic Pivots, Latest Products, and Share Graphs.
           </p>
           <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800/80 text-xs font-mono-code">
             <div>
@@ -662,7 +782,7 @@
         </div>
 
         <!-- CARD 2: THE PRODUCT REVIEWS -->
-        <div onclick="openMainView('products')" class="exec-panel tilt-card rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-indigo-500/30 hover:border-indigo-400">
+        <div id="hub-card-products" onclick="transitionToViewFromHub('products')" class="exec-panel rounded-3xl p-8 cursor-pointer group relative overflow-hidden border-2 border-indigo-500/30 hover:border-indigo-400">
           <div class="absolute -right-12 -top-12 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-400/20 transition"></div>
           <div class="flex items-center justify-between mb-6">
             <span class="font-mono-code text-xs uppercase tracking-widest text-indigo-300 bg-indigo-500/10 border border-indigo-400/30 px-3 py-1 rounded-md">
@@ -676,7 +796,7 @@
             The Product Reviews
           </h3>
           <p class="text-sm text-slate-300 leading-relaxed mb-6">
-            Explore Upcoming Market Launches (with expected release dates), Current Tiered Products (Flagship, Mid-Range, Value) in INR (₹), Terminal Spec + Strategy Popups, Direct Official Links, and the Market-Boom Blueprint.
+            Explore Upcoming Market Launches (with expected release dates), Current Tiered Products (Flagship, Mid-Range, Value), interactive Aura-Bot Floating Spec Overlay, Direct Official Links, and the Market-Boom Blueprint.
           </p>
           <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800/80 text-xs font-mono-code">
             <div>
@@ -694,16 +814,26 @@
     </section>
 
     <!-- =====================================================================
-         STAGE VIEW 2: "THE COMPANIES STRATEGIES" (FULL-WINDOW EXPANSION)
+         STAGE VIEW 2: "THE COMPANIES STRATEGIES" (PPT EXPANDED VIEW)
          ===================================================================== -->
-    <section id="view-companies" class="hidden max-w-6xl mx-auto pt-4 expand-stage">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
-        <div>
-          <div class="text-xs font-mono-code text-sky-400 uppercase tracking-widest">MODULE 01 // RANKED BY MARKET SHARE &amp; VALUATION</div>
-          <!-- Terminal Typewriter Header -->
-          <h2 id="typewriter-companies-header" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1 terminal-cursor"></h2>
+    <section id="view-companies" class="hidden max-w-6xl mx-auto pt-4 ppt-stage-enter">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6 pb-5 border-b border-slate-800">
+        <div class="max-w-3xl">
+          <div class="text-xs font-mono-code text-sky-400 uppercase tracking-widest">MODULE 01 // CORPORATE GAME THEORY &amp; MARKET SHARE HIERARCHY</div>
+          <!-- 1. Main Heading Typed First -->
+          <h2 id="typewriter-companies-header" class="font-heading text-2xl sm:text-4xl font-bold text-white mt-1"></h2>
+          <!-- 2. Detailed Headline Typed Second (After Heading Cursor Finishes) -->
+          <p id="typewriter-companies-subheadline" class="font-mono-code text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed"></p>
         </div>
-        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer transition">
+
+        <!-- DYNAMIC CONTEXTUAL BACK BUTTON:
+             Shows "← Back to Sector Hub" on the list, and automatically changes to
+             "← Back to Company List" when inside any company's profile! -->
+        <button
+          id="companies-dynamic-back-btn"
+          onclick="handleCompaniesBackAction()"
+          class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-sky-500/40 text-xs font-mono-code font-semibold text-sky-300 cursor-pointer transition shrink-0"
+        >
           ← Back to Sector Hub
         </button>
       </div>
@@ -711,8 +841,8 @@
       <!-- LIST OF TOP-10 COMPANIES IN HORIZONTAL RECTANGULAR BOXES -->
       <div id="companies-list-container" class="space-y-4"></div>
 
-      <!-- SINGLE COMPANY FULL-WINDOW DEEP-DIVE VIEW (SHOWN WHEN USER CLICKS ANY COMPANY) -->
-      <div id="company-detail-view" class="hidden exec-panel rounded-3xl p-6 sm:p-8 border-2 border-sky-500/35 expand-stage">
+      <!-- SINGLE COMPANY FULL-WINDOW DEEP-DIVE VIEW -->
+      <div id="company-detail-view" class="hidden exec-panel rounded-3xl p-6 sm:p-8 border-2 border-sky-500/35 ppt-stage-enter">
         <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-800">
           <div class="flex items-center gap-4">
             <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700 p-2.5 flex items-center justify-center shrink-0">
@@ -726,21 +856,22 @@
               <h3 id="comp-detail-name" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1"></h3>
             </div>
           </div>
-          <button onclick="closeCompanyDetail()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-sky-300 cursor-pointer transition">
-            ← Back to Top-10 Companies List
+          <button onclick="closeCompanyDetail()" class="px-4 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/40 text-xs font-mono-code font-semibold text-sky-300 cursor-pointer transition">
+            ← Back to Company List
           </button>
         </div>
 
-        <!-- Terminal Typewriter Company Description -->
-        <div class="my-5 bg-slate-950/90 border border-slate-800 rounded-2xl p-5">
-          <div class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 mb-1.5">EXECUTIVE TERMINAL DOSSIER //</div>
-          <p id="comp-detail-typewriter-desc" class="font-mono-code text-xs sm:text-sm text-slate-200 leading-relaxed terminal-cursor"></p>
+        <!-- Sequential Typewriter Company Description + Strategy -->
+        <div class="my-5 bg-slate-950/90 border border-slate-800 rounded-2xl p-5 space-y-2">
+          <div class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400">EXECUTIVE TERMINAL DOSSIER //</div>
+          <p id="comp-detail-typewriter-desc" class="font-mono-code text-xs sm:text-sm text-slate-200 leading-relaxed"></p>
+          <p id="comp-detail-typewriter-strat" class="font-mono-code text-xs sm:text-sm text-emerald-300 leading-relaxed pt-1"></p>
         </div>
 
-        <!-- 3 SUB-TABS FOR SELECTED COMPANY: History | Latest Products | Market Value & Share Graphs -->
+        <!-- 3 SUB-TABS FOR SELECTED COMPANY: History (Latest First) | Latest Products | Market Value & Share Graphs -->
         <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3 mb-6">
           <button onclick="switchCompanySubTab('ctab-history')" id="btn-ctab-history" class="comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/40 cursor-pointer transition">
-            📜 History &amp; Strategy Timeline
+            📜 History Timeline (Latest First)
           </button>
           <button onclick="switchCompanySubTab('ctab-products')" id="btn-ctab-products" class="comp-subtab-btn px-4 py-2 rounded-xl text-xs font-mono-code font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white cursor-pointer transition">
             🚀 Latest Products Portfolio
@@ -750,7 +881,7 @@
           </button>
         </div>
 
-        <!-- SUB-TAB 1: VERTICAL HISTORY TIMELINE -->
+        <!-- SUB-TAB 1: VERTICAL HISTORY TIMELINE (REVERSED: LATEST AT THE TOP) -->
         <div id="ctab-history" class="comp-subtab-pane space-y-5">
           <div id="comp-timeline-box" class="relative border-l-2 border-sky-500/40 ml-4 pl-6 space-y-6"></div>
         </div>
@@ -768,21 +899,24 @@
     </section>
 
     <!-- =====================================================================
-         STAGE VIEW 3: "THE PRODUCT REVIEWS" (FULL-WINDOW EXPANSION)
+         STAGE VIEW 3: "THE PRODUCT REVIEWS" (PPT EXPANDED VIEW)
          ===================================================================== -->
-    <section id="view-products" class="hidden max-w-7xl mx-auto pt-4 space-y-8 expand-stage">
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
-        <div>
+    <section id="view-products" class="hidden max-w-7xl mx-auto pt-4 space-y-8 ppt-stage-enter">
+      <div class="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-slate-800">
+        <div class="max-w-3xl">
           <div class="text-xs font-mono-code text-indigo-400 uppercase tracking-widest">MODULE 02 // UPCOMING RELEASES, CURRENT TIERS &amp; BOOM BLUEPRINT</div>
-          <h2 id="typewriter-products-header" class="font-heading text-2xl sm:text-3xl font-bold text-white mt-1 terminal-cursor"></h2>
+          <!-- 1. Main Heading Typed First -->
+          <h2 id="typewriter-products-header" class="font-heading text-2xl sm:text-4xl font-bold text-white mt-1"></h2>
+          <!-- 2. Detailed Headline Typed Second -->
+          <p id="typewriter-products-subheadline" class="font-mono-code text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed"></p>
         </div>
-        <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer transition">
+        <button onclick="openMainView('hub')" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-indigo-500/40 text-xs font-mono-code font-semibold text-indigo-300 cursor-pointer transition shrink-0">
           ← Back to Sector Hub
         </button>
       </div>
 
       <!-- PART 1: UPCOMING LAUNCHES (WITH LAUNCH DATES) -->
-      <div class="exec-panel rounded-3xl p-6">
+      <div class="exec-panel rounded-3xl p-6 scroll-reveal-item">
         <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
           <div>
             <span class="text-[11px] font-mono-code uppercase tracking-wider text-amber-400 block">Pre-Launch Pipeline Radar</span>
@@ -794,13 +928,12 @@
       </div>
 
       <!-- PART 2: CURRENT MARKET PRODUCTS (WITH TIER RANGING FILTER) -->
-      <div class="exec-panel rounded-3xl p-6">
+      <div class="exec-panel rounded-3xl p-6 scroll-reveal-item">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800">
           <div>
-            <span class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 block">Active Market Catalog</span>
+            <span class="text-[11px] font-mono-code uppercase tracking-wider text-sky-400 block">Active Market Catalog (Scroll Down to Reveal Cards)</span>
             <h3 class="font-heading text-xl font-bold text-white mt-0.5">📱 Current Products Available in the Market</h3>
           </div>
-          <!-- Tier Ranging Filter -->
           <div class="flex flex-wrap gap-2 text-xs font-mono-code">
             <button type="button" onclick="filterCurrentProducts('all')" id="flt-all" class="flt-btn bg-sky-500/20 text-sky-300 border border-sky-400/40 px-3 py-1.5 rounded-lg cursor-pointer transition">All Tiers</button>
             <button type="button" onclick="filterCurrentProducts('Premium Flagship')" id="flt-premium" class="flt-btn bg-slate-900 text-slate-400 border border-slate-800 hover:text-white px-3 py-1.5 rounded-lg cursor-pointer transition">Ultra-Premium</button>
@@ -811,8 +944,8 @@
         <div id="current-products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
 
-      <!-- PART 3: RECOMMENDED "BOOM MODEL" BLUEPRINT -->
-      <div class="rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/45 bg-gradient-to-br from-emerald-950/40 via-slate-900/95 to-sky-950/35 shadow-2xl">
+      <!-- PART 3: RECOMMENDED "BOOM MODEL" BLUEPRINT (SCROLL REVEALED) -->
+      <div class="rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/45 bg-gradient-to-br from-emerald-950/40 via-slate-900/95 to-sky-950/35 shadow-2xl scroll-reveal-item">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
           <span class="text-xs font-mono-code font-bold uppercase tracking-wider bg-emerald-400 text-slate-950 px-3.5 py-1 rounded-md">
             ★ Market-Boom Product Blueprint (Recommended Nash Sweet-Spot Model)
@@ -846,7 +979,7 @@
     <!-- =====================================================================
          STAGE VIEW 4: MATHEMATICAL NASH, ZERO-SUM LP & ADVANCED SOLVERS
          ===================================================================== -->
-    <section id="view-models" class="hidden max-w-6xl mx-auto pt-4 space-y-6 expand-stage">
+    <section id="view-models" class="hidden max-w-6xl mx-auto pt-4 space-y-6 ppt-stage-enter">
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div>
           <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-wider">SYLLABUS MODULES 1–5 COMPUTATIONAL SOLVERS</span>
@@ -858,7 +991,7 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="exec-panel rounded-2xl p-6">
+        <div class="exec-panel rounded-2xl p-6 scroll-reveal-item">
           <h3 class="font-heading text-lg font-bold text-white mb-2">📊 3×3 Normal-Form Payoff Matrix &amp; Nash Equilibrium</h3>
           <div class="overflow-x-auto rounded-xl border border-slate-800">
             <table class="w-full text-xs text-left">
@@ -869,36 +1002,34 @@
           <div id="gt-nash-details" class="mt-4 space-y-2 text-xs text-slate-300"></div>
         </div>
 
-        <div class="exec-panel rounded-2xl p-6">
+        <div class="exec-panel rounded-2xl p-6 scroll-reveal-item">
           <h3 class="font-heading text-lg font-bold text-white mb-2">⚖️ Zero-Sum Share &amp; Mixed-Strategy LP Solver</h3>
           <div id="gt-zerosum-details" class="space-y-3 text-xs text-slate-300"></div>
         </div>
       </div>
 
-      <div class="exec-panel rounded-2xl p-6">
+      <div class="exec-panel rounded-2xl p-6 scroll-reveal-item">
         <h3 class="font-heading text-lg font-bold text-white mb-3">🌳 Extensive-Form Backward Induction, Bayesian Signaling &amp; ESS</h3>
         <div id="gt-advanced-details" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300"></div>
       </div>
     </section>
 
     <!-- =====================================================================
-         STAGE VIEW 5: ⚙️ SETTINGS & BACKGROUND DATA EXTRACTION ENGINE
-         (Hides all IR controls, Dual-Engine Option A vs B comparison & logs)
+         STAGE VIEW 5: SETTINGS & BACKGROUND DATA EXTRACTION ENGINE
          ===================================================================== -->
-    <section id="view-settings" class="hidden max-w-6xl mx-auto pt-4 space-y-6 expand-stage">
+    <section id="view-settings" class="hidden max-w-6xl mx-auto pt-4 space-y-6 ppt-stage-enter">
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div>
           <span class="text-xs font-mono-code text-sky-400 uppercase tracking-wider">SYSTEM CONFIGURATION &amp; BACKGROUND EXTRACTION ENGINE</span>
-          <h2 class="font-heading text-2xl font-bold text-white mt-0.5">⚙️ Settings, Dual-Engine Reliability &amp; Background Web Indexer</h2>
+          <h2 class="font-heading text-2xl font-bold text-white mt-0.5">Settings, Dual-Engine Reliability &amp; Background Web Indexer</h2>
         </div>
         <button onclick="openMainView('hub')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono-code text-slate-300 cursor-pointer">
           ← Back to Sector Hub
         </button>
       </div>
 
-      <!-- Engine Parameters Card -->
       <div class="exec-panel rounded-2xl p-6">
-        <h3 class="font-heading text-lg font-bold text-white mb-4">1. Background Web Extraction &amp; Currency Parameters</h3>
+        <h3 class="font-heading text-lg font-bold text-white mb-4">1. Background Web Extraction Parameters</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
             <span class="font-mono-code text-slate-400 uppercase block mb-2">Source Authority Weight</span>
@@ -922,14 +1053,12 @@
         </div>
       </div>
 
-      <!-- Option A vs Option B Dual-Engine Verification Comparison -->
       <div class="exec-panel rounded-2xl p-6">
         <h3 class="font-heading text-lg font-bold text-white mb-2">2. Option A (Web/Wikipedia Scraper) vs. Option B (LLM / Knowledge API) Comparison</h3>
         <p id="dual-verdict-banner" class="text-xs font-mono-code text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 p-3 rounded-xl mb-4"></p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs" id="dual-engines-grid"></div>
       </div>
 
-      <!-- Hidden Background IR Diagnostics (Trust Table, Index Preview, Metrics) -->
       <div class="exec-panel rounded-2xl p-6 space-y-6">
         <h3 class="font-heading text-lg font-bold text-white">3. Background Web Extraction Diagnostics (Crawled Sources &amp; Reliability)</h3>
         <div class="overflow-x-auto rounded-xl border border-slate-800">
@@ -954,51 +1083,76 @@
   </main>
 
   <!-- =======================================================================
-       7. FLOATING RECTANGULAR TERMINAL MODAL FOR PRODUCT "DETAIL" BUTTON
-       (Types out Specs + Launch Strategy with Terminal Block Cursor █)
+       7. NON-BLURRING FLOATING SPEC OVERLAY + RANDOM-EDGE CHARACTER ("AURA-BOT")
+       (Zero background blur; flies in from random screen edge; single sequential cursor)
        ======================================================================= -->
-  <div id="product-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md">
-    <div class="w-full max-w-xl rounded-2xl bg-slate-950 border-2 border-sky-400/50 shadow-2xl overflow-hidden expand-stage">
-      <!-- Terminal Window Bar -->
-      <div class="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-          <span class="w-3 h-3 rounded-full bg-amber-400"></span>
-          <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
-          <span id="modal-terminal-title" class="ml-2 font-mono-code text-xs text-sky-300 font-semibold truncate">marketaura://spec-strategy-inspector</span>
+  <div id="floating-spec-assistant" class="hidden" aria-live="polite">
+    <div id="floating-spec-card">
+      <!-- Top Bar with Character Avatar + Small Cross (✕) Sign -->
+      <div class="flex items-center justify-between px-4 py-3 bg-slate-900/95 border-b border-slate-800 rounded-t-20">
+        <div class="flex items-center gap-3">
+          <!-- Animated SVG Cyber-Quant Character ("Aura-Bot") -->
+          <div class="aura-bot-avatar w-11 h-11 shrink-0">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Antenna -->
+              <line x1="32" y1="4" x2="32" y2="14" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="32" cy="4" r="3.5" fill="#10b981"/>
+              <!-- Bot Head Helmet -->
+              <rect x="12" y="14" width="40" height="30" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+              <!-- Glowing Visor -->
+              <rect x="17" y="21" width="30" height="12" rx="5" fill="#0284c7" fill-opacity="0.35" stroke="#38bdf8" stroke-width="1.5"/>
+              <!-- Animated Cyber Eyes -->
+              <circle cx="25" cy="27" r="3" fill="#38bdf8"/>
+              <circle cx="39" cy="27" r="3" fill="#38bdf8"/>
+              <!-- Bot Body & Thruster -->
+              <path d="M22 46H42L38 56H26L22 46Z" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+              <path d="M28 57L32 63L36 57H28Z" fill="#38bdf8"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="bot-edge-badge" class="font-mono-code text-[10px] text-sky-400 uppercase tracking-wider">AURA-BOT // SPEC PROJECTION</span>
+            </div>
+            <h4 id="modal-prod-name" class="font-heading text-base sm:text-lg font-bold text-white leading-tight"></h4>
+          </div>
         </div>
-        <button onclick="closeProductDetailModal()" class="text-xs font-mono-code text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800 cursor-pointer">
-          [ESC / CLOSE ✕]
+
+        <!-- Simple Small Cross Sign (✕) at the Top of the Floating Window -->
+        <button
+          type="button"
+          onclick="closeProductDetailModal()"
+          class="w-7 h-7 rounded-lg bg-slate-800/90 hover:bg-rose-500/25 border border-slate-700 hover:border-rose-400/50 text-slate-300 hover:text-rose-300 flex items-center justify-center text-sm font-bold cursor-pointer transition shrink-0"
+          title="Close Spec Window"
+        >
+          ✕
         </button>
       </div>
 
-      <!-- Terminal Body with Typewriter Output -->
-      <div class="p-5 space-y-4 max-h-[78vh] overflow-y-auto font-mono-code text-xs">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div>
-            <div id="modal-prod-brand" class="text-[11px] text-sky-400 uppercase"></div>
-            <h4 id="modal-prod-name" class="font-heading text-xl font-bold text-white"></h4>
-          </div>
-          <span id="modal-prod-price" class="text-base font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-400/30 px-3 py-1 rounded-lg"></span>
+      <!-- Floating Window Content: Sequential Typewriter (Specs First -> Strategy Second) -->
+      <div class="p-4 sm:p-5 space-y-3.5 overflow-y-auto font-mono-code text-xs">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+          <span id="modal-prod-brand" class="text-[11px] text-slate-400 uppercase"></span>
+          <span id="modal-prod-price" class="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-400/30 px-2.5 py-0.5 rounded-md"></span>
         </div>
 
+        <!-- 1. Technical Specifications (Types First) -->
         <div>
-          <div class="text-[11px] uppercase tracking-wider text-indigo-400 mb-1.5">// 01. HARDWARE &amp; TECHNICAL SPECIFICATIONS</div>
-          <pre id="modal-typewriter-specs" class="whitespace-pre-wrap text-slate-200 bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl leading-relaxed terminal-cursor"></pre>
+          <div class="text-[10px] uppercase tracking-wider text-sky-400 mb-1">// 01. HARDWARE &amp; TECHNICAL SPECIFICATIONS</div>
+          <pre id="modal-typewriter-specs" class="whitespace-pre-wrap text-slate-100 bg-slate-900/95 border border-slate-800 p-3 rounded-xl leading-relaxed min-h-[88px]"></pre>
         </div>
 
+        <!-- 2. Company Game-Theory Strategy (Types Only After Specs Finish & Cursor Moves Here) -->
         <div>
-          <div class="text-[11px] uppercase tracking-wider text-emerald-400 mb-1.5">// 02. COMPANY GAME-THEORY LAUNCH STRATEGY</div>
-          <p id="modal-typewriter-strategy" class="text-slate-200 bg-emerald-950/30 border border-emerald-500/30 p-3.5 rounded-xl leading-relaxed terminal-cursor"></p>
+          <div class="text-[10px] uppercase tracking-wider text-emerald-400 mb-1">// 02. COMPANY GAME-THEORY LAUNCH STRATEGY</div>
+          <p id="modal-typewriter-strategy" class="text-slate-200 bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl leading-relaxed min-h-[54px]"></p>
         </div>
 
-        <div class="flex justify-end gap-3 pt-2">
-          <a id="modal-official-link" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
-            Visit Official Product Page ↗
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-[10px] text-slate-500">Background remains live &amp; scrollable</span>
+          <a id="modal-official-link" href="#" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
+            Official Page ↗
           </a>
-          <button onclick="closeProductDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer">
-            Close Terminal
-          </button>
         </div>
       </div>
     </div>
@@ -1006,7 +1160,7 @@
 
   <script>
     // =========================================================================
-    // 1. REAL-TIME 3D WEBGL STRATEGIC EQUILIBRIUM MESH (VISIBLE AT ALL TIMES)
+    // 1. REAL-TIME 3D WEBGL STRATEGIC EQUILIBRIUM MESH
     // =========================================================================
     (function initThreeJsScene() {
       const canvas = document.getElementById('webgl-canvas');
@@ -1088,58 +1242,244 @@
     })();
 
     // =========================================================================
-    // 2. TERMINAL TYPEWRITER ENGINE (WITH █ CURSOR) & CURRENCY FORMATTER
+    // 2. SLOWER TYPEWRITER ENGINE WITH PUNCTUATION PAUSES & SEQUENTIAL QUEUE
+    //    (When one cursor finishes typing, its cursor disappears completely
+    //     and the next element's cursor begins!)
     // =========================================================================
-    const activeTimers = new WeakMap();
+    let activeSequenceToken = 0;
 
-    function typeTerminalText(element, fullText, speedMs = 16) {
-      if (!element) return;
-      if (activeTimers.has(element)) {
-        clearInterval(activeTimers.get(element));
-      }
-      element.textContent = '';
-      element.classList.add('terminal-cursor');
-      element.classList.remove('done-typing');
-
-      let i = 0;
-      const str = String(fullText || '');
-      const timer = setInterval(() => {
-        element.textContent += str.charAt(i);
-        i++;
-        if (i >= str.length) {
-          clearInterval(timer);
-          element.classList.add('done-typing');
+    function typeWithPausesPromise(element, fullText, baseSpeedMs = 36, token) {
+      return new Promise((resolve) => {
+        if (!element) {
+          resolve();
+          return;
         }
-      }, speedMs);
-      activeTimers.set(element, timer);
+        element.textContent = '';
+        element.classList.add('terminal-cursor');
+
+        const str = String(fullText || '');
+        let idx = 0;
+
+        function stepChar() {
+          if (token !== activeSequenceToken) {
+            element.classList.remove('terminal-cursor');
+            resolve();
+            return;
+          }
+          if (idx >= str.length) {
+            // Completely remove cursor from finished text area before moving to next
+            setTimeout(() => {
+              element.classList.remove('terminal-cursor');
+              resolve();
+            }, 260);
+            return;
+          }
+
+          const ch = str.charAt(idx);
+          element.textContent += ch;
+          idx++;
+
+          // Realistic human/terminal pauses on punctuation & line breaks
+          let delay = baseSpeedMs;
+          if (ch === '.' || ch === '!' || ch === '?') {
+            delay = 440;
+          } else if (ch === ',' || ch === ':' || ch === ';' || ch === '—' || ch === '|') {
+            delay = 280;
+          } else if (ch === '\n') {
+            delay = 360;
+          } else if (idx % 28 === 0 && ch === ' ') {
+            // Subtle micro-thinking pause mid-sentence
+            delay = 210;
+          }
+
+          setTimeout(stepChar, delay);
+        }
+
+        // Initial brief cursor blink before first character appears
+        setTimeout(stepChar, 220);
+      });
     }
 
+    async function runTypewriterSequence(stepsArray) {
+      activeSequenceToken++;
+      const myToken = activeSequenceToken;
+
+      // Clear all target elements and remove any leftover cursors first
+      stepsArray.forEach(item => {
+        if (item.el) {
+          item.el.textContent = '';
+          item.el.classList.remove('terminal-cursor');
+        }
+      });
+
+      for (const item of stepsArray) {
+        if (myToken !== activeSequenceToken) break;
+        await typeWithPausesPromise(item.el, item.text, item.speed || 34, myToken);
+      }
+    }
+
+    // Separate token for the floating spec window so it doesn't cancel main page headers
+    let activeModalToken = 0;
+    function typeModalWithPauses(element, fullText, baseSpeedMs, token) {
+      return new Promise((resolve) => {
+        if (!element) { resolve(); return; }
+        element.textContent = '';
+        element.classList.add('terminal-cursor');
+        const str = String(fullText || '');
+        let idx = 0;
+
+        function nextChar() {
+          if (token !== activeModalToken) {
+            element.classList.remove('terminal-cursor');
+            resolve();
+            return;
+          }
+          if (idx >= str.length) {
+            setTimeout(() => {
+              element.classList.remove('terminal-cursor');
+              resolve();
+            }, 300);
+            return;
+          }
+          const ch = str.charAt(idx);
+          element.textContent += ch;
+          idx++;
+
+          let delay = baseSpeedMs;
+          if (ch === '\n') delay = 320;
+          else if (ch === ':' || ch === '.' || ch === '—') delay = 240;
+          else if (ch === ',') delay = 160;
+
+          setTimeout(nextChar, delay);
+        }
+        setTimeout(nextChar, 200);
+      });
+    }
+
+    // =========================================================================
+    // 3. SCROLL-TRIGGERED LAZY REVEAL (ONLY LOADS WHEN SCROLLED INTO VIEW)
+    // =========================================================================
+    let scrollObserver = null;
+
+    function initScrollRevealObserver() {
+      if (scrollObserver) scrollObserver.disconnect();
+
+      scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            scrollObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: '0px 0px -45px 0px',
+        threshold: 0.12
+      });
+
+      document.querySelectorAll('.scroll-reveal-item').forEach(el => {
+        el.classList.remove('is-visible');
+        scrollObserver.observe(el);
+      });
+    }
+
+    // =========================================================================
+    // 4. 10 CURRENCIES WITH REAL COUNTRY FLAG IMAGES (DEFAULT INR ₹)
+    // =========================================================================
     let currentCurrency = 'INR';
-    const CURRENCY_RATES = {
-      INR: { symbol: '₹', rate: 1, locale: 'en-IN' },
-      USD: { symbol: '$', rate: 1 / 84.0, locale: 'en-US' },
-      EUR: { symbol: '€', rate: 1 / 91.0, locale: 'de-DE' }
-    };
+    const CURRENCIES_LIST = [
+      { code: 'INR', symbol: '₹', rate: 1, locale: 'en-IN', flag: 'https://flagcdn.com/w40/in.png', name: 'INR (₹) — Indian Rupee' },
+      { code: 'USD', symbol: '$', rate: 1 / 84.0, locale: 'en-US', flag: 'https://flagcdn.com/w40/us.png', name: 'USD ($) — US Dollar' },
+      { code: 'EUR', symbol: '€', rate: 1 / 91.0, locale: 'de-DE', flag: 'https://flagcdn.com/w40/eu.png', name: 'EUR (€) — Euro' },
+      { code: 'GBP', symbol: '£', rate: 1 / 108.0, locale: 'en-GB', flag: 'https://flagcdn.com/w40/gb.png', name: 'GBP (£) — British Pound' },
+      { code: 'JPY', symbol: '¥', rate: 1.82, locale: 'ja-JP', flag: 'https://flagcdn.com/w40/jp.png', name: 'JPY (¥) — Japanese Yen' },
+      { code: 'AED', symbol: 'AED ', rate: 1 / 22.9, locale: 'en-AE', flag: 'https://flagcdn.com/w40/ae.png', name: 'AED (د.إ) — UAE Dirham' },
+      { code: 'SGD', symbol: 'S$', rate: 1 / 63.0, locale: 'en-SG', flag: 'https://flagcdn.com/w40/sg.png', name: 'SGD (S$) — Singapore Dollar' },
+      { code: 'AUD', symbol: 'A$', rate: 1 / 55.0, locale: 'en-AU', flag: 'https://flagcdn.com/w40/au.png', name: 'AUD (A$) — Australian Dollar' },
+      { code: 'CAD', symbol: 'C$', rate: 1 / 60.5, locale: 'en-CA', flag: 'https://flagcdn.com/w40/ca.png', name: 'CAD (C$) — Canadian Dollar' },
+      { code: 'CHF', symbol: 'CHF ', rate: 1 / 95.0, locale: 'de-CH', flag: 'https://flagcdn.com/w40/ch.png', name: 'CHF (Fr) — Swiss Franc' }
+    ];
+
+    function buildCurrencyFlagMenu() {
+      const menu = document.getElementById('currency-dropdown-menu');
+      if (!menu) return;
+      menu.innerHTML = '';
+      CURRENCIES_LIST.forEach(c => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs font-mono-code text-slate-200 hover:bg-sky-500/20 hover:text-sky-300 transition cursor-pointer';
+        btn.innerHTML = `
+          <img src="${c.flag}" alt="${c.code}" class="w-5 h-3.5 object-cover rounded-xs border border-slate-700 shrink-0" />
+          <span class="truncate">${c.name}</span>
+        `;
+        btn.onclick = () => selectCurrencyOption(c.code);
+        menu.appendChild(btn);
+      });
+    }
+
+    function toggleCurrencyDropdown(e) {
+      e.stopPropagation();
+      document.getElementById('currency-dropdown-menu').classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('currency-dropdown-menu');
+      if (menu && !e.target.closest('#currency-dropdown-btn')) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function selectCurrencyOption(code) {
+      const found = CURRENCIES_LIST.find(x => x.code === code) || CURRENCIES_LIST[0];
+      currentCurrency = found.code;
+      document.getElementById('selected-curr-flag').src = found.flag;
+      document.getElementById('selected-curr-label').textContent = found.name;
+      document.getElementById('currency-dropdown-menu').classList.add('hidden');
+
+      if (lastAnalysisData && lastAnalysisData.game_theory_analysis) {
+        renderProductReviewsStage(lastAnalysisData.game_theory_analysis);
+        initScrollRevealObserver();
+      }
+    }
 
     function formatPrice(priceInr) {
       const num = Number(priceInr || 0);
       if (num === 0) return 'Free / Open Protocol';
-      const cfg = CURRENCY_RATES[currentCurrency] || CURRENCY_RATES.INR;
+      const cfg = CURRENCIES_LIST.find(x => x.code === currentCurrency) || CURRENCIES_LIST[0];
       const converted = Math.round(num * cfg.rate);
       return `${cfg.symbol}${converted.toLocaleString(cfg.locale)}`;
     }
 
-    function changeCurrency(newCurr) {
-      currentCurrency = newCurr;
-      if (lastAnalysisData) {
-        renderProductReviewsStage(lastAnalysisData.game_theory_analysis);
-      }
-    }
-
     // =========================================================================
-    // 3. STATE & NAVIGATION BETWEEN HUB, COMPANIES, PRODUCTS & SETTINGS
+    // 5. PPT-STYLE CARD ENLARGEMENT TRANSITION & STAGE NAVIGATION
     // =========================================================================
     let lastAnalysisData = null;
+    let isInsideSingleCompanyProfile = false;
+
+    function transitionToViewFromHub(targetView) {
+      const hubEl = document.getElementById('view-hub');
+      const cardComp = document.getElementById('hub-card-companies');
+      const cardProd = document.getElementById('hub-card-products');
+
+      // If currently on the Sector Hub, play the PPT Enlarge + Sibling Fade animation first!
+      if (hubEl && !hubEl.classList.contains('hidden') && cardComp && cardProd) {
+        if (targetView === 'companies') {
+          cardComp.classList.add('ppt-card-enlarge');
+          cardProd.classList.add('ppt-card-fade-out');
+        } else if (targetView === 'products') {
+          cardProd.classList.add('ppt-card-enlarge');
+          cardComp.classList.add('ppt-card-fade-out');
+        }
+
+        setTimeout(() => {
+          cardComp.classList.remove('ppt-card-enlarge', 'ppt-card-fade-out');
+          cardProd.classList.remove('ppt-card-enlarge', 'ppt-card-fade-out');
+          openMainView(targetView);
+        }, 430);
+      } else {
+        openMainView(targetView);
+      }
+    }
 
     function openMainView(viewName) {
       const views = ['hub', 'companies', 'products', 'models', 'settings'];
@@ -1151,11 +1491,18 @@
       });
 
       const targetEl = document.getElementById('view-' + viewName);
-      if (targetEl) targetEl.classList.remove('hidden');
+      if (targetEl) {
+        targetEl.classList.remove('hidden');
+        // Re-trigger PPT slide/zoom animation
+        targetEl.classList.remove('ppt-stage-enter');
+        void targetEl.offsetWidth;
+        targetEl.classList.add('ppt-stage-enter');
+      }
+
       const targetBtn = document.getElementById('nav-btn-' + viewName);
       if (targetBtn) targetBtn.classList.add('nav-active');
 
-      // Morph MarketAura header to compact top-left corner when entering sub-views
+      // Morph MarketAura header into top-left corner when inside deep-dive views
       const brandHeader = document.getElementById('brand-header');
       const cornerBrand = document.getElementById('compact-corner-brand');
       const chipsRow = document.getElementById('sector-chips-row');
@@ -1176,24 +1523,50 @@
         const gt = lastAnalysisData.game_theory_analysis;
         if (viewName === 'companies') {
           closeCompanyDetail();
-          typeTerminalText(
-            document.getElementById('typewriter-companies-header'),
-            `Top-${gt.companies_top10.length} Companies in ${gt.industry_name} (Ranked by Market Share)`,
-            18
-          );
+          // Sequential Typing: 1. Heading (with pauses) -> cursor disappears -> 2. Detailed Headline
+          runTypewriterSequence([
+            {
+              el: document.getElementById('typewriter-companies-header'),
+              text: `Top-${gt.companies_top10.length} Companies in ${gt.industry_name}`,
+              speed: 38
+            },
+            {
+              el: document.getElementById('typewriter-companies-subheadline'),
+              text: `Ranked in descending order of Market Share & Valuation — Click any company card below to enlarge its full strategic dossier, reversed History Timeline, and Share Trajectory.`,
+              speed: 24
+            }
+          ]);
         } else if (viewName === 'products') {
-          typeTerminalText(
-            document.getElementById('typewriter-products-header'),
-            `Product Reviews & Upcoming Launch Radar — ${gt.industry_name}`,
-            18
-          );
+          runTypewriterSequence([
+            {
+              el: document.getElementById('typewriter-products-header'),
+              text: `Product Reviews & Launch Radar — ${gt.industry_name}`,
+              speed: 38
+            },
+            {
+              el: document.getElementById('typewriter-products-subheadline'),
+              text: `Evaluating Upcoming Launches, Active Tiered Models (${currentCurrency}), and the Nash-Optimal Market-Boom Product Blueprint. Scroll down to reveal lower tiers.`,
+              speed: 24
+            }
+          ]);
         }
       }
+
+      setTimeout(initScrollRevealObserver, 120);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Dynamic Back Button Handler inside "The Companies Strategies"
+    function handleCompaniesBackAction() {
+      if (isInsideSingleCompanyProfile) {
+        closeCompanyDetail();
+      } else {
+        openMainView('hub');
+      }
+    }
+
     // =========================================================================
-    // 4. RENDER "THE COMPANIES STRATEGIES" & SINGLE COMPANY DEEP-DIVE
+    // 6. RENDER "THE COMPANIES STRATEGIES" & REVERSED TIMELINE DEEP-DIVE
     // =========================================================================
     function renderCompaniesStage(gt) {
       const listBox = document.getElementById('companies-list-container');
@@ -1204,7 +1577,7 @@
 
       companies.forEach((c, idx) => {
         const row = document.createElement('div');
-        row.className = 'company-row exec-panel tilt-card rounded-2xl p-5 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-800 hover:border-sky-400/60 transition-all duration-300';
+        row.className = 'company-row scroll-reveal-item exec-panel rounded-2xl p-5 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-800 hover:border-sky-400/60';
         row.onclick = () => selectCompanyDeepDive(idx);
         row.innerHTML = `
           <div class="flex items-start sm:items-center gap-4 min-w-0">
@@ -1239,10 +1612,22 @@
       const c = gt.companies_top10[companyIndex];
       if (!c) return;
 
-      // Smoothly decrease opacity of other company cards before full takeover
+      isInsideSingleCompanyProfile = true;
+
+      // Change top-right button text from "Back to Sector Hub" to "Back to Company List"
+      const topBackBtn = document.getElementById('companies-dynamic-back-btn');
+      if (topBackBtn) {
+        topBackBtn.textContent = '← Back to Company List';
+      }
+
+      // Enlarge clicked row and fade out other rows smoothly
       const allRows = document.querySelectorAll('#companies-list-container .company-row');
       allRows.forEach((r, i) => {
-        if (i !== companyIndex) r.classList.add('company-row-fade');
+        if (i === companyIndex) {
+          r.classList.add('company-row-selected');
+        } else {
+          r.classList.add('company-row-fade');
+        }
       });
 
       setTimeout(() => {
@@ -1255,21 +1640,34 @@
         document.getElementById('comp-detail-tier').textContent = `${c.tier} • Valuation: ${c.market_value_inr}`;
         document.getElementById('comp-detail-name').textContent = c.name;
 
-        typeTerminalText(
-          document.getElementById('comp-detail-typewriter-desc'),
-          `${c.description} | Active Game Strategy: ${c.current_strategy}`,
-          14
-        );
+        // Sequential single-cursor typing: Description first -> cursor disappears -> Active Strategy second
+        runTypewriterSequence([
+          {
+            el: document.getElementById('comp-detail-typewriter-desc'),
+            text: c.description,
+            speed: 28
+          },
+          {
+            el: document.getElementById('comp-detail-typewriter-strat'),
+            text: `Active Game Strategy: ${c.current_strategy}`,
+            speed: 30
+          }
+        ]);
 
-        // Populate Tab 1: Vertical History Timeline
+        // Populate Tab 1: Vertical History Timeline — REVERSED SO LATEST IS AT THE TOP
         const tBox = document.getElementById('comp-timeline-box');
         tBox.innerHTML = '';
-        (c.history || []).forEach(h => {
+        const reversedHistory = (c.history || []).slice().reverse();
+        reversedHistory.forEach((h, hIdx) => {
+          const isLatest = hIdx === 0;
           tBox.innerHTML += `
-            <div class="relative bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
-              <span class="absolute -left-[33px] top-5 w-4 h-4 rounded-full bg-sky-400 border-4 border-slate-950"></span>
+            <div class="relative bg-slate-900/90 border ${isLatest ? 'border-emerald-400/50' : 'border-slate-800'} rounded-2xl p-4 scroll-reveal-item">
+              <span class="absolute -left-[33px] top-5 w-4 h-4 rounded-full ${isLatest ? 'bg-emerald-400' : 'bg-sky-400'} border-4 border-slate-950"></span>
               <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-                <span class="font-heading font-bold text-white text-base">${h.title}</span>
+                <div class="flex items-center gap-2">
+                  ${isLatest ? '<span class="text-[10px] font-mono-code font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded">LATEST ERA</span>' : ''}
+                  <span class="font-heading font-bold text-white text-base">${h.title}</span>
+                </div>
                 <span class="font-mono-code text-xs font-bold text-sky-300 bg-sky-500/15 border border-sky-400/30 px-2.5 py-0.5 rounded">${h.year}</span>
               </div>
               <p class="text-xs text-slate-300 leading-relaxed">${h.event}</p>
@@ -1327,14 +1725,24 @@
         `;
 
         switchCompanySubTab('ctab-history');
-      }, 240);
+        setTimeout(initScrollRevealObserver, 80);
+      }, 340);
     }
 
     function closeCompanyDetail() {
+      isInsideSingleCompanyProfile = false;
+      const topBackBtn = document.getElementById('companies-dynamic-back-btn');
+      if (topBackBtn) {
+        topBackBtn.textContent = '← Back to Sector Hub';
+      }
+
       document.getElementById('company-detail-view').classList.add('hidden');
       const listContainer = document.getElementById('companies-list-container');
       listContainer.classList.remove('hidden');
-      listContainer.querySelectorAll('.company-row').forEach(r => r.classList.remove('company-row-fade'));
+      listContainer.querySelectorAll('.company-row').forEach(r => {
+        r.classList.remove('company-row-fade', 'company-row-selected');
+      });
+      setTimeout(initScrollRevealObserver, 80);
     }
 
     function switchCompanySubTab(tabId) {
@@ -1350,7 +1758,7 @@
     }
 
     // =========================================================================
-    // 5. RENDER "THE PRODUCT REVIEWS" + FLOATING TERMINAL SPEC/STRATEGY MODAL
+    // 7. RENDER "THE PRODUCT REVIEWS" + RANDOM-EDGE CHARACTER SPEC OVERLAY
     // =========================================================================
     let activeCurrentProducts = [];
     let activeUpcomingProducts = [];
@@ -1362,17 +1770,14 @@
       document.getElementById('hub-prod-count').textContent =
         `${activeUpcomingProducts.length} Upcoming + ${activeCurrentProducts.length} Active Models`;
 
-      // Render Upcoming Products
       const upGrid = document.getElementById('upcoming-products-grid');
       upGrid.innerHTML = '';
       activeUpcomingProducts.forEach((p, idx) => {
         upGrid.innerHTML += buildProductCardHTML(p, idx, true);
       });
 
-      // Render Current Products
       filterCurrentProducts('all');
 
-      // Render Boom Model Blueprint
       const bm = gt.boom_model;
       if (bm) {
         document.getElementById('boom-model-name').textContent = bm.name;
@@ -1407,7 +1812,7 @@
       const poolType = isUpcoming ? 'upcoming' : 'current';
 
       return `
-        <div class="exec-panel tilt-card rounded-2xl overflow-hidden flex flex-col justify-between border border-slate-800">
+        <div class="scroll-reveal-item exec-panel rounded-2xl overflow-hidden flex flex-col justify-between border border-slate-800">
           <div>
             <div class="relative h-48 bg-slate-950 overflow-hidden">
               <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover opacity-85 hover:scale-105 transition duration-500" />
@@ -1430,7 +1835,6 @@
             </div>
           </div>
 
-          <!-- Two Action Buttons: 1. Detail (Floating Terminal Popup) | 2. Direct Official Website -->
           <div class="p-4 pt-0 grid grid-cols-2 gap-2.5">
             <button
               type="button"
@@ -1470,34 +1874,71 @@
           grid.innerHTML += buildProductCardHTML(p, idx, false);
         }
       });
+      setTimeout(initScrollRevealObserver, 60);
     }
 
-    function openProductDetailModal(poolType, idx) {
+    // FLOATING AURA-BOT SPEC OVERLAY:
+    // Flies in randomly from Left, Right, Top, or Bottom without blurring background,
+    // and types Specs FIRST -> removes cursor -> types Strategy SECOND!
+    async function openProductDetailModal(poolType, idx) {
       const list = poolType === 'upcoming' ? activeUpcomingProducts : activeCurrentProducts;
       const p = list[idx];
       if (!p) return;
 
-      const modal = document.getElementById('product-detail-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      const wrapper = document.getElementById('floating-spec-assistant');
+      const card = document.getElementById('floating-spec-card');
+      wrapper.classList.remove('hidden');
 
+      // Pick a random screen edge for Aura-Bot & the floating card to fly in from
+      const edges = [
+        { name: 'RIGHT FLANK', cls: 'enter-from-right', pos: { bottom: '24px', right: '24px', top: 'auto', left: 'auto' } },
+        { name: 'LEFT FLANK', cls: 'enter-from-left', pos: { bottom: '24px', left: '90px', top: 'auto', right: 'auto' } },
+        { name: 'LOWER DECK', cls: 'enter-from-bottom', pos: { bottom: '28px', right: '32px', top: 'auto', left: 'auto' } },
+        { name: 'UPPER ORBIT', cls: 'enter-from-top', pos: { top: '88px', right: '28px', bottom: 'auto', left: 'auto' } }
+      ];
+      const chosen = edges[Math.floor(Math.random() * edges.length)];
+
+      card.classList.remove('enter-from-right', 'enter-from-left', 'enter-from-bottom', 'enter-from-top');
+      card.style.top = chosen.pos.top;
+      card.style.bottom = chosen.pos.bottom;
+      card.style.left = chosen.pos.left;
+      card.style.right = chosen.pos.right;
+      void card.offsetWidth;
+      card.classList.add(chosen.cls);
+
+      document.getElementById('bot-edge-badge').textContent = `AURA-BOT // ARRIVED VIA ${chosen.name}`;
       document.getElementById('modal-prod-brand').textContent = `${p.brand} • ${p.launch_date || p.category}`;
       document.getElementById('modal-prod-name').textContent = p.name;
       document.getElementById('modal-prod-price').textContent = formatPrice(p.price_inr);
       document.getElementById('modal-official-link').href = p.official_url || '#';
 
+      const specsEl = document.getElementById('modal-typewriter-specs');
+      const stratEl = document.getElementById('modal-typewriter-strategy');
+
+      // Cancel any previous modal typing and clear both fields
+      activeModalToken++;
+      const myModalToken = activeModalToken;
+      specsEl.textContent = '';
+      stratEl.textContent = '';
+      specsEl.classList.remove('terminal-cursor');
+      stratEl.classList.remove('terminal-cursor');
+
       const specLines = Object.entries(p.specs || {})
         .map(([k, v]) => `> ${k.padEnd(16, ' ')} : ${v}`)
         .join('\n');
 
-      typeTerminalText(document.getElementById('modal-typewriter-specs'), specLines, 12);
-      typeTerminalText(document.getElementById('modal-typewriter-strategy'), p.launch_strategy, 14);
+      // 1. Type Specs first with blinking cursor; when finished, its cursor is removed
+      await typeModalWithPauses(specsEl, specLines, 26, myModalToken);
+
+      // 2. Only after Specs finish, start typing Launch Strategy with the cursor
+      if (myModalToken === activeModalToken) {
+        await typeModalWithPauses(stratEl, p.launch_strategy, 28, myModalToken);
+      }
     }
 
     function closeProductDetailModal() {
-      const modal = document.getElementById('product-detail-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      activeModalToken++;
+      document.getElementById('floating-spec-assistant').classList.add('hidden');
     }
 
     document.addEventListener('keydown', (e) => {
@@ -1505,9 +1946,10 @@
     });
 
     // =========================================================================
-    // 6. BOOTLOADER & FORM SUBMISSION
+    // 8. BOOTLOADER & FORM SUBMISSION
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
+      buildCurrencyFlagMenu();
       const boot = document.getElementById('boot-loader');
       setTimeout(() => {
         boot.setAttribute('aria-busy', 'false');
@@ -1564,7 +2006,7 @@
       const steps = [
         { phase: 'STAGE 01 // OPTION A + B EXTRACTION', text: 'Running Live Wikipedia/Web Scraper + Autonomous Knowledge Synthesizer...' },
         { phase: 'STAGE 02 // TOP-10 MARKET SHARE RANKING', text: 'Sorting Top-10 industry players by market share, valuation & history...' },
-        { phase: 'STAGE 03 // PRODUCT & LAUNCH RADAR', text: 'Compiling upcoming product launch dates, INR prices & launch strategies...' },
+        { phase: 'STAGE 03 // PRODUCT & LAUNCH RADAR', text: 'Compiling upcoming product launch dates, multi-currency prices & strategies...' },
         { phase: 'STAGE 04 // NASH & BOOM BLUEPRINT', text: 'Solving 3x3 Normal-Form Nash Equilibrium & Market-Boom Product Blueprint...' }
       ];
       let sIdx = 0;
@@ -1702,7 +2144,7 @@
         </div>
       `;
 
-      // Populate Hidden Settings & Background Extraction Diagnostics (View 5)
+      // Populate Settings & Background Extraction Diagnostics (View 5)
       document.getElementById('out-active-query').textContent = `Query: ${data.active_query}`;
       document.getElementById('out-expanded-terms').textContent =
         `Expanded: ${data.added_terms && data.added_terms.length ? data.added_terms.join(', ') : 'None'}`;
