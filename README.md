@@ -1,6 +1,7 @@
 # 🌐 MarketAura
 
 > **Live Deployment:** https://market-aura.vercel.app/
+
 Accessible via the production URL in the repository description above.
 
 **MarketAura** is an autonomous market intelligence, corporate strategy, and quantitative game theory decision platform. By analyzing live competitive landscapes, product releases, and market share hierarchies, MarketAura computes mathematically optimal entry playbooks and product blueprints that allow new entrants to carve out profitable positions without getting trapped in destructive price wars.
