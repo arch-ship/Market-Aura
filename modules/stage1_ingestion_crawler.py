@@ -5,8 +5,13 @@ import datetime
 import urllib.parse
 import xml.etree.ElementTree as ET
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
-from bs4 import BeautifulSoup
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
 
 try:
     from pypdf import PdfReader
@@ -28,7 +33,7 @@ def _load_local_env():
     """Loads key=value pairs from root .env into os.environ if not already present."""
     candidates = [
         os.path.join(os.getcwd(), ".env"),
-        os.path.join(os.path.dirname(__file__), "..", ".env"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"),
     ]
     for env_path in candidates:
         if os.path.exists(env_path):
@@ -49,6 +54,17 @@ def _load_local_env():
 
 
 _load_local_env()
+
+
+def _strip_html(raw_html: str) -> str:
+    if not raw_html:
+        return ""
+    if BeautifulSoup is not None:
+        try:
+            return BeautifulSoup(raw_html, "html.parser").get_text(" ", strip=True)
+        except Exception:
+            pass
+    return re.sub(r"<[^>]+>", " ", raw_html).strip()
 
 
 class DocumentParser:
@@ -136,6 +152,9 @@ class QueryFormulator:
     def translate_to_english(cls, text: str) -> str:
         if not text:
             return ""
+        # Skip network call for plain ASCII English strings (saves 500ms-1500ms on Vercel!)
+        if all(ord(ch) < 128 for ch in text):
+            return text
         if GoogleTranslator is not None:
             try:
                 return GoogleTranslator(source="auto", target="en").translate(text)
@@ -156,11 +175,6 @@ class QueryFormulator:
 
     @classmethod
     def generate_expanded_regional_queries(cls, base_query: str, region: str) -> list:
-        """
-        Expands a base industry query (e.g., 'milk') into multiple distinct regional queries
-        so cross-query consensus identifies which brands consistently appear in that region
-        (e.g., Amul/Mother Dairy for 'India', Lactalis/Nestle/DFA for 'Global').
-        """
         q = base_query.strip()
         reg = region.strip() if region and region.strip() else "India"
         if reg.lower() in ["global", "worldwide", "world"]:
@@ -180,10 +194,79 @@ class QueryFormulator:
 
 class WebAndSocialCrawler:
     """
-    Multi-Query Google Custom Search JSON API + Google Gemini Search Grounding +
+    Parallelized Multi-Query Google Custom Search JSON API + Google Gemini Search Grounding +
     Alternate Multi-Query Web/News Scraper.
-    Reads GOOGLE_API_KEY / GEMINI_API_KEY and GOOGLE_CSE_ID directly from .env.
+    Runs concurrent HTTP calls so serverless execution stays fast (~2-3s total).
     """
+
+    @staticmethod
+    def _fetch_google_cse_single(api_key: str, cse_id: str, eq: str, q_idx: int, query: str, today_str: str) -> list:
+        out = []
+        try:
+            params = {"key": api_key, "cx": cse_id, "q": eq, "num": 4}
+            resp = requests.get("https://www.googleapis.com/customsearch/v1", params=params, timeout=2.5)
+            if resp.status_code == 200:
+                items = resp.json().get("items", [])
+                for idx, item in enumerate(items):
+                    link = item.get("link", "https://www.google.com")
+                    domain = urllib.parse.urlparse(link).netloc.replace("www.", "") or "google.com"
+                    pagemap = item.get("pagemap", {})
+                    cse_imgs = pagemap.get("cse_image") or pagemap.get("cse_thumbnail") or []
+                    img_url = cse_imgs[0].get("src", "") if cse_imgs and isinstance(cse_imgs[0], dict) else ""
+                    out.append({
+                        "id": f"GOOGLE_CSE_{q_idx}_{idx}",
+                        "title": item.get("title", f"{query} Market Report"),
+                        "source": domain,
+                        "url": link,
+                        "image_url": img_url,
+                        "date": today_str,
+                        "text": item.get("snippet", ""),
+                        "expanded_query_used": eq,
+                        "scraper_engine": "Google Custom Search JSON API",
+                        "outlinks": [domain, "google.com", "reuters.com"]
+                    })
+        except Exception:
+            pass
+        return out
+
+    @staticmethod
+    def _fetch_news_rss_single(eq: str, q_idx: int, hl_gl: str, query: str, today_str: str) -> list:
+        out = []
+        try:
+            q_enc = urllib.parse.quote(eq)
+            rss_url = f"https://news.google.com/rss/search?q={q_enc}&hl={hl_gl}"
+            resp = requests.get(
+                rss_url,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; MarketAuraBot/5.0)"},
+                timeout=2.2
+            )
+            if resp.status_code == 200:
+                root = ET.fromstring(resp.content)
+                channel = root.find("channel")
+                if channel is not None:
+                    for idx, item in enumerate(channel.findall("item")[:3]):
+                        title = item.findtext("title") or f"{query} Market Update"
+                        link = item.findtext("link") or f"https://www.google.com/search?q={q_enc}"
+                        source_el = item.find("source")
+                        source_url = source_el.attrib.get("url", "https://news.google.com") if source_el is not None else "https://news.google.com"
+                        source_domain = urllib.parse.urlparse(source_url).netloc.replace("www.", "") or "news.google.com"
+                        raw_desc = item.findtext("description") or title
+                        clean_desc = _strip_html(raw_desc)
+                        out.append({
+                            "id": f"ALT_NEWS_{q_idx}_{idx}",
+                            "title": title,
+                            "source": source_domain,
+                            "url": link,
+                            "image_url": "",
+                            "date": today_str,
+                            "text": clean_desc[:360] if clean_desc else title,
+                            "expanded_query_used": eq,
+                            "scraper_engine": "Alternate Multi-Query Web News Scraper",
+                            "outlinks": [source_domain, "google.com"]
+                        })
+        except Exception:
+            pass
+        return out
 
     @classmethod
     def crawl_live_web(
@@ -200,51 +283,20 @@ class WebAndSocialCrawler:
         results = []
         today_str = datetime.date.today().isoformat()
 
-        # ------------------------------------------------------------------
-        # TIER 1: OFFICIAL GOOGLE CUSTOM SEARCH JSON API (MULTI-QUERY EXPANSION)
-        # Also scrapes real product/brand thumbnails from pagemap.cse_image
-        # ------------------------------------------------------------------
+        # TIER 1: PARALLEL GOOGLE CUSTOM SEARCH JSON API
         if api_key and cse_id:
-            for q_idx, eq in enumerate(expanded_queries[:4]):
-                try:
-                    params = {
-                        "key": api_key,
-                        "cx": cse_id,
-                        "q": eq,
-                        "num": 4
-                    }
-                    resp = requests.get(
-                        "https://www.googleapis.com/customsearch/v1",
-                        params=params,
-                        timeout=3.2
-                    )
-                    if resp.status_code == 200:
-                        items = resp.json().get("items", [])
-                        for idx, item in enumerate(items):
-                            link = item.get("link", "https://www.google.com")
-                            domain = urllib.parse.urlparse(link).netloc.replace("www.", "") or "google.com"
-                            pagemap = item.get("pagemap", {})
-                            cse_imgs = pagemap.get("cse_image") or pagemap.get("cse_thumbnail") or []
-                            img_url = cse_imgs[0].get("src", "") if cse_imgs and isinstance(cse_imgs[0], dict) else ""
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = [
+                    executor.submit(cls._fetch_google_cse_single, api_key, cse_id, eq, q_idx, query, today_str)
+                    for q_idx, eq in enumerate(expanded_queries[:4])
+                ]
+                for fut in as_completed(futures):
+                    try:
+                        results.extend(fut.result())
+                    except Exception:
+                        pass
 
-                            results.append({
-                                "id": f"GOOGLE_CSE_{q_idx}_{idx}",
-                                "title": item.get("title", f"{query} Market Report"),
-                                "source": domain,
-                                "url": link,
-                                "image_url": img_url,
-                                "date": today_str,
-                                "text": item.get("snippet", ""),
-                                "expanded_query_used": eq,
-                                "scraper_engine": "Google Custom Search JSON API",
-                                "outlinks": [domain, "google.com", "reuters.com"]
-                            })
-                except Exception:
-                    pass
-
-        # ------------------------------------------------------------------
-        # TIER 2: GOOGLE GEMINI API WITH LIVE GOOGLE SEARCH GROUNDING
-        # ------------------------------------------------------------------
+        # TIER 2: GOOGLE GEMINI SEARCH GROUNDING (if CSE wasn't configured or returned few hits)
         if len(results) < 5 and api_key and api_key.startswith("AIza"):
             try:
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={urllib.parse.quote(api_key)}"
@@ -259,7 +311,7 @@ class WebAndSocialCrawler:
                     }],
                     "tools": [{"google_search": {}}]
                 }
-                resp = requests.post(gemini_url, json=payload, timeout=4.5)
+                resp = requests.post(gemini_url, json=payload, timeout=3.8)
                 if resp.status_code == 200:
                     data = resp.json()
                     candidates = data.get("candidates", [])
@@ -267,9 +319,7 @@ class WebAndSocialCrawler:
                         parts = candidates[0].get("content", {}).get("parts", [])
                         grounded_text = " ".join(p.get("text", "") for p in parts if "text" in p).strip()
                         grounding_chunks = (
-                            candidates[0]
-                            .get("groundingMetadata", {})
-                            .get("groundingChunks", [])
+                            candidates[0].get("groundingMetadata", {}).get("groundingChunks", [])
                         )
                         for idx, chunk in enumerate(grounding_chunks[:max_results]):
                             web_info = chunk.get("web", {})
@@ -304,10 +354,7 @@ class WebAndSocialCrawler:
             except Exception:
                 pass
 
-        # ------------------------------------------------------------------
-        # TIER 3: ALTERNATE LIVE WEB SCRAPER (MULTI-QUERY NEWS RSS + WIKIPEDIA)
-        # Runs automatically if CSE/API keys are missing or quota-exhausted
-        # ------------------------------------------------------------------
+        # TIER 3: PARALLEL ALTERNATE MULTI-QUERY NEWS RSS SCRAPER
         if len(results) < max_results:
             is_india = any(
                 city in region.lower()
@@ -318,42 +365,15 @@ class WebAndSocialCrawler:
                 ]
             )
             hl_gl = "en-IN&gl=IN&ceid=IN:en" if is_india else "en-US&gl=US&ceid=US:en"
-
-            for q_idx, eq in enumerate(expanded_queries[:3]):
-                try:
-                    q_enc = urllib.parse.quote(eq)
-                    rss_url = f"https://news.google.com/rss/search?q={q_enc}&hl={hl_gl}"
-                    resp = requests.get(
-                        rss_url,
-                        headers={"User-Agent": "Mozilla/5.0 (compatible; MarketAuraBot/4.0)"},
-                        timeout=2.6
-                    )
-                    if resp.status_code == 200:
-                        root = ET.fromstring(resp.content)
-                        channel = root.find("channel")
-                        if channel is not None:
-                            for idx, item in enumerate(channel.findall("item")[:3]):
-                                title = item.findtext("title") or f"{query} Market Update"
-                                link = item.findtext("link") or f"https://www.google.com/search?q={q_enc}"
-                                source_el = item.find("source")
-                                source_url = source_el.attrib.get("url", "https://news.google.com") if source_el is not None else "https://news.google.com"
-                                source_domain = urllib.parse.urlparse(source_url).netloc.replace("www.", "") or "news.google.com"
-                                raw_desc = item.findtext("description") or title
-                                clean_desc = BeautifulSoup(raw_desc, "html.parser").get_text(" ", strip=True)
-
-                                results.append({
-                                    "id": f"ALT_NEWS_{q_idx}_{idx}",
-                                    "title": title,
-                                    "source": source_domain,
-                                    "url": link,
-                                    "image_url": "",
-                                    "date": today_str,
-                                    "text": clean_desc[:360] if clean_desc else title,
-                                    "expanded_query_used": eq,
-                                    "scraper_engine": "Alternate Multi-Query Web News Scraper",
-                                    "outlinks": [source_domain, "google.com"]
-                                })
-                except Exception:
-                    pass
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                futures = [
+                    executor.submit(cls._fetch_news_rss_single, eq, q_idx, hl_gl, query, today_str)
+                    for q_idx, eq in enumerate(expanded_queries[:3])
+                ]
+                for fut in as_completed(futures):
+                    try:
+                        results.extend(fut.result())
+                    except Exception:
+                        pass
 
         return results[:max_results]
