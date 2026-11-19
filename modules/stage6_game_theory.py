@@ -4,14 +4,13 @@ import json
 import urllib.parse
 from collections import Counter
 import requests
-import numpy as np
 
 
 def _load_local_env():
     """Loads key=value pairs from root .env into os.environ if not already present."""
     candidates = [
         os.path.join(os.getcwd(), ".env"),
-        os.path.join(os.path.dirname(__file__), "..", ".env"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"),
     ]
     for env_path in candidates:
         if os.path.exists(env_path):
@@ -849,7 +848,7 @@ class GameTheoryIndustryEngine:
                     "contents": [{"parts": [{"text": f"{system_instruction}\n\n{user_prompt}"}]}],
                     "tools": [{"google_search": {}}]
                 }
-                resp = requests.post(url, json=payload, timeout=6.0)
+                resp = requests.post(url, json=payload, timeout=5.0)
                 if resp.status_code == 200:
                     parts = resp.json().get("candidates", [])[0].get("content", {}).get("parts", [])
                     raw_json_str = "".join(p.get("text", "") for p in parts if "text" in p).strip()
@@ -867,7 +866,7 @@ class GameTheoryIndustryEngine:
                         "temperature": 0.15,
                         "max_tokens": 2000
                     },
-                    timeout=6.0
+                    timeout=5.0
                 )
                 if resp.status_code == 200:
                     raw_json_str = resp.json()["choices"][0]["message"]["content"].strip()
