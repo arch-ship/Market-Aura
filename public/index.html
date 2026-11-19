@@ -421,7 +421,20 @@
       <div class="loader-track" role="presentation"><div id="loader-bar"></div></div>
       <div class="flex items-center justify-between mt-4 text-[11px] font-mono-code text-slate-400 uppercase">
         <span id="loader-phase">STAGE 01 // MULTI-QUERY GOOGLE EXTRACTION</span>
-        <span class="text-sky-400">● VERIFYING REGIONAL LEADERS</span>
+        <span id="loader-live-dot" class="text-sky-400">● VERIFYING REGIONAL LEADERS</span>
+      </div>
+      <!-- Real Diagnostic Error Box (Replaces old misleading uvicorn alert) -->
+      <div id="loader-error-box" class="hidden mt-5 p-4 rounded-2xl bg-rose-950/60 border border-rose-500/40 text-left space-y-2">
+        <div class="text-xs font-mono-code font-bold text-rose-300 uppercase" id="loader-error-title">API Request Failed</div>
+        <pre id="loader-error-detail" class="text-[11px] font-mono-code text-rose-200 whitespace-pre-wrap break-words max-h-32 overflow-y-auto"></pre>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button type="button" onclick="retryLastSearch()" class="px-4 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono-code text-xs font-bold cursor-pointer">
+            ↻ Retry Request
+          </button>
+          <button type="button" onclick="closeSearchLoader()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-code text-xs cursor-pointer">
+            Return to Search
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -1962,14 +1975,18 @@
       let execText = '';
       let sourceMode = 'Autonomous Startup Strategy Engine';
       try {
-        const fd = new FormData();
-        fd.append('industry', gt.industry_name);
-        fd.append('region', currentRegion);
-        fd.append('capital_stage', capStage);
-        fd.append('entry_posture', posture);
-        fd.append('distribution_model', channel);
-        fd.append('founder_goal', customGoal);
-        const res = await fetch('/api/venture-roadmap', { method: 'POST', body: fd });
+        const res = await fetch('/api/venture-roadmap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            industry: gt.industry_name,
+            region: currentRegion,
+            capital_stage: capStage,
+            entry_posture: posture,
+            distribution_model: channel,
+            founder_goal: customGoal
+          })
+        });
         if (res.ok) {
           const j = await res.json();
           execText = j.executive_plan;
@@ -2185,40 +2202,83 @@
         sIdx++;
       }, 2400);
 
-      const formData = new FormData();
-      formData.append('query', query);
-      formData.append('region', currentRegion);
-      formData.append('trust_weight', alphaSlider.value);
-      formData.append('relevance_weight', (1 - parseFloat(alphaSlider.value)).toFixed(2));
-      formData.append('use_prf', document.getElementById('prf-check').checked);
+      // Reset loader diagnostic UI
+      const errBox = document.getElementById('loader-error-box');
+      if (errBox) errBox.classList.add('hidden');
+      document.getElementById('loader-title').textContent = 'Extracting Live Market & Brand Telemetry';
+      document.getElementById('loader-live-dot').textContent = '● VERIFYING REGIONAL LEADERS';
+
+      let fetchOpts;
       if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append('query', query);
+        formData.append('region', currentRegion);
+        formData.append('trust_weight', alphaSlider.value);
+        formData.append('relevance_weight', (1 - parseFloat(alphaSlider.value)).toFixed(2));
+        formData.append('use_prf', document.getElementById('prf-check').checked);
         formData.append('file', fileInput.files[0]);
+        fetchOpts = { method: 'POST', body: formData };
+      } else {
+        fetchOpts = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: query,
+            region: currentRegion,
+            trust_weight: parseFloat(alphaSlider.value),
+            relevance_weight: parseFloat((1 - parseFloat(alphaSlider.value)).toFixed(2)),
+            use_prf: document.getElementById('prf-check').checked
+          })
+        };
       }
 
       const startTime = performance.now();
-      const MIN_LOADER_MS = 2600;
+      const MIN_LOADER_MS = 2200;
 
       let data = null;
+      let errDetail = '';
       try {
-        const res = await fetch('/api/search', { method: 'POST', body: formData });
-        if (res.ok) {
-          data = await res.json();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 22000);
+        fetchOpts.signal = controller.signal;
+
+        const res = await fetch('/api/search', fetchOpts);
+        clearTimeout(timeoutId);
+
+        const rawText = await res.text();
+        let parsed = null;
+        try { parsed = JSON.parse(rawText); } catch (_) {}
+
+        if (res.ok && parsed && parsed.game_theory_analysis) {
+          data = parsed;
+        } else {
+          errDetail = `HTTP ${res.status} ${res.statusText}\n` +
+            (parsed && (parsed.error || parsed.detail)
+              ? `${parsed.error || parsed.detail}${parsed.traceback ? '\n' + parsed.traceback.join('\n') : ''}`
+              : rawText.slice(0, 320));
         }
       } catch (err) {
-        console.warn('Backend unreachable:', err);
+        errDetail = err.name === 'AbortError'
+          ? 'Request timed out after 22s while waiting for /api/search.'
+          : `Network error calling /api/search: ${err.message}`;
       }
 
       const elapsed = performance.now() - startTime;
-      if (elapsed < MIN_LOADER_MS) await waitMs(MIN_LOADER_MS - elapsed);
+      if (data && elapsed < MIN_LOADER_MS) await waitMs(MIN_LOADER_MS - elapsed);
 
       clearInterval(stepTimer);
-      loader.classList.add('hidden');
-      document.body.classList.remove('is-loading');
 
       if (!data || !data.game_theory_analysis) {
-        alert('Please ensure the FastAPI server is running (uvicorn api.index:app --reload).');
+        document.getElementById('loader-title').textContent = 'Backend Request Failed';
+        document.getElementById('loader-live-dot').textContent = '● ERROR';
+        document.getElementById('loader-error-title').textContent = 'Server Diagnostic Details (/api/search)';
+        document.getElementById('loader-error-detail').textContent = errDetail || 'Empty response returned from /api/search.';
+        if (errBox) errBox.classList.remove('hidden');
         return;
       }
+
+      loader.classList.add('hidden');
+      document.body.classList.remove('is-loading');
 
       lastAnalysisData = data;
       renderAllData(data);
@@ -2228,6 +2288,15 @@
       resultsBox.classList.remove('hidden');
       openMainView('hub');
     });
+
+    function closeSearchLoader() {
+      document.getElementById('search-loader').classList.add('hidden');
+      document.body.classList.remove('is-loading');
+    }
+
+    function retryLastSearch() {
+      document.getElementById('search-form').dispatchEvent(new Event('submit'));
+    }
 
     function renderAllData(data) {
       const gt = data.game_theory_analysis;
