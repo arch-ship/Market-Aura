@@ -1,86 +1,93 @@
-# 🌐 MarketAura
+# 🌐 MarketAura — Market Intelligence & Startup Launch Platform
 
 > **Live Deployment:** https://market-aura.vercel.app/
 
-Accessible via the production URL in the repository description above.
-
-**MarketAura** is an autonomous market intelligence, corporate strategy, and quantitative game theory decision platform. By analyzing live competitive landscapes, product releases, and market share hierarchies, MarketAura computes mathematically optimal entry playbooks and product blueprints that allow new entrants to carve out profitable positions without getting trapped in destructive price wars.
+**MarketAura** is a real-time competitive intelligence, product benchmarking, and startup launch platform designed for founders, analysts, and emerging challengers. Enter any industry—from **Milk & Dairy** and **Specialty Coffee** to **Smartphones**, **Electric Vehicles**, **E-Commerce**, or **SaaS**—to uncover verified regional or global market leaders, realistic local product pricing, and a practical step-by-step market-entry blueprint.
 
 ---
 
 ## ⚡ Core Features & Capabilities
 
-### 1. Dual-Engine Real-World Data Verification
-* **Engine A (Zero-Key Live Web & Encyclopedia Scraper):** Scrapes live web endpoints, corporate filings, and Wikipedia knowledge graphs in real time to extract current brand market shares, product releases, and strategic shifts.
-* **Engine B (Autonomous Strategic Knowledge Engine):** Connects with live AI synthesis APIs (Groq / Gemini) when configured, or deploys deterministic game-theoretic modeling.
-* **Dual-Source Consensus Scoring:** Cross-verifies data points between both engines to establish high-confidence market metrics and reliability scores.
+### 1. Multi-Query Google API Scraping & Cross-Query Consensus
+- **Environment-Managed API Keys (`.env`):** Automatically loads `GOOGLE_API_KEY` / `GEMINI_API_KEY`, `GOOGLE_CSE_ID`, and optional `GROQ_API_KEY` from `.env` (or Vercel Environment Variables) without exposing manual key inputs in the UI.
+- **Multi-Query Regional Expansion:** Expands every industry query into multiple regional search queries (e.g., `"milk companies in India"`, `"top milk brands in India market share 2026"`, `"best milk products and prices in India"`) and cross-verifies brand frequency across queries to confirm authentic local leaders.
+- **Resilient Multi-Tier Pipeline:** Combines the **Google Custom Search JSON API** (including live image thumbnails), **Google Gemini 2.5 Flash with Google Search Grounding**, an **alternate multi-query web/news scraper**, and curated regional fallback datasets so the platform works seamlessly even when offline or rate-limited.
 
 ---
 
-### 2. Module 01 // The Companies Strategies
-* **Top-10 Corporate Hierarchy:** Dynamically ranks the industry's top players in descending order of market share and total enterprise valuation.
-* **PPT-Style Morph Transition:** Clicking a company card smoothly enlarges it while fading out background rows, taking over the viewport with an interactive terminal interface.
-* **Deep-Dive Company Dossiers:**
-  * **Reversed History & Strategic Pivots:** Vertical chronological timeline organized with the **latest era at the top** to trace business model evolutions from inception to the present.
-  * **Latest Products Portfolio:** Active flagship and core product offerings with direct links to official corporate portals.
-  * **Market Value, Share & Trajectory:** Enterprise capitalization figures, overall segment control, and a 4-quarter market share performance bar chart.
+### 2. Region-Specific & Global Intelligence (Globe Picker + GPS + Auto-Currency)
+- **Top-Right Globe & Sidebar Region Scope:** Search any country, city, or small local neighborhood (powered by live OpenStreetMap Nominatim autocomplete plus a built-in gazetteer) or click **Use My Current Location (GPS)** to auto-detect your exact region.
+- **Automatic Currency Synchronization:** Switching regions automatically updates the display currency across all products and recommendations across 10 currencies with real country flag icons (**INR ₹**, **USD $**, **EUR €**, **GBP £**, **JPY ¥**, **AED**, **SGD S$**, **AUD A$**, **CAD C$**, and **CHF**).
+- **Dynamic Regional Re-Ranking:** Searching the same industry across different scopes adapts the competitive landscape—for instance, **Milk** in **India** surfaces *Amul (GCMMF)*, *Mother Dairy*, *Nandini (KMF)*, *Hatsun Agro*, *Parag Milk Foods*, and *Country Delight*, while **Global** surfaces *Groupe Lactalis*, *Nestlé*, *Dairy Farmers of America*, *Danone*, *Arla Foods*, and *Yili Group*.
 
 ---
 
-### 3. Module 02 // The Product Reviews & Launch Radar
-* **Pre-Launch Pipeline Radar:** Upcoming flagship and disruptor products with projected launch dates, technical specs, and pre-emptive signaling strategies.
-* **Tiered Market Catalog:** Active products categorized into **Ultra-Premium Flagship**, **Mid-Range Disruptor**, and **Value / Entry Tier**.
-* **Scroll-Triggered Lazy Reveal:** Lower-tier cards and deep analyses load smoothly as you scroll into their viewport.
-* **Multi-Currency Engine with Real Flag Icons:** Live price formatting defaulting to **INR (₹)** with an interactive country-flag switcher supporting USD ($), EUR (€), GBP (£), JPY (¥), AED (د.إ), SGD (S$), AUD (A$), CAD (C$), and CHF (Fr).
-* **Aura-Bot Floating Spec Inspector:** An animated SVG Cyber-Quant bot that flies in randomly from any edge of the screen to project specifications without blurring or freezing background navigation.
-* **★ Market-Boom Product Blueprint:** Recommends the exact price point, spec sheet, and value proposition guaranteed by Backward Induction to capture market share without provoking incumbent price wars.
+### 3. Corporate Hierarchy (`The Companies Strategies`)
+- **Ranked Market Leaders:** Dynamically lists the top industry players ordered by market share and scale for your selected region.
+- **PPT-Style Morph Transitions & Terminal Typewriter:** Clicking a card smoothly enlarges it while fading out surrounding cards and typing headlines with a sequential terminal block cursor (`█`).
+- **Deep-Dive Company Dossiers:**
+  - **Reversed History Timeline:** Vertical chronological timeline ordered with the **latest era at the top**, tracking founding strategy, pivots, and current market posture.
+  - **Latest Products Portfolio:** Core active product lines with direct links to official company portals.
+  - **Market Value, Share & Trajectory:** Enterprise scale figures, regional share bars, and 4-quarter market share trajectory charts.
 
 ---
 
-### 4. Mathematical Game Theory Solvers
-* **Normal-Form Payoff Matrices:** Models 3×3 non-cooperative games between entrants and incumbents.
-* **Dominance & IESDS:** Identifies strictly dominant strategies and eliminates dominated actions (such as head-on price wars) using Iterated Elimination of Strictly Dominated Strategies.
-* **Nash Equilibrium & Pareto Optimality:** Calculates pure strategy equilibria and identifies Pareto-efficient co-opetition outcomes.
-* **Zero-Sum Games & Mixed-Strategy Optimization:** Formulates two-person zero-sum marketing games, calculating Maximin, Minimax, Saddle Points, and Linear Programming (LP) probability distributions.
-* **Extensive-Form Game Trees (Backward Induction):** Proves Subgame Perfect Nash Equilibria (SPNE) where rational incumbents accommodate focused niche entrants to protect core margins.
-* **Advanced Models:** Incorporates Bayesian Incomplete-Information games, Costly Quality Signaling, Repeated Games ($\delta \ge 0.75$), Evolutionarily Stable Strategies (ESS), and Vickrey Second-Price mechanism design.
+### 4. Product & Launch Radar (`The Product Reviews`)
+- **Industry-Adaptive Categories & Realistic Unit Pricing:** Automatically tailors category filters, photography, and pricing to the searched industry (e.g., *A2 & Organic Fresh*, *Full Cream & Daily Fresh*, and *Toned & Value Pouch* priced around ₹54–₹125/L for Milk; *Flagship*, *Mid-Range Performance*, and *Budget 5G* for Smartphones).
+- **Conditional Upcoming Launches:** Displays upcoming release windows only for industries with active launch cycles, automatically hiding the section for everyday staples.
+- **Scroll-Triggered Lazy Reveal:** Lower-tier product cards and recommendations animate smoothly into view as you scroll.
+- **Aura-Bot Floating Spec Inspector:** Clicking **`>_ Detail & Specs`** summons an animated SVG assistant from a random edge of the screen to type out product specifications followed sequentially by brand positioning—without blurring or locking background scrolling.
+- **★ Recommended Market-Entry Product Opportunity:** Recommends an underserved price-to-quality sweet-spot offering calibrated to real industry unit economics.
 
 ---
 
-### 5. Settings & Background Engine
-* Segregates background web extraction diagnostics, source authority parameters, query expansion controls, and reliability matrices inside a dedicated settings panel to keep the primary tactical workspace clean and focused.
+### 5. Startup Launch Studio (`/api/venture-roadmap`)
+- Accessible via the full-width button at the bottom of the Sector Command Hub or the left sidebar.
+- Written in clear, actionable startup language for founders—letting you configure **Starting Capital Stage**, **Competitive Advantage Focus**, **Go-To-Market Channel**, and a **Custom Startup Goal** to generate:
+  - **Custom Executive Launch Strategy**
+  - **Strategic Trade-Offs, Competitor Risks & Mitigation Playbook**
+  - **18-Month 4-Step Operational Launch Roadmap**
+  - **Region-Specific Distributor, Co-Packing, EMS & Supply Chain Partners**
+  - **Curated Startup Investors & Venture Capital Directory** with direct portal links
+
+---
+
+### 6. Settings & Data Engine (Split Backend Diagnostics)
+Keeps all technical engines cleanly organized inside two separate backend panels in the left sidebar:
+- **Information Retrieval (IR) Backend:** Live `.env` connection status (`/api/env-status`), source trust weight ($\alpha$), multi-query expansion toggle, executed regional query log, cross-query verified entities, PageRank/HITS/Spam/Consensus reliability matrix, precision metrics, and inverted index preview.
+- **Game Theory (GT) Backend:** $3 \times 3$ Normal-Form Payoff Matrix, Strictly Dominant Strategy & IESDS elimination, Pure Strategy Nash Equilibrium, Pareto Optimality, Two-Person Zero-Sum Mixed-Strategy Linear Programming (LP) solver, Extensive-Form Backward Induction (SPNE), Bayesian Signaling, Repeated Games ($\delta \ge 0.75$), and Evolutionarily Stable Strategies (ESS).
 
 ---
 
 ## 🏗️ Repository File Structure
 
 ```text
-MarketAura/
+Market-Aura/
 │
 ├── api/
-│   └── index.py                       # FastAPI serverless backend entry point
+│   └── index.py                       # FastAPI serverless backend (/, /api/search, /api/venture-roadmap, /api/env-status)
 │
 ├── data/
-│   ├── sample_article.txt             # Sample industry analysis document
+│   ├── sample_article.txt             # Sample unstructured market analysis brief
 │   └── sample_upload.xml              # Sample semi-structured XML dataset
 │
 ├── modules/
 │   ├── __init__.py                    # Python package initializer
-│   ├── stage1_ingestion_crawler.py    # Multi-format parser, web crawler & CLIR
-│   ├── stage2_indexer.py              # Inverted, positional, and compressed indexer
-│   ├── stage3_retrieval.py            # Vector Space Model, BM25 & semantic search
-│   ├── stage4_reliability.py          # PageRank, HITS, spam classification & clustering
-│   ├── stage5_ranking_qa.py           # Hybrid scoring, QA extraction & evaluation
-│   └── stage6_game_theory.py          # MarketAura game theory & product intelligence engine
+│   ├── stage1_ingestion_crawler.py    # Multi-format parser, multi-query regional expansion & Google API crawler
+│   ├── stage2_indexer.py              # Preprocessing, inverted, positional & compressed indexes
+│   ├── stage3_retrieval.py            # Vector Space Model (TF-IDF), BM25 & semantic search
+│   ├── stage4_reliability.py          # PageRank, HITS authority, spam filter & consensus scoring
+│   ├── stage5_ranking_qa.py           # Hybrid scoring, extractive QA & evaluation metrics
+│   └── stage6_game_theory.py          # Regional/global brand extractor, realistic pricing & GT solvers
 │
 ├── public/
-│   └── index.html                     # Interactive 3D WebGL frontend terminal
+│   └── index.html                     # 3D WebGL frontend, Globe/GPS picker, Startup Launch Studio & Settings
 │
-├── .gitignore                         # Excludes cache, virtual environments, and secrets
+├── .env                               # Local API keys (ignored by Git)
+├── .gitignore                         # Excludes .env, __pycache__, and virtual environments
 ├── vercel.json                        # Vercel serverless routing configuration
 ├── requirements.txt                   # Deployment dependencies
 └── README.md                          # Platform documentation
-
 ```
 
 ---
@@ -90,49 +97,45 @@ MarketAura/
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/](https://github.com/)<your-username>/MarketAura.git
-cd MarketAura
-
+git clone https://github.com/arch-ship/Market-Aura.git
+cd Market-Aura
 ```
 
 ### 2. Create and Activate a Virtual Environment
 
 ```bash
-# macOS/Linux
+# macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 
 # Windows
 python -m venv venv
 venv\Scripts\activate
-
 ```
 
 ### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
-
 ```
 
-### 4. Optional: Configure Live LLM API Keys
+### 4. Configure `.env` (Recommended for Live Google Search & Grounded AI)
 
-Create a `.env` file in the root folder if you wish to enable Option B external API synthesis:
+Create a `.env` file in the root directory (excluded from Git via `.gitignore`):
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
-# or
-GEMINI_API_KEY=your_gemini_api_key_here
-
+GOOGLE_API_KEY=your_google_ai_studio_or_cloud_api_key
+GOOGLE_CSE_ID=your_google_programmable_search_engine_cx_id
+# Optional alternative LLM provider:
+GROQ_API_KEY=your_groq_api_key
 ```
 
-*(If no API key is provided, MarketAura runs in autonomous mode with internal consensus validation).*
+*(If no API keys are provided, MarketAura automatically runs using its alternate multi-query web scraper, NLP brand extractor, and regional knowledge base.)*
 
 ### 5. Run the Application
 
 ```bash
 uvicorn api.index:app --reload
-
 ```
 
 Open **`http://127.0.0.1:8000`** in your browser.
@@ -141,19 +144,14 @@ Open **`http://127.0.0.1:8000`** in your browser.
 
 ## ☁️ Deployment (Vercel)
 
-The project is configured for direct deployment on Vercel:
+The project is deployed at **https://market-aura.vercel.app/**:
 
-1. `vercel.json` rewrites all incoming traffic to `api/index.py`.
-2. Vercel provisions the Python runtime as a serverless function while serving `public/index.html` as the interactive client.
-3. Access the live platform via the production link pinned in the repository description.
+1. `vercel.json` routes all `/` and `/api/*` traffic to the FastAPI application in `api/index.py`.
+2. Add `GOOGLE_API_KEY` and `GOOGLE_CSE_ID` (and optional `GROQ_API_KEY`) under **Vercel Project Settings → Environment Variables**, then redeploy so the serverless runtime loads the credentials automatically.
 
 ---
 
 ## 👥 Authors
 
-* **Developers:** Aditya Garg & Ayaz Wasee Al Ansari
-* **Institution:** Department of Computer Applications, Jaypee Institute of Information Technology (JIIT), Noida
-
-```
-
-```
+- **Developers:** Aditya Garg & Ayaz Wasee Al Ansari
+- **Institution:** Department of Computer Applications, Jaypee Institute of Information Technology (JIIT), Noida
